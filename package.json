@@ -17,7 +17,8 @@
   "dependencies": {
     "jasmine-focused": "~0.12.0",
     "pegjs": "~0.7.0",
-    "underscore": "~1.5.1"
+    "underscore": "~1.5.1",
+    "coffee-script": "~1.6.3"
   },
   "devDependencies": {}
 }
