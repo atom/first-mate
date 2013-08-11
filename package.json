@@ -1,0 +1,23 @@
+{
+  "name": "first-mate",
+  "version": "0.0.0",
+  "description": "TextMate helpers",
+  "main": "./lib/first-mate.coffee",
+  "scripts": {
+    "test": "jasmine-focused --captureExceptions --coffee spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/first-mate"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atom/first-mate/issues"
+  },
+  "dependencies": {
+    "jasmine-focused": "~0.12.0",
+    "pegjs": "~0.7.0",
+    "underscore": "~1.5.1"
+  },
+  "devDependencies": {}
+}
