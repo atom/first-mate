@@ -1,6 +1,6 @@
 {
   "name": "first-mate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TextMate helpers",
   "main": "./lib/first-mate.coffee",
   "scripts": {
