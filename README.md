@@ -1,4 +1,4 @@
-# first mate
+# First Mate [![Build Status](https://travis-ci.org/atom/first-mate.png)](https://travis-ci.org/atom/first-mate)
 
 TextMate helpers
 
