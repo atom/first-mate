@@ -1,4 +1,4 @@
-ScopeSelector = require '../lib/scope-selector'
+ScopeSelector = require '../src/scope-selector'
 
 describe "ScopeSelector", ->
   describe ".matches(scopes)", ->
