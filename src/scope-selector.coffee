@@ -8,7 +8,7 @@ createParser = ->
   unless parser?
     matchersPath = require.resolve('./scope-selector-matchers')
     matchers = "{ var matchers= require('#{matchersPath}'); }"
-    patternPath = require.resolve('./scope-selector-pattern.pegjs')
+    patternPath = require.resolve('../grammars/scope-selector-pattern.pegjs')
     patternContents = "#{matchers}\n#{fs.readFileSync(patternPath, 'utf8')}"
     parser = PEG.buildParser(patternContents)
   parser
