@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>first-mate by atom</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>first-mate</h1>
+        <p>TextMate helpers</p>
+
+        <p class="view"><a href="https://github.com/atom/first-mate">View the Project on GitHub <small>atom/first-mate</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/atom/first-mate/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/atom/first-mate/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/atom/first-mate">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="first-mate-" class="anchor" href="#first-mate-"><span class="octicon octicon-link"></span></a>First Mate <a href="https://travis-ci.org/atom/first-mate"><img src="https://travis-ci.org/atom/first-mate.png" alt="Build Status"></a>
+</h1>
+
+<p>TextMate helpers</p>
+
+<h2>
+<a name="installing" class="anchor" href="#installing"><span class="octicon octicon-link"></span></a>Installing</h2>
+
+<div class="highlight highlight-sh"><pre>npm install first-mate
+</pre></div>
+
+<h2>
+<a name="using" class="anchor" href="#using"><span class="octicon octicon-link"></span></a>Using</h2>
+
+<div class="highlight highlight-coffeescript"><pre><span class="p">{</span><span class="nx">ScopeSelector</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="s">'first-mate'</span>
+<span class="nv">selector = </span><span class="k">new</span> <span class="nx">ScopeSelector</span><span class="p">(</span><span class="s">'a | b'</span><span class="p">)</span>
+<span class="nx">selector</span><span class="p">.</span><span class="nx">matches</span><span class="p">([</span><span class="s">'c'</span><span class="p">])</span> <span class="c1"># false</span>
+<span class="nx">selector</span><span class="p">.</span><span class="nx">matches</span><span class="p">([</span><span class="s">'a'</span><span class="p">])</span> <span class="c1"># true</span>
+</pre></div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/atom">atom</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
