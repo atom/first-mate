@@ -4,7 +4,7 @@ TextMate helpers
 
 ## Installing
 
-```shc
+```sh
 npm install first-mate
 ```
 
