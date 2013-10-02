@@ -20,6 +20,7 @@
   "bugs": {
     "url": "https://github.com/atom/first-mate/issues"
   },
+  "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
     "pegjs": "~0.7.0",
     "underscore": "~1.5.1"
