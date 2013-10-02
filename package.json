@@ -11,7 +11,12 @@
     "type": "git",
     "url": "https://github.com/atom/first-mate"
   },
-  "license": "MIT",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/atom/first-mate/raw/master/LICENSE.md"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/atom/first-mate/issues"
   },
