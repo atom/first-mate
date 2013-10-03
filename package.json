@@ -23,7 +23,7 @@
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
     "pegjs": "~0.7.0",
-    "underscore": "~1.5.1"
+    "lodash.flatten": "~2.2.0"
   },
   "devDependencies": {
     "jasmine-focused": "~0.14.0",

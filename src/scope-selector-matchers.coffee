@@ -1,10 +1,10 @@
-_ = require 'underscore'
+flatten = require 'lodash.flatten'
 
 ### Internal ###
 
 class SegmentMatcher
   constructor: (segment) ->
-    @segment = _.flatten(segment).join('')
+    @segment = flatten(segment).join('')
 
   matches: (scope) -> scope is @segment
 
