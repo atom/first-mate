@@ -2,7 +2,7 @@
   "name": "first-mate",
   "version": "0.3.0",
   "description": "TextMate helpers",
-  "main": "./lib/first-mate.coffee",
+  "main": "./lib/first-mate.js",
   "scripts": {
     "test": "grunt test",
     "prepublish": "grunt clean lint coffee"
