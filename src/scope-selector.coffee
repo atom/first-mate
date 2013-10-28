@@ -1,5 +1,5 @@
 fs = require 'fs'
-
+path = require 'path'
 PEG = require 'pegjs'
 
 parser = null
@@ -7,6 +7,7 @@ parser = null
 createParser = ->
   unless parser?
     matchersPath = require.resolve('./scope-selector-matchers')
+    matchersPath = matchersPath.replace(/\\/g, '\\\\')  if path.sep is '\\'
     matchers = "{ var matchers= require('#{matchersPath}'); }"
     patternPath = require.resolve('../grammars/scope-selector-pattern.pegjs')
     patternContents = "#{matchers}\n#{fs.readFileSync(patternPath, 'utf8')}"
