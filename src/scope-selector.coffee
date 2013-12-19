@@ -9,7 +9,7 @@ createParser = ->
     matchersPath = require.resolve('./scope-selector-matchers')
     matchersPath = matchersPath.replace(/\\/g, '\\\\')  if path.sep is '\\'
     matchers = "{ var matchers= require('#{matchersPath}'); }"
-    patternPath = require.resolve('../grammars/scope-selector-pattern.pegjs')
+    patternPath = require.resolve(path.join('..', 'grammars', 'scope-selector-pattern.pegjs'))
     patternContents = "#{matchers}\n#{fs.readFileSync(patternPath, 'utf8')}"
     parser = PEG.buildParser(patternContents)
   parser
