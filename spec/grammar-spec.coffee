@@ -2,7 +2,7 @@ path = require 'path'
 Registry = require '../src/registry'
 
 
-describe "Registry", ->
+describe "Grammar tokenization", ->
   [grammar, registry] = []
 
   loadGrammarSync = (name) ->
@@ -21,7 +21,7 @@ describe "Registry", ->
     loadGrammarSync('python.json')
     loadGrammarSync('python-regex.json')
 
-  describe "::loadGrammarSync", ->
+  describe "Registry::loadGrammarSync", ->
     it "returns a grammar for the file path specified", ->
       grammar = loadGrammarSync('hello.cson')
       expect(grammar).not.toBeNull()
