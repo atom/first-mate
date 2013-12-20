@@ -3,7 +3,7 @@ _ = require 'underscore-plus'
 
 module.exports =
 class Rule
-  constructor: (@grammar, @registry, {@scopeName, patterns, @endPattern}) ->
+  constructor: (@grammar, @registry, {@scopeName, patterns, @endPattern}={}) ->
     patterns ?= []
     @patterns = patterns.map (pattern) => @grammar.createPattern(pattern)
     if @endPattern and not @endPattern.hasBackReferences
