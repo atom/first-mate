@@ -54,7 +54,7 @@ class Grammar
   grammarUpdated: (scopeName) ->
     return false unless _.include(@includedGrammarScopes, scopeName)
     @clearRules()
-    atom.syntax.grammarUpdated(@scopeName)
+    @registry.grammarUpdated(@scopeName)
     @emit 'grammar-updated'
     true
 
