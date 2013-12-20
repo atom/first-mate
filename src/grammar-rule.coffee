@@ -3,7 +3,7 @@ _ = require 'underscore-plus'
 
 module.exports =
 class Rule
-  constructor: ({@grammar, @scopeName, @patterns, @endPattern}) ->
+  constructor: ({@grammar, @registry, @scopeName, @patterns, @endPattern}) ->
     @patterns ?= []
     if @endPattern and not @endPattern.hasBackReferences
       @patterns.unshift(@endPattern)
@@ -68,7 +68,7 @@ class Rule
       results.push(result)
 
     scopes = scopesFromStack(ruleStack)
-    for injectionGrammar in _.without(@grammar.getInjectionGrammars(), @grammar, baseGrammar)
+    for injectionGrammar in _.without(@registry.injectionGrammars, @grammar, baseGrammar)
       if injectionGrammar.injectionSelector.matches(scopes)
         scanner = injectionGrammar.getInitialRule().getScanner(injectionGrammar, position, firstLine)
         if result = scanner.findNextMatch(lineWithNewline, position)

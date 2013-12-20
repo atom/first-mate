@@ -1,6 +1,6 @@
 module.exports =
 class Pattern
-  constructor: ({@grammar, name, contentName, @include, match, begin, end, captures, beginCaptures, endCaptures, patterns, @popRule, @hasBackReferences}) ->
+  constructor: ({@grammar, @registry, name, contentName, @include, match, begin, end, captures, beginCaptures, endCaptures, patterns, @popRule, @hasBackReferences}) ->
     @pushRule = null
     @capture = null
     @backReferences = null
@@ -88,7 +88,7 @@ class Pattern
       baseGrammar.getInitialRule()
     else
       @grammar.addIncludedGrammarScope(name)
-      @grammar.grammarForScopeName(name)?.getInitialRule()
+      @registry.grammarForScopeName(name)?.getInitialRule()
 
   getIncludedPatterns: (baseGrammar, included) ->
     if @include

@@ -25,7 +25,8 @@
     "pegjs": "~0.7.0",
     "underscore": "~1.5.1",
     "underscore-plus": "~0.6.1",
-    "oniguruma": "~0.24.0"
+    "oniguruma": "~0.24.0",
+    "emissary": "~0.28.0"
   },
   "devDependencies": {
     "jasmine-focused": "~0.14.0",
