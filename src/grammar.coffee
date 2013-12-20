@@ -38,7 +38,7 @@ class Grammar
   includedGrammarScopes: null
   maxTokensPerLine: 100
 
-  constructor: ({ @name, @fileTypes, @scopeName, injections, injectionSelector, patterns, repository, @foldingStopMarker, firstLineMatch}) ->
+  constructor: ({@name, @fileTypes, @scopeName, injections, injectionSelector, patterns, repository, @foldingStopMarker, firstLineMatch}) ->
     @rawPatterns = patterns
     @rawRepository = repository
     @injections = new Injections(this, injections)
@@ -55,7 +55,7 @@ class Grammar
     @repository = null
 
   getInitialRule: ->
-    @initialRule ?= new Rule(this, {@scopeName, patterns: @rawPatterns})
+    @initialRule ?= new Rule({grammar: this, @scopeName, patterns: @rawPatterns})
 
   getRepository: ->
     @repository ?= do =>
