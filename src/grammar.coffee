@@ -183,5 +183,5 @@ class Grammar
   getMaxTokensPerLine: ->
     @maxTokensPerLine
 
-  scopesFromStack = (stack) ->
+  scopesFromStack: (stack) ->
     _.compact(_.pluck(stack, "scopeName"))
