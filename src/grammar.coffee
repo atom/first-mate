@@ -5,7 +5,7 @@ fs = require 'fs-plus'
 {OnigRegExp, OnigScanner} = require 'oniguruma'
 {Emitter} = require 'emissary'
 
-Injections = require './grammar-injections'
+Injections = require './injections'
 Rule = require './rule'
 ScopeSelector = require './scope-selector'
 

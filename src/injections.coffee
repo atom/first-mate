@@ -1,7 +1,7 @@
 _ = require 'underscore-plus'
 {OnigScanner} = require 'oniguruma'
 
-Pattern = require './grammar-pattern'
+Pattern = require './pattern'
 ScopeSelector = require './scope-selector'
 
 module.exports =
