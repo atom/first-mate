@@ -36,11 +36,15 @@ class Registry
     @grammarsByScopeName[scopeName]
 
   loadGrammarSync: (grammarPath) ->
-    new Grammar(this, fs.readObjectSync(grammarPath))
+    grammar = new Grammar(this, fs.readObjectSync(grammarPath))
+    @addGrammar(grammar)
+    grammar
 
   loadGrammar: (grammarPath, done) ->
     fs.readObject grammarPath, (error, object) =>
       if error?
         done?(error)
       else
-        done?(null, new Grammar(this, object))
+        grammar = new Grammar(this, object)
+        @addGrammar(grammar)
+        done?(null, grammar)
