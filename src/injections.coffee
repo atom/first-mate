@@ -13,7 +13,7 @@ class Injections
       patterns = []
       anchored = false
       for regex in values.patterns
-        pattern = @grammar.createPattern({regex})
+        pattern = @grammar.createPattern(regex)
         anchored = true if pattern.anchored
         patterns.push(pattern.getIncludedPatterns(grammar, patterns)...)
       @injections.push
