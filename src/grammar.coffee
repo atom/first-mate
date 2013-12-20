@@ -104,9 +104,13 @@ class Grammar
 
   createPattern: (options) -> new Pattern(this, @registry, options)
 
-  tokenizeLine: (line, ruleStack=[@getInitialRule()], firstLine=false) ->
+  tokenizeLine: (line, ruleStack, firstLine=false) ->
+    if ruleStack?
+      ruleStack = new Array(ruleStack...) # clone ruleStack
+    else
+      ruleStack = [@getInitialRule()]
     originalRuleStack = ruleStack
-    ruleStack = new Array(ruleStack...) # clone ruleStack
+
     tokens = []
     position = 0
 
@@ -158,7 +162,7 @@ class Grammar
             break
 
     ruleStack.forEach (rule) -> rule.clearAnchorPosition()
-    { tokens, ruleStack }
+    {tokens, ruleStack}
 
   tokenizeLines: (text) ->
     lines = text.split('\n')
