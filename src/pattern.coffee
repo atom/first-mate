@@ -2,7 +2,11 @@ _ = require 'underscore-plus'
 
 module.exports =
 class Pattern
-  constructor: ({@grammar, @registry, name, contentName, @include, match, begin, end, captures, beginCaptures, endCaptures, patterns, @popRule, @hasBackReferences}) ->
+  constructor: (@grammar, @registry, options={}) ->
+    {name, contentName, match, begin, end, patterns} = options
+    {captures, beginCaptures, endCaptures} = options
+    {@include, @popRule, @hasBackReferences} = options
+
     @pushRule = null
     @capture = null
     @backReferences = null
@@ -17,14 +21,14 @@ class Pattern
     else if begin
       @regexSource = begin
       @captures = beginCaptures ? captures
-      endPattern = new Pattern({@grammar, match: end, captures: endCaptures ? captures, popRule: true})
-      @pushRule = new Rule({@grammar, @scopeName, patterns, endPattern})
+      endPattern = @grammar.createPattern({match: end, captures: endCaptures ? captures, popRule: true})
+      @pushRule = @grammar.createRule({@scopeName, patterns, endPattern})
 
     if @captures?
       for group, capture of @captures
         if capture.patterns?.length > 0 and not capture.rule
           capture.scopeName = @scopeName
-          capture.rule = new Rule({@grammar})
+          capture.rule = @grammar.createRule()
 
     @anchored = @hasAnchor()
 
@@ -79,7 +83,7 @@ class Pattern
       index = parseInt(match[1..])
       _.escapeRegExp(beginCaptures[index] ? "\\#{index}")
 
-    new Pattern({@grammar, hasBackReferences: false, match: resolvedMatch, @captures, @popRule})
+    @grammar.createPattern({hasBackReferences: false, match: resolvedMatch, @captures, @popRule})
 
   ruleForInclude: (baseGrammar, name) ->
     if name[0] == "#"

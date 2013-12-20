@@ -6,15 +6,15 @@ ScopeSelector = require './scope-selector'
 
 module.exports =
 class Injections
-  constructor: ({@grammar, injections}) ->
+  constructor: (@grammar, injections={}) ->
     @injections = []
     @scanners = {}
-    for selector, values of injections ? {}
+    for selector, values of injections
       continue unless values?.patterns?.length > 0
       patterns = []
       anchored = false
       for regex in values.patterns
-        pattern = new Pattern({grammar, regex})
+        pattern = @grammar.createPattern({regex})
         anchored = true if pattern.anchored
         patterns.push(pattern.getIncludedPatterns(grammar, patterns)...)
       @injections.push

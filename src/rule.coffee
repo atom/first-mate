@@ -3,8 +3,9 @@ _ = require 'underscore-plus'
 
 module.exports =
 class Rule
-  constructor: ({@grammar, @registry, @scopeName, @patterns, @endPattern}) ->
-    @patterns ?= []
+  constructor: (@grammar, @registry, {@scopeName, patterns, @endPattern}) ->
+    patterns ?= []
+    @patterns = patterns.map (pattern) => @grammar.createPattern(pattern)
     if @endPattern and not @endPattern.hasBackReferences
       @patterns.unshift(@endPattern)
     @scannersByBaseGrammarName = {}
@@ -90,7 +91,7 @@ class Rule
 
   getRuleToPush: (line, beginPatternCaptureIndices) ->
     if @endPattern.hasBackReferences
-      rule = new Rule(@grammar, {@scopeName})
+      rule = @grammar.createRule({@scopeName})
       rule.endPattern = @endPattern.resolveBackReferences(line, beginPatternCaptureIndices)
       rule.patterns = [rule.endPattern, @patterns...]
       rule

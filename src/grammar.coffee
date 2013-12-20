@@ -6,26 +6,15 @@ fs = require 'fs-plus'
 {Emitter} = require 'emissary'
 
 Injections = require './injections'
+Pattern = require './pattern'
 Rule = require './rule'
 ScopeSelector = require './scope-selector'
 
 pathSplitRegex = new RegExp("[#{_.escapeRegExp(path.sep)}.]")
 
-### Internal ###
-
 module.exports =
 class Grammar
   Emitter.includeInto(this)
-
-  @load: (grammarPath, done) ->
-    fs.readObject grammarPath, (error, object) ->
-      if error?
-        done(error)
-      else
-        done(null, new Grammar(object))
-
-  @loadSync: (grammarPath) ->
-    new Grammar(fs.readObjectSync(grammarPath))
 
   name: null
   rawPatterns: null
@@ -38,7 +27,7 @@ class Grammar
   includedGrammarScopes: null
   maxTokensPerLine: 100
 
-  constructor: ({@name, @fileTypes, @scopeName, injections, injectionSelector, patterns, repository, @foldingStopMarker, firstLineMatch}) ->
+  constructor: (@registry, {@name, @fileTypes, @scopeName, injections, injectionSelector, patterns, repository, @foldingStopMarker, firstLineMatch}) ->
     @rawPatterns = patterns
     @rawRepository = repository
     @injections = new Injections(this, injections)
@@ -55,14 +44,14 @@ class Grammar
     @repository = null
 
   getInitialRule: ->
-    @initialRule ?= new Rule({grammar: this, @scopeName, patterns: @rawPatterns})
+    @initialRule ?= @createRule({@scopeName, patterns: @rawPatterns})
 
   getRepository: ->
     @repository ?= do =>
       repository = {}
       for name, data of @rawRepository
         data = {patterns: [data], tempName: name} if data.begin? or data.match?
-        repository[name] = new Rule(this, data)
+        repository[name] = @createRule(data)
       repository
 
   addIncludedGrammarScope: (scope) ->
@@ -116,6 +105,10 @@ class Grammar
     pathScore
 
   createToken: (value, scopes) -> {value, scopes}
+
+  createRule: (options) -> new Rule(this, @registry, options)
+
+  createPattern: (options) -> new Pattern(this, @registry, options)
 
   tokenizeLine: (line, ruleStack=[@getInitialRule()], firstLine=false) ->
     originalRuleStack = ruleStack

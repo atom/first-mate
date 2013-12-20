@@ -1,5 +1,8 @@
 _ = require 'underscore-plus'
 {Emitter} = require 'emissary'
+fs = require 'fs-plus'
+
+Grammar = require './grammar'
 
 module.exports =
 class Registry
@@ -31,3 +34,13 @@ class Registry
 
   grammarForScopeName: (scopeName) ->
     @grammarsByScopeName[scopeName]
+
+  loadGrammarSync: (grammarPath) ->
+    new Grammar(this, fs.readObjectSync(grammarPath))
+
+  loadGrammar: (grammarPath, done) ->
+    fs.readObject grammarPath, (error, object) =>
+      if error?
+        done?(error)
+      else
+        done?(null, new Grammar(this, object))
