@@ -1,3 +1,5 @@
+_ = require 'underscore-plus'
+
 module.exports =
 class Pattern
   constructor: ({@grammar, @registry, name, contentName, @include, match, begin, end, captures, beginCaptures, endCaptures, patterns, @popRule, @hasBackReferences}) ->
