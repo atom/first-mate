@@ -117,7 +117,7 @@ class Pattern
         match
 
   handleMatch: (stack, line, captureIndices) ->
-    scopes = scopesFromStack(stack)
+    scopes = @grammar.scopesFromStack(stack)
     if @scopeName and not @popRule
       scopes.push(@resolveScopeName(line, captureIndices))
 
@@ -129,7 +129,7 @@ class Pattern
       if zeroLengthMatch
         tokens = []
       else
-        tokens = [new Token(value: line[start...end], scopes: scopes)]
+        tokens = [@grammar.createToken(line[start...end], scopes)]
     if @pushRule
       ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
       ruleToPush.anchorPosition = captureIndices[0].end
@@ -169,19 +169,13 @@ class Pattern
           continue
 
         if childCapture.start > previousChildCaptureEnd
-          tokens.push(new Token(
-            value: line[previousChildCaptureEnd...childCapture.start]
-            scopes: scopes
-          ))
+          tokens.push(@grammar.createToken(line[previousChildCaptureEnd...childCapture.start], scopes))
 
         captureTokens = @getTokensForCaptureIndices(line, captureIndices, scopes, stack)
         tokens.push(captureTokens...)
         previousChildCaptureEnd = childCapture.end
 
       if parentCapture.end > previousChildCaptureEnd
-        tokens.push(new Token(
-          value: line[previousChildCaptureEnd...parentCapture.end]
-          scopes: scopes
-        ))
+        tokens.push(@grammar.createToken(line[previousChildCaptureEnd...parentCapture.end], scopes))
 
     tokens

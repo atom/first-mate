@@ -6,7 +6,7 @@ ScopeSelector = require './scope-selector'
 
 module.exports =
 class Injections
-  constructor: ({grammar, injections}) ->
+  constructor: ({@grammar, injections}) ->
     @injections = []
     @scanners = {}
     for selector, values of injections ? {}
@@ -35,7 +35,7 @@ class Injections
 
   getScanners: (ruleStack, firstLine, position, anchorPosition) ->
     scanners = []
-    scopes = scopesFromStack(ruleStack)
+    scopes = @grammar.scopesFromStack(ruleStack)
     for injection in @injections
       if injection.selector.matches(scopes)
         scanner = @getScanner(injection, firstLine, position, anchorPosition)
