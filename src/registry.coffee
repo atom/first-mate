@@ -28,6 +28,10 @@ class Registry
     _.remove(@injectionGrammars, grammar)
     @grammarUpdated(grammar.scopeName)
 
+  removeGrammarForScopeName: (scopeName) ->
+    grammar = @grammarForScopeName(scopeName)
+    @removeGrammar(grammar) if grammar?
+
   grammarUpdated: (scopeName) ->
     for grammar in @grammars when grammar.scopeName isnt scopeName
       @emit 'grammar-updated', grammar if grammar.grammarUpdated(scopeName)
