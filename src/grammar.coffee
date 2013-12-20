@@ -17,10 +17,10 @@ class Grammar
   Emitter.includeInto(this)
 
   constructor: (@registry, {@name, @fileTypes, @scopeName, injections, injectionSelector, patterns, repository, @foldingStopMarker, firstLineMatch}) ->
-    repository = null
-    initialRule = null
-    firstLineRegex = null
-    maxTokensPerLine = 100
+    @repository = null
+    @initialRule = null
+    @firstLineRegex = null
+    @maxTokensPerLine = 100
 
     @rawPatterns = patterns
     @rawRepository = repository
