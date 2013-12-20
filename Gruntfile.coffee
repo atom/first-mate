@@ -22,7 +22,7 @@ module.exports = (grunt) ->
 
     shell:
       test:
-        command: 'jasmine-focused --captureExceptions --coffee spec/'
+        command: 'node --harmony_collections node_modules/.bin/jasmine-focused --coffee --captureExceptions spec'
         options:
           stdout: true
           stderr: true
@@ -34,5 +34,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'clean', -> require('rimraf').sync('lib')
   grunt.registerTask('lint', ['coffeelint:src', 'coffeelint:test'])
-  grunt.registerTask('default', ['coffeelint', 'coffee'])
+  grunt.registerTask('default', ['coffee', 'coffeelint'])
   grunt.registerTask('test', ['default', 'coffeelint:test', 'shell:test'])

@@ -5,7 +5,8 @@
   "main": "./lib/first-mate.js",
   "scripts": {
     "test": "grunt test",
-    "prepublish": "grunt clean lint coffee"
+    "prepublish": "grunt clean lint coffee",
+    "benchmark": "node_modules/.bin/coffee --nodejs --harmony_collections benchmark/benchmark.coffee"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,12 @@
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
     "pegjs": "~0.7.0",
-    "underscore": "~1.5.1"
+    "underscore": "~1.5.1",
+    "underscore-plus": "~0.6.1",
+    "oniguruma": "~0.24.0",
+    "emissary": "~0.28.0",
+    "fs-plus": "~0.13.0",
+    "coffee-script": "~1.6.3"
   },
   "devDependencies": {
     "jasmine-focused": "~0.14.0",
