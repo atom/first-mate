@@ -16,18 +16,12 @@ module.exports =
 class Grammar
   Emitter.includeInto(this)
 
-  name: null
-  rawPatterns: null
-  rawRepository: null
-  fileTypes: null
-  scopeName: null
-  repository: null
-  initialRule: null
-  firstLineRegex: null
-  includedGrammarScopes: null
-  maxTokensPerLine: 100
-
   constructor: (@registry, {@name, @fileTypes, @scopeName, injections, injectionSelector, patterns, repository, @foldingStopMarker, firstLineMatch}) ->
+    repository = null
+    initialRule = null
+    firstLineRegex = null
+    maxTokensPerLine = 100
+
     @rawPatterns = patterns
     @rawRepository = repository
     @injections = new Injections(this, injections)
