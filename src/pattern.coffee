@@ -28,7 +28,7 @@ class Pattern
       for group, capture of @captures
         if capture.patterns?.length > 0 and not capture.rule
           capture.scopeName = @scopeName
-          capture.rule = @grammar.createRule()
+          capture.rule = @grammar.createRule(capture)
 
     @anchored = @hasAnchor()
 
