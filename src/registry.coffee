@@ -55,3 +55,18 @@ class Registry
         grammar = new Grammar(this, object)
         @addGrammar(grammar)
         done?(null, grammar)
+
+  grammarOverrideForPath: (path) ->
+    @grammarOverridesByPath[path]
+
+  setGrammarOverrideForPath: (path, scopeName) ->
+    @grammarOverridesByPath[path] = scopeName
+
+  clearGrammarOverrideForPath: (path) ->
+    delete @grammarOverridesByPath[path]
+
+  clearGrammarOverrides: ->
+    @grammarOverridesByPath = {}
+
+  selectGrammar: (filePath, fileContents) ->
+    _.max @grammars, (grammar) -> grammar.getScore(filePath, fileContents)

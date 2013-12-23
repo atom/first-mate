@@ -61,7 +61,7 @@ class Grammar
   getScore: (filePath, contents) ->
     contents = fs.readFileSync(filePath, 'utf8') if not contents? and fs.isFileSync(filePath)
 
-    if atom.syntax.grammarOverrideForPath(filePath) is @scopeName
+    if @registry.grammarOverrideForPath(filePath) is @scopeName
       2 + (filePath?.length ? 0)
     else if @matchesContents(contents)
       1 + (filePath?.length ? 0)
