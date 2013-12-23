@@ -1,5 +1,10 @@
 _ = require 'underscore-plus'
 
+AllDigitsRegex = /\\\d+/g
+CaptureIndexRegex = /\$(\d+)/
+CustomCaptureIndexRegex = /\${(\d+):\/(downcase|upcase)}/
+DigitRegex = /\\\d+/
+
 module.exports =
 class Pattern
   constructor: (@grammar, @registry, options={}) ->
@@ -13,7 +18,7 @@ class Pattern
     @scopeName = name ? contentName # TODO: We need special treatment of contentName
 
     if match
-      if (end or @popRule) and @hasBackReferences ?= /\\\d+/.test(match)
+      if (end or @popRule) and @hasBackReferences ?= DigitRegex.test(match)
         @match = match
       else
         @regexSource = match
@@ -79,7 +84,7 @@ class Pattern
     for {start, end} in beginCaptureIndices
       beginCaptures.push line[start...end]
 
-    resolvedMatch = @match.replace /\\\d+/g, (match) ->
+    resolvedMatch = @match.replace AllDigitsRegex, (match) ->
       index = parseInt(match[1..])
       _.escapeRegExp(beginCaptures[index] ? "\\#{index}")
 
@@ -104,7 +109,7 @@ class Pattern
       [this]
 
   resolveScopeName: (line, captureIndices) ->
-    resolvedScopeName = @scopeName.replace /\${(\d+):\/(downcase|upcase)}/, (match, index, command) ->
+    resolvedScopeName = @scopeName.replace CustomCaptureIndexRegex, (match, index, command) ->
       capture = captureIndices[parseInt(index)]
       if capture?
         replacement = line.substring(capture.start, capture.end)
@@ -115,7 +120,7 @@ class Pattern
       else
         match
 
-    resolvedScopeName.replace /\$(\d+)/, (match, index) ->
+    resolvedScopeName.replace CaptureIndexRegex, (match, index) ->
       capture = captureIndices[parseInt(index)]
       if capture?
         line.substring(capture.start, capture.end)
