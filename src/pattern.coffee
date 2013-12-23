@@ -46,7 +46,7 @@ class Pattern
   hasAnchor: ->
     return false unless @regexSource
     escape = false
-    for character in @regexSource.split('')
+    for character in @regexSource
       return true if escape and 'AGz'.indexOf(character) isnt -1
       escape = not escape and character is '\\'
     false
@@ -55,7 +55,7 @@ class Pattern
     escaped = []
     placeholder = '\uFFFF'
     escape = false
-    for character in @regexSource.split('')
+    for character in @regexSource
       if escape
         switch character
           when 'A'
