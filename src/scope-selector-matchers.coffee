@@ -1,6 +1,4 @@
-_ = require 'underscore'
-
-### Internal ###
+_ = require 'underscore-plus'
 
 class SegmentMatcher
   constructor: (segment) ->
