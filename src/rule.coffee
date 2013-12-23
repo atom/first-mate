@@ -78,10 +78,14 @@ class Rule
         if result = scanner.findNextMatch(lineWithNewline, position)
           results.push(result)
 
-    if results.length > 0
+    if results.length > 1
       _.min results, (result) =>
         @normalizeCaptureIndices(line, result.captureIndices)
         result.captureIndices[0].start
+    else if results.length is 1
+      result = results[0]
+      @normalizeCaptureIndices(line, result.captureIndices)
+      result
 
   getNextTokens: (ruleStack, line, position, firstLine) ->
     result = @findNextMatch(ruleStack, line, position, firstLine)
