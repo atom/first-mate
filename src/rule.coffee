@@ -41,7 +41,7 @@ class Rule
 
   normalizeCaptureIndices: (line, captureIndices) ->
     lineLength = line.length
-    captureIndices.forEach (capture) ->
+    for capture in captureIndices
       capture.end = Math.min(capture.end, lineLength)
       capture.start = Math.min(capture.start, lineLength)
 

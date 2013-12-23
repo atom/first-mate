@@ -90,7 +90,7 @@ class Grammar
 
     pathComponents = filePath.split(pathSplitRegex)
     pathScore = -1
-    @fileTypes.forEach (fileType) ->
+    for fileType in @fileTypes
       fileTypeComponents = fileType.split(pathSplitRegex)
       pathSuffix = pathComponents[-fileTypeComponents.length..-1]
       if _.isEqual(pathSuffix, fileTypeComponents)
@@ -161,7 +161,7 @@ class Grammar
             tokens.push(@createToken(line[position...line.length], scopes))
             break
 
-    ruleStack.forEach (rule) -> rule.clearAnchorPosition()
+    rule.clearAnchorPosition() for rule in ruleStack
     {tokens, ruleStack}
 
   tokenizeLines: (text) ->
