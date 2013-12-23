@@ -167,8 +167,8 @@ class Grammar
   tokenizeLines: (text) ->
     lines = text.split('\n')
     ruleStack = null
-    for line, i in lines
-      { tokens, ruleStack } = @tokenizeLine(line, ruleStack, i is 0)
+    for line, lineNumber in lines
+      {tokens, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
       tokens
 
   getMaxTokensPerLine: ->
