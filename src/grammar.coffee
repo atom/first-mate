@@ -16,10 +16,12 @@ module.exports =
 class Grammar
   Emitter.includeInto(this)
 
-  constructor: (@registry, {@name, @fileTypes, @scopeName, injections, injectionSelector, patterns, repository, @foldingStopMarker, firstLineMatch}) ->
+  constructor: (@registry, options={}) ->
+    {@name, @fileTypes, @scopeName, @foldingStopMarker} = options
+    {injections, injectionSelector, patterns, repository, firstLineMatch} = options
+
     @repository = null
     @initialRule = null
-    @firstLineRegex = null
     @maxTokensPerLine = 100
 
     @rawPatterns = patterns
@@ -28,8 +30,14 @@ class Grammar
 
     if injectionSelector?
       @injectionSelector = new ScopeSelector(injectionSelector)
+    else
+      @injectionSelector = null
 
-    @firstLineRegex = new OnigRegExp(firstLineMatch) if firstLineMatch
+    if firstLineMatch
+      @firstLineRegex = new OnigRegExp(firstLineMatch)
+    else
+      @firstLineRegex = null
+
     @fileTypes ?= []
     @includedGrammarScopes = []
 
