@@ -18,7 +18,6 @@ class Registry
     @addGrammar(@nullGrammar)
 
   addGrammar: (grammar) ->
-    previousGrammars = new Array(@grammars...)
     @grammars.push(grammar)
     @grammarsByScopeName[grammar.scopeName] = grammar
     @injectionGrammars.push(grammar) if grammar.injectionSelector?
