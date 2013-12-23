@@ -24,7 +24,6 @@
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
     "pegjs": "~0.7.0",
-    "underscore": "~1.5.1",
     "underscore-plus": "~0.6.1",
     "oniguruma": "~0.24.0",
     "emissary": "~0.28.0",
