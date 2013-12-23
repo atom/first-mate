@@ -27,8 +27,7 @@
     "underscore-plus": "~0.6.1",
     "oniguruma": "~0.24.0",
     "emissary": "~0.28.0",
-    "fs-plus": "~0.13.0",
-    "coffee-script": "~1.6.3"
+    "fs-plus": "~0.13.0"
   },
   "devDependencies": {
     "jasmine-focused": "~0.14.0",
@@ -37,6 +36,7 @@
     "grunt": "~0.4.1",
     "grunt-shell": "~0.2.2",
     "grunt-coffeelint": "0.0.6",
-    "rimraf": "~2.1.4"
+    "rimraf": "~2.1.4",
+    "coffee-script": "~1.6.3"
   }
 }
