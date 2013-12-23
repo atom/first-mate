@@ -175,4 +175,6 @@ class Grammar
     @maxTokensPerLine
 
   scopesFromStack: (stack) ->
-    _.compact(_.pluck(stack, "scopeName"))
+    scopes = []
+    scopes.push(rule.scopeName) for rule in stack when rule.scopeName
+    scopes
