@@ -68,8 +68,10 @@ class Pattern
               escaped.push("\\#{character}")
             else
               escaped.push(placeholder)
-          when 'z' then escaped.push('$(?!\n)(?<!\n)')
-          else escaped.push("\\#{character}")
+          when 'z'
+            escaped.push('$(?!\n)(?<!\n)')
+          else
+            escaped.push("\\#{character}")
         escape = false
       else if character is '\\'
         escape = true
