@@ -7,13 +7,10 @@ class NullGrammar
   name: 'Null Grammar'
   scopeName: 'text.plain.null-grammar'
 
-  constructor: ->
-    @scopes = ['null-grammar.text.plain']
-
   getScore: -> 0
 
   tokenizeLine: (line) ->
-    tokens: [{value: line, @scopes}]
+    tokens: [{value: line, scopes: ['null-grammar.text.plain']}]
 
   tokenizeLines: (text) ->
     lines = text.split('\n')
