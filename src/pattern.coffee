@@ -88,7 +88,10 @@ class Pattern
 
     resolvedMatch = @match.replace AllDigitsRegex, (match) ->
       index = parseInt(match[1..])
-      _.escapeRegExp(beginCaptures[index] ? "\\#{index}")
+      if beginCaptures[index]?
+        _.escapeRegExp(beginCaptures[index])
+      else
+        "\\#{index}"
 
     @grammar.createPattern({hasBackReferences: false, match: resolvedMatch, @captures, @popRule})
 
