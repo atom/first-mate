@@ -3,6 +3,7 @@ _ = require 'underscore-plus'
 fs = require 'fs-plus'
 
 Grammar = require './grammar'
+NullGrammar = require './null-grammar'
 
 module.exports =
 class Registry
@@ -13,6 +14,8 @@ class Registry
     @grammarsByScopeName = {}
     @injectionGrammars = []
     @grammarOverridesByPath = {}
+    @nullGrammar = new NullGrammar()
+    @addGrammar(@nullGrammar)
 
   addGrammar: (grammar) ->
     previousGrammars = new Array(@grammars...)
