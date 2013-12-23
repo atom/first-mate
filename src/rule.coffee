@@ -68,10 +68,11 @@ class Rule
     if result = @scanInjections(ruleStack, lineWithNewline, position, firstLine)
       results.push(result)
 
-    scopes = @grammar.scopesFromStack(ruleStack)
+    scopes = null
     for injectionGrammar in @registry.injectionGrammars
       continue if injectionGrammar is @grammar
       continue if injectionGrammar is baseGrammar
+      scopes ?= @grammar.scopesFromStack(ruleStack)
       if injectionGrammar.injectionSelector.matches(scopes)
         scanner = injectionGrammar.getInitialRule().getScanner(injectionGrammar, position, firstLine)
         if result = scanner.findNextMatch(lineWithNewline, position)

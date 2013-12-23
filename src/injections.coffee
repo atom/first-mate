@@ -33,10 +33,11 @@ class Injections
     scanner
 
   getScanners: (ruleStack, firstLine, position, anchorPosition) ->
+    return [] if @injections.length is 0
+
     scanners = []
     scopes = @grammar.scopesFromStack(ruleStack)
-    for injection in @injections
-      if injection.selector.matches(scopes)
-        scanner = @getScanner(injection, firstLine, position, anchorPosition)
-        scanners.push(scanner)
+    for injection in @injections when injection.selector.matches(scopes)
+      scanner = @getScanner(injection, firstLine, position, anchorPosition)
+      scanners.push(scanner)
     scanners
