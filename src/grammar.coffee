@@ -2,7 +2,7 @@ path = require 'path'
 
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
-{OnigRegExp, OnigScanner} = require 'oniguruma'
+{OnigRegExp} = require 'oniguruma'
 {Emitter} = require 'emissary'
 
 Injections = require './injections'
