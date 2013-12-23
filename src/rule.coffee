@@ -1,5 +1,6 @@
 _ = require 'underscore-plus'
-{OnigScanner} = require 'oniguruma'
+
+Scanner = require './scanner'
 
 module.exports =
 class Rule
@@ -23,31 +24,19 @@ class Rule
 
   clearAnchorPosition: -> @anchorPosition = -1
 
-  createScanner: (patterns, firstLine, position) ->
-    anchored = false
-    regexes = _.map patterns, (pattern) =>
-      anchored = true if pattern.anchored
-      pattern.getRegex(firstLine, position, @anchorPosition)
-
-    scanner = new OnigScanner(regexes)
-    scanner.patterns = patterns
-    scanner.anchored = anchored
-    scanner
-
-  getScanner: (baseGrammar, position, firstLine) ->
+  getScanner: (baseGrammar) ->
     return scanner if scanner = @scannersByBaseGrammarName[baseGrammar.name]
 
     patterns = @getIncludedPatterns(baseGrammar)
-    scanner = @createScanner(patterns, firstLine, position)
-    @scannersByBaseGrammarName[baseGrammar.name] = scanner unless scanner.anchored
+    scanner = new Scanner(patterns)
+    @scannersByBaseGrammarName[baseGrammar.name] = scanner
     scanner
 
   scanInjections: (ruleStack, line, position, firstLine) ->
     baseGrammar = ruleStack[0].grammar
     if injections = baseGrammar.injections
-      scanners = injections.getScanners(ruleStack, position, firstLine, @anchorPosition)
-      for scanner in scanners
-        result = scanner.findNextMatch(line, position)
+      for scanner in injections.getScanners(ruleStack)
+        result = scanner.findNextMatch(line, firstLine, position, @anchorPosition)
         return result if result?
 
   normalizeCaptureIndices: (line, captureIndices) ->
@@ -61,8 +50,8 @@ class Rule
     baseGrammar = ruleStack[0].grammar
     results = []
 
-    scanner = @getScanner(baseGrammar, position, firstLine)
-    if result = scanner.findNextMatch(lineWithNewline, position)
+    scanner = @getScanner(baseGrammar)
+    if result = scanner.findNextMatch(lineWithNewline, firstLine, position, @anchorPosition)
       results.push(result)
 
     if result = @scanInjections(ruleStack, lineWithNewline, position, firstLine)
@@ -75,7 +64,7 @@ class Rule
       scopes ?= @grammar.scopesFromStack(ruleStack)
       if injectionGrammar.injectionSelector.matches(scopes)
         scanner = injectionGrammar.getInitialRule().getScanner(injectionGrammar, position, firstLine)
-        if result = scanner.findNextMatch(lineWithNewline, position)
+        if result = scanner.findNextMatch(lineWithNewline, firstLine, position, @anchorPosition)
           results.push(result)
 
     if results.length > 1
@@ -83,7 +72,7 @@ class Rule
         @normalizeCaptureIndices(line, result.captureIndices)
         result.captureIndices[0].start
     else if results.length is 1
-      result = results[0]
+      [result] = results
       @normalizeCaptureIndices(line, result.captureIndices)
       result
 
@@ -91,10 +80,10 @@ class Rule
     result = @findNextMatch(ruleStack, line, position, firstLine)
     return null unless result?
 
-    { index, captureIndices, scanner } = result
-    firstCapture = captureIndices[0]
-    nextTokens = scanner.patterns[index].handleMatch(ruleStack, line, captureIndices)
-    { nextTokens, tokensStartPosition: firstCapture.start, tokensEndPosition: firstCapture.end }
+    {index, captureIndices, scanner} = result
+    [firstCapture] = captureIndices
+    nextTokens = scanner.handleMatch(result, ruleStack, line)
+    {nextTokens, tokensStartPosition: firstCapture.start, tokensEndPosition: firstCapture.end}
 
   getRuleToPush: (line, beginPatternCaptureIndices) ->
     if @endPattern.hasBackReferences
