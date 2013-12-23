@@ -30,7 +30,7 @@
     "fs-plus": "~0.13.0"
   },
   "devDependencies": {
-    "jasmine-focused": "~0.14.0",
+    "jasmine-focused": "~0.15.0",
     "grunt-contrib-coffee": "~0.7.0",
     "grunt-cli": "~0.1.8",
     "grunt": "~0.4.1",
