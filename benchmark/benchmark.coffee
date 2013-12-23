@@ -12,4 +12,5 @@ for i in [0...1]
   tokens = grammar.tokenizeLines(content)
   duration = Date.now() - start
   tokenCount = tokens.reduce ((count, line) -> count + line.length), 0
-  console.log "Generated #{tokenCount} tokens for #{lineCount} lines in #{duration}ms"
+  tokensPerMillisecond = Math.round(tokenCount / duration)
+  console.log "Generated #{tokenCount} tokens for #{lineCount} lines in #{duration}ms (#{tokensPerMillisecond} tokens/ms)"
