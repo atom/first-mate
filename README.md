@@ -10,11 +10,24 @@ npm install first-mate
 
 ## Using
 
+### ScopeSelector
+
 ```coffeescript
 {ScopeSelector} = require 'first-mate'
 selector = new ScopeSelector('a | b')
 selector.matches(['c']) # false
 selector.matches(['a']) # true
+```
+
+### GrammarRegistry
+
+```coffeescript
+{GrammarRegistry} = require 'first-mate'
+registry = new GrammarRegistry()
+grammar = registry.loadGrammarSync('./spec/fixtures/javascript.json')
+{tokens} = grammar.tokenizeLine('var offset = 3;')
+for {value, scopes} in tokens
+  console.log("Token text: '#{value}' with scopes: #{scopes}")
 ```
 
 ## Developing
