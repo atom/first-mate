@@ -127,7 +127,7 @@ class Grammar
       previousRuleStackLength = ruleStack.length
       previousPosition = position
 
-      if tokens.length >= (@getMaxTokensPerLine() - 1)
+      if tokens.length >= @getMaxTokensPerLine() - 1
         token = @createToken(line[position..], scopes)
         tokens.push token
         ruleStack = originalRuleStack
