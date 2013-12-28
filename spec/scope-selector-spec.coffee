@@ -66,6 +66,11 @@ describe "ScopeSelector", ->
       expect(new ScopeSelector('a c').matches(['a', 'b', 'c', 'd', 'e'])).toBeTruthy()
       expect(new ScopeSelector('a b e').matches(['a', 'b', 'c', 'd', 'e'])).toBeTruthy()
 
+    it "accepts a string scope parameter", ->
+      expect(new ScopeSelector('a|b').matches('a')).toBeTruthy()
+      expect(new ScopeSelector('a|b').matches('b')).toBeTruthy()
+      expect(new ScopeSelector('a|b').matches('c')).toBeFalsy()
+
   describe ".toCssSelector()", ->
     it "converts the TextMate scope selector to a CSS selector", ->
       expect(new ScopeSelector('a b c').toCssSelector()).toBe '.a .b .c'
