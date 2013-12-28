@@ -24,7 +24,7 @@ class ScopeSelector
 
   # Check if this scope selector matches the scopes.
   #
-  # scopes - An {Array} of {String}s.
+  # scopes - An {Array} of {String}s or a single {String}.
   #
   # Returns a {Boolean}.
   matches: (scopes) -> @matcher.matches(scopes)
