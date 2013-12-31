@@ -41,6 +41,12 @@ class Grammar
     @fileTypes ?= []
     @includedGrammarScopes = []
 
+  activate: ->
+    @registry.addGrammar(this)
+
+  deactivate: ->
+    @registry.removeGrammar(this)
+
   clearRules: ->
     @initialRule = null
     @repository = null
