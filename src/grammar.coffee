@@ -120,7 +120,7 @@ class Grammar
 
   tokenizeLine: (line, ruleStack, firstLine=false) ->
     if ruleStack?
-      ruleStack = new Array(ruleStack...) # clone ruleStack
+      ruleStack = ruleStack.slice()
     else
       ruleStack = [@getInitialRule()]
     originalRuleStack = ruleStack
