@@ -17,6 +17,8 @@ class Registry
     @nullGrammar = new NullGrammar()
     @addGrammar(@nullGrammar)
 
+  createToken: (value, scopes) -> {value, scopes}
+
   addGrammar: (grammar) ->
     @grammars.push(grammar)
     @grammarsByScopeName[grammar.scopeName] = grammar

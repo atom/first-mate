@@ -112,7 +112,7 @@ class Grammar
 
     pathScore
 
-  createToken: (value, scopes) -> {value, scopes}
+  createToken: (value, scopes) -> @registry.createToken(value, scopes)
 
   createRule: (options) -> new Rule(this, @registry, options)
 
