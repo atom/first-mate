@@ -21,6 +21,15 @@ describe "Grammar tokenization", ->
     loadGrammarSync('python.json')
     loadGrammarSync('python-regex.json')
 
+  describe "when the registry is empty", ->
+    it "tokenizes using the null grammar", ->
+      emptyRegistry = new Registry()
+      grammar = emptyRegistry.selectGrammar('foo.js', '')
+      {tokens} = grammar.tokenizeLine('a = 1;')
+      expect(tokens.length).toBe 1
+      expect(tokens[0].value).toBe 'a = 1;'
+      expect(tokens[0].scopes).toEqual ['null-grammar.text.plain']
+
   describe "Registry::loadGrammarSync", ->
     it "returns a grammar for the file path specified", ->
       grammar = loadGrammarSync('hello.cson')
