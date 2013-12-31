@@ -2,6 +2,7 @@ path = require 'path'
 fs = require 'fs-plus'
 Registry = require '../src/registry'
 
+console.log 'Tokenizing jQuery v2.0.3'
 registry = new Registry()
 grammar = registry.loadGrammarSync(path.resolve(__dirname, '..', 'spec', 'fixtures', 'javascript.json'))
 content = fs.readFileSync(path.join(__dirname, 'large.js'), 'utf8')
