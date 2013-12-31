@@ -41,19 +41,29 @@ class Registry
   grammarForScopeName: (scopeName) ->
     @grammarsByScopeName[scopeName]
 
+  readGrammarSync: (grammarPath) ->
+    new Grammar(this, fs.readObjectSync(grammarPath))
+
+  readGrammar: (grammarPath, callback) ->
+    fs.readObject grammarPath, (error, object) =>
+      if error?
+        callback?(error)
+      else
+        callback?(null, new Grammar(this, object))
+
   loadGrammarSync: (grammarPath) ->
-    grammar = new Grammar(this, fs.readObjectSync(grammarPath))
+    grammar = @readGrammarSync(grammarPath)
     @addGrammar(grammar)
     grammar
 
-  loadGrammar: (grammarPath, done) ->
+  loadGrammar: (grammarPath, callback) ->
     fs.readObject grammarPath, (error, object) =>
       if error?
-        done?(error)
+        callback?(error)
       else
         grammar = new Grammar(this, object)
         @addGrammar(grammar)
-        done?(null, grammar)
+        callback?(null, grammar)
 
   grammarOverrideForPath: (path) ->
     @grammarOverridesByPath[path]
