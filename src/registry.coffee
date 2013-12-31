@@ -14,7 +14,7 @@ class Registry
     @grammarsByScopeName = {}
     @injectionGrammars = []
     @grammarOverridesByPath = {}
-    @nullGrammar = new NullGrammar()
+    @nullGrammar = new NullGrammar(this)
     @addGrammar(@nullGrammar)
 
   createToken: (value, scopes) -> {value, scopes}

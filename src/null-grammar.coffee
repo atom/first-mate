@@ -7,10 +7,12 @@ class NullGrammar
   name: 'Null Grammar'
   scopeName: 'text.plain.null-grammar'
 
+  constructor: (@registry) ->
+
   getScore: -> 0
 
   tokenizeLine: (line) ->
-    tokens: [{value: line, scopes: ['null-grammar.text.plain']}]
+    tokens: [@registry.createToken(line, ['null-grammar.text.plain'])]
 
   tokenizeLines: (text) ->
     lines = text.split('\n')
