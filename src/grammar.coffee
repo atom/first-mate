@@ -148,7 +148,12 @@ class Grammar
 
         tokens.push(nextTokens...)
         position = tokensEndPosition
-        break if position is line.length and nextTokens.length is 0 and ruleStack.length is previousRuleStackLength
+
+        # break if at end of the line and no tokens were in the match and no rule was pushed to the stack
+        if position is line.length and nextTokens.length is 0 and ruleStack.length is previousRuleStackLength
+          if tokens.length is 0 # push filler token for unmatched text
+            tokens.push(@createToken(line[position...line.length], scopes))
+          break
 
       else # push filler token for unmatched text at end of line
         if position < line.length or line.length == 0

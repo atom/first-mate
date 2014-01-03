@@ -647,3 +647,12 @@ describe "Grammar tokenization", ->
         expect(line2[1].scopes).toEqual ["source.python"]
         expect(line2[2].value).toEqual "b"
         expect(line2[2].scopes).toEqual ["source.python"]
+
+    describe "clojure", ->
+      it "parses empty lines correctly", ->
+        loadGrammarSync('clojure.json')
+        grammar = registry.grammarForScopeName('source.clojure')
+        {tokens} = grammar.tokenizeLine ""
+        expect(tokens.length).toBe 1
+        expect(tokens[0].value).toEqual ""
+        expect(tokens[0].scopes).toEqual ["source.clojure"]
