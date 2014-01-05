@@ -47,7 +47,6 @@ Synchronously load a grammar and add it to the registry.
 
 Returns a `Grammar` instance.
 
-
 ### Grammar
 
 #### tokenizeLine(line, [ruleStack], [firstLine])
