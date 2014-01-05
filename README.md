@@ -47,6 +47,30 @@ Synchronously load a grammar and add it to the registry.
 
 Returns a `Grammar` instance.
 
+
+### Grammar
+
+#### tokenizeLine(line, [ruleStack], [firstLine])
+
+Generate the tokenize for the given line of text.
+
+`line` - The string text of the line.
+
+`ruleStack` - An array of Rule objects that was returned from a previous call
+to this method.
+
+`firstLine` - `true` to indicate that the very first line is being tokenized.
+
+Returns an object with a `tokens` key pointing to an array of token objects
+and a `ruleStack` key pointing to an array of rules to pass to this method
+on future calls for lines proceeding the line that was just tokenized.
+
+#### tokenizeLines(text)
+
+`text` - The string text possibly containing newlines.
+
+Returns an array of tokens for each line tokenized.
+
 ## Developing
 
   * Clone the repository
