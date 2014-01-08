@@ -25,7 +25,7 @@
   "dependencies": {
     "pegjs": "~0.7.0",
     "underscore-plus": "~0.6.1",
-    "oniguruma": "~0.25.0",
+    "oniguruma": "~0.26.0",
     "emissary": "~0.28.0",
     "fs-plus": "~0.13.0"
   },
