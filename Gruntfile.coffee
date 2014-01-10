@@ -23,9 +23,12 @@ module.exports = (grunt) ->
       benchmark: ['benchmark/*.coffee']
 
     peg:
-      grammars:
-        src: 'src/scope-selector-pattern.pegjs'
-        dest: 'lib/scope-selector-pattern.js'
+      glob_to_multiple:
+        expand: true
+        cwd: 'src'
+        src: ['*.pegjs']
+        dest: 'lib'
+        ext: '.js'
 
     shell:
       test:

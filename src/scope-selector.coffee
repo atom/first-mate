@@ -1,11 +1,11 @@
-parser = require './scope-selector-pattern'
+ScopeSelectorParser = require './scope-selector-parser'
 
 module.exports =
 class ScopeSelector
   # Create a new scope selector.
   #
   # source - A {String} to parse as a scope selector.
-  constructor: (source) -> @matcher = parser.parse(source)
+  constructor: (source) -> @matcher = ScopeSelectorParser.parse(source)
 
   # Check if this scope selector matches the scopes.
   #
