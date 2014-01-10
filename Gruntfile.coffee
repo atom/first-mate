@@ -22,6 +22,11 @@ module.exports = (grunt) ->
       gruntfile: ['Gruntfile.coffee']
       benchmark: ['benchmark/*.coffee']
 
+    peg:
+      grammars:
+        src: 'src/scope-selector-pattern.pegjs'
+        dest: 'lib/scope-selector-pattern.js'
+
     shell:
       test:
         command: 'node --harmony_collections node_modules/.bin/jasmine-focused --coffee --captureExceptions spec'
@@ -33,8 +38,9 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-shell')
   grunt.loadNpmTasks('grunt-coffeelint')
+  grunt.loadNpmTasks('grunt-peg')
 
   grunt.registerTask 'clean', -> require('rimraf').sync('lib')
   grunt.registerTask('lint', ['coffeelint'])
-  grunt.registerTask('default', ['coffee', 'lint'])
+  grunt.registerTask('default', ['coffee', 'peg', 'lint'])
   grunt.registerTask('test', ['default', 'shell:test'])

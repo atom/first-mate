@@ -1,6 +1,5 @@
 path = require 'path'
-Registry = require '../src/registry'
-
+Registry = require '../lib/registry'
 
 describe "Grammar tokenization", ->
   [grammar, registry] = []

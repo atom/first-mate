@@ -1,3 +1,5 @@
+{ var matchers= require('./scope-selector-matchers'); }
+
 start = _ selector:(selector) _ {
   return selector;
 }
