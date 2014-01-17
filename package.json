@@ -23,7 +23,7 @@
   },
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
-    "underscore-plus": "~0.6.1",
+    "underscore-plus": "1.x",
     "oniguruma": "~0.26.0",
     "emissary": "~0.28.0",
     "fs-plus": "~0.14.0"
