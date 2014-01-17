@@ -25,7 +25,7 @@
   "dependencies": {
     "underscore-plus": "1.x",
     "oniguruma": "~0.26.0",
-    "emissary": "~0.28.0",
+    "emissary": "1.x",
     "fs-plus": "1.x"
   },
   "devDependencies": {
