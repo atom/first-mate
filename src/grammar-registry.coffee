@@ -6,7 +6,7 @@ Grammar = require './grammar'
 NullGrammar = require './null-grammar'
 
 module.exports =
-class Registry
+class GrammarRegistry
   Emitter.includeInto(this)
 
   constructor: ->
