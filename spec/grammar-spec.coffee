@@ -1,4 +1,5 @@
 path = require 'path'
+fs = require 'fs-plus'
 Registry = require '../lib/grammar-registry'
 
 describe "Grammar tokenization", ->
@@ -32,6 +33,7 @@ describe "Grammar tokenization", ->
   describe "Registry::loadGrammarSync", ->
     it "returns a grammar for the file path specified", ->
       grammar = loadGrammarSync('hello.cson')
+      expect(fs.isFileSync(grammar.path)).toBe true
       expect(grammar).not.toBeNull()
 
       {tokens} = grammar.tokenizeLine('hello world!')

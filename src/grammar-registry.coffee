@@ -43,15 +43,20 @@ class GrammarRegistry
   grammarForScopeName: (scopeName) ->
     @grammarsByScopeName[scopeName]
 
+  createGrammar: (grammarPath, object) ->
+    grammar = new Grammar(this, object)
+    grammar.path = grammarPath
+    grammar
+
   readGrammarSync: (grammarPath) ->
-    new Grammar(this, fs.readObjectSync(grammarPath))
+    @createGrammar(grammarPath, fs.readObjectSync(grammarPath))
 
   readGrammar: (grammarPath, callback) ->
     fs.readObject grammarPath, (error, object) =>
       if error?
         callback?(error)
       else
-        callback?(null, new Grammar(this, object))
+        callback?(null, @createGrammar(grammarPath, object))
 
   loadGrammarSync: (grammarPath) ->
     grammar = @readGrammarSync(grammarPath)
@@ -63,7 +68,7 @@ class GrammarRegistry
       if error?
         callback?(error)
       else
-        grammar = new Grammar(this, object)
+        grammar = @createGrammar(grammarPath, object)
         @addGrammar(grammar)
         callback?(null, grammar)
 
