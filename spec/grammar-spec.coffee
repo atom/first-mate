@@ -657,3 +657,31 @@ describe "Grammar tokenization", ->
         expect(tokens.length).toBe 1
         expect(tokens[0].value).toEqual ""
         expect(tokens[0].scopes).toEqual ["source.clojure"]
+
+    describe "HTML", ->
+      describe "when it contains CSS", ->
+        it "correctly parses the CSS rules", ->
+          loadGrammarSync("css.json")
+          grammar = registry.grammarForScopeName("text.html.basic")
+
+          lines = grammar.tokenizeLines """
+            <html>
+              <head>
+                <style>
+                  body {
+                    color: blue;
+                  }
+                </style>
+              </head>
+            </html>
+          """
+
+          line4 = lines[4]
+          expect(line4[4].value).toEqual "blue"
+          expect(line4[4].scopes).toEqual [
+            "text.html.basic"
+            "source.css.embedded.html"
+            "meta.property-list.css"
+            "meta.property-value.css"
+            "support.constant.color.w3c-standard-color-name.css"
+          ]

@@ -5,8 +5,10 @@ Scanner = require './scanner'
 module.exports =
 class Rule
   constructor: (@grammar, @registry, {@scopeName, patterns, @endPattern}={}) ->
-    patterns ?= []
-    @patterns = patterns.map (pattern) => @grammar.createPattern(pattern)
+    @patterns = []
+    for pattern in patterns ? []
+      @patterns.push(@grammar.createPattern(pattern)) unless pattern.disabled
+
     if @endPattern and not @endPattern.hasBackReferences
       @patterns.unshift(@endPattern)
     @scannersByBaseGrammarName = {}
