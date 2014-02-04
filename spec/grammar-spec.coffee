@@ -1,6 +1,6 @@
 path = require 'path'
 fs = require 'fs-plus'
-Registry = require '../lib/grammar-registry'
+GrammarRegistry = require '../lib/grammar-registry'
 
 describe "Grammar tokenization", ->
   [grammar, registry] = []
@@ -9,7 +9,7 @@ describe "Grammar tokenization", ->
     registry.loadGrammarSync(path.join(__dirname, 'fixtures', name))
 
   beforeEach ->
-    registry = new Registry()
+    registry = new GrammarRegistry()
     loadGrammarSync('text.json')
     loadGrammarSync('javascript.json')
     loadGrammarSync('javascript-regex.json')
@@ -23,7 +23,7 @@ describe "Grammar tokenization", ->
 
   describe "when the registry is empty", ->
     it "tokenizes using the null grammar", ->
-      emptyRegistry = new Registry()
+      emptyRegistry = new GrammarRegistry()
       grammar = emptyRegistry.selectGrammar('foo.js', '')
       {tokens} = grammar.tokenizeLine('a = 1;')
       expect(tokens.length).toBe 1
