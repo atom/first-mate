@@ -53,7 +53,7 @@ class GrammarRegistry
   # A 'grammar-added' event is emitted after the grammar is added.
   #
   # grammar - The {Grammar} to add. This should be a value previously returned
-  #           from {readGrammar} or {readGrammarSync}.
+  #           from {.readGrammar} or {.readGrammarSync}.
   addGrammar: (grammar) ->
     @grammars.push(grammar)
     @grammarsByScopeName[grammar.scopeName] = grammar
