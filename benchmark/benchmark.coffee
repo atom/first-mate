@@ -1,9 +1,9 @@
 path = require 'path'
 fs = require 'fs-plus'
-Registry = require '../src/registry'
+GrammarRegistry = require '../lib/grammar-registry'
 
 console.log 'Tokenizing jQuery v2.0.3'
-registry = new Registry()
+registry = new GrammarRegistry()
 grammar = registry.loadGrammarSync(path.resolve(__dirname, '..', 'spec', 'fixtures', 'javascript.json'))
 content = fs.readFileSync(path.join(__dirname, 'large.js'), 'utf8')
 lineCount = content.split('\n').length
