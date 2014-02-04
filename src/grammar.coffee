@@ -47,7 +47,7 @@ class Grammar
 
   # Public: Tokenize all lines in the given text.
   #
-  # * text: A {String} containing one or more lines.
+  # text - A {String} containing one or more lines.
   #
   # Returns an {Array} of token arrays for each line tokenized.
   tokenizeLines: (text) ->
@@ -59,22 +59,20 @@ class Grammar
 
   # Public: Tokenize the line of text.
   #
-  # * line: A {String} of text to tokenize.
-  #
-  # * ruleStack: An optional {Array} of rules previously returned from this
-  #              method. This should be null when tokenizing the first line in
-  #              the file.
-  #
-  # * firstLine: A {Boolean} denoting whether this is the first line in the file
-  #              which defaults to `false`. This should be `true` when
-  #              tokenizing the first line in the file.
+  # line      - A {String} of text to tokenize.
+  # ruleStack - An optional {Array} of rules previously returned from this
+  #             method. This should be null when tokenizing the first line in
+  #             the file.
+  # firstLine - A {Boolean} denoting whether this is the first line in the file
+  #             which defaults to `false`. This should be `true` when
+  #             tokenizing the first line in the file.
   #
   # Returns an {Object} containing `tokens` and `ruleStack` properties:
-  #   * tokens: An {Array} of tokens covering the entire line of text.
+  #   token     - An {Array} of tokens covering the entire line of text.
   #
-  #   * ruleStack: An {Array} of rules representing the tokenized state at the
-  #                end of the line. These should be passed back into this method
-  #                when tokenizing the next line in the file.
+  #   ruleStack - An {Array} of rules representing the tokenized state at the
+  #               end of the line. These should be passed back into this method
+  #               when tokenizing the next line in the file.
   tokenizeLine: (line, ruleStack, firstLine=false) ->
     if ruleStack?
       ruleStack = ruleStack.slice()

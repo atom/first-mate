@@ -26,7 +26,7 @@ class GrammarRegistry
 
   # Public: Get a grammar with the given scope name.
   #
-  # * scopeName: A {String} such as `"source.js"`.
+  # scopeName - A {String} such as `"source.js"`.
   #
   # Returns a {Grammar} or undefined.
   grammarForScopeName: (scopeName) ->
@@ -34,7 +34,7 @@ class GrammarRegistry
 
   # Public: Remove a grammar from this registry.
   #
-  # * grammar: The {Grammar} to remove.
+  # grammar - The {Grammar} to remove.
   removeGrammar: (grammar) ->
     _.remove(@grammars, grammar)
     delete @grammarsByScopeName[grammar.scopeName]
@@ -43,7 +43,7 @@ class GrammarRegistry
 
   # Public: Remove the grammar with the given scope name.
   #
-  # * scopeName: A {String} such as `"source.js"`.
+  # scopeName - A {String} such as `"source.js"`.
   removeGrammarForScopeName: (scopeName) ->
     grammar = @grammarForScopeName(scopeName)
     @removeGrammar(grammar) if grammar?
@@ -52,8 +52,8 @@ class GrammarRegistry
   #
   # A 'grammar-added' event is emitted after the grammar is added.
   #
-  # * grammar: The {Grammar} to add. This should be a value previously returned
-  #            from {readGrammar} or {readGrammarSync}
+  # grammar - The {Grammar} to add. This should be a value previously returned
+  #           from {readGrammar} or {readGrammarSync}.
   addGrammar: (grammar) ->
     @grammars.push(grammar)
     @grammarsByScopeName[grammar.scopeName] = grammar
@@ -63,7 +63,7 @@ class GrammarRegistry
 
   # Public: Read a grammar synchronously but don't add it to the registry.
   #
-  # * grammarPath: A {String} absolute file path to a grammar file.
+  # grammarPath - A {String} absolute file path to a grammar file.
   #
   # Returns a {Grammar}.
   readGrammarSync: (grammarPath) ->
@@ -71,10 +71,9 @@ class GrammarRegistry
 
   # Public: Read a grammar asynchronously but don't add it to the registry.
   #
-  # * grammarPath: A {String} absolute file path to a grammar file.
-  #
-  # * callback: A {Function} to call when loaded with `(error, grammar)`
-  #             arguments.
+  # grammarPath - A {String} absolute file path to a grammar file.
+  # callback    - A {Function} to call when loaded with `(error, grammar)`
+  #               arguments.
   readGrammar: (grammarPath, callback) ->
     fs.readObject grammarPath, (error, object) =>
       if error?
@@ -84,7 +83,7 @@ class GrammarRegistry
 
   # Public: Read a grammar synchronously and add it to this registry.
   #
-  # * grammarPath: A {String} absolute file path to a grammar file.
+  # grammarPath - A {String} absolute file path to a grammar file.
   #
   # Returns a {Grammar}.
   loadGrammarSync: (grammarPath) ->
@@ -94,10 +93,9 @@ class GrammarRegistry
 
   # Public: Read a grammar asynchronously and add it to the registry.
   #
-  # * grammarPath: A {String} absolute file path to a grammar file.
-  #
-  # * callback: A {Function} to call when loaded with `(error, grammar)`
-  #             arguments.
+  # grammarPath - A {String} absolute file path to a grammar file.
+  # callback    - A {Function} to call when loaded with `(error, grammar)`
+  #               arguments.
   loadGrammar: (grammarPath, callback) ->
     fs.readObject grammarPath, (error, object) =>
       if error?
@@ -109,7 +107,7 @@ class GrammarRegistry
 
   # Public: Get the grammar override for the given file path.
   #
-  # * filePath: A {String} file path.
+  # filePath - A {String} file path.
   #
   # Returns a {Grammar} or undefined.
   grammarOverrideForPath: (filePath) ->
@@ -117,9 +115,8 @@ class GrammarRegistry
 
   # Public: Set the grammar override for the given file path.
   #
-  # * filePath: A {String} file path.
-  #
-  # * scopeName: A {String} such as `"source.js"`.
+  # filePath  - A {String} file path.
+  # scopeName - A {String} such as `"source.js"`.
   #
   # Returns a {Grammar} or undefined.
   setGrammarOverrideForPath: (filePath, scopeName) ->
@@ -127,7 +124,7 @@ class GrammarRegistry
 
   # Public: Remove the grammar override for the given file path.
   #
-  # * filePath: A {String} file path.
+  # filePath - A {String} file path.
   clearGrammarOverrideForPath: (filePath) ->
     delete @grammarOverridesByPath[filePath]
 
@@ -140,9 +137,8 @@ class GrammarRegistry
   # This picks the best match by checking the file path and contents against
   # each grammar.
   #
-  # * filePath: A {String} file path.
-  #
-  # * fileContents: A {String} of text for the file path.
+  # filePath     - A {String} file path.
+  # fileContents - A {String} of text for the file path.
   #
   # Return a {Grammar}, never null.
   selectGrammar: (filePath, fileContents) ->
