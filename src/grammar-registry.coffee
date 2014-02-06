@@ -140,7 +140,7 @@ class GrammarRegistry
   # filePath     - A {String} file path.
   # fileContents - A {String} of text for the file path.
   #
-  # Return a {Grammar}, never null.
+  # Returns a {Grammar}, never null.
   selectGrammar: (filePath, fileContents) ->
     _.max @grammars, (grammar) -> grammar.getScore(filePath, fileContents)
 
