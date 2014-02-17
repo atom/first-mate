@@ -26,7 +26,8 @@
     "underscore-plus": "1.x",
     "oniguruma": "1.x",
     "emissary": "1.x",
-    "fs-plus": "1.x"
+    "fs-plus": "1.x",
+    "season": "1.x"
   },
   "devDependencies": {
     "jasmine-focused": "1.x",

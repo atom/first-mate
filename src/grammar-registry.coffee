@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
+CSON = require 'season'
 {Emitter} = require 'emissary'
-fs = require 'fs-plus'
 
 Grammar = require './grammar'
 NullGrammar = require './null-grammar'
@@ -67,7 +67,7 @@ class GrammarRegistry
   #
   # Returns a {Grammar}.
   readGrammarSync: (grammarPath) ->
-    @createGrammar(grammarPath, fs.readObjectSync(grammarPath))
+    @createGrammar(grammarPath, CSON.readFileSync(grammarPath))
 
   # Public: Read a grammar asynchronously but don't add it to the registry.
   #
@@ -75,7 +75,7 @@ class GrammarRegistry
   # callback    - A {Function} to call when loaded with `(error, grammar)`
   #               arguments.
   readGrammar: (grammarPath, callback) ->
-    fs.readObject grammarPath, (error, object) =>
+    CSON.readFile grammarPath, (error, object) =>
       if error?
         callback?(error)
       else
@@ -97,7 +97,7 @@ class GrammarRegistry
   # callback    - A {Function} to call when loaded with `(error, grammar)`
   #               arguments.
   loadGrammar: (grammarPath, callback) ->
-    fs.readObject grammarPath, (error, object) =>
+    CSON.readFile grammarPath, (error, object) =>
       if error?
         callback?(error)
       else
