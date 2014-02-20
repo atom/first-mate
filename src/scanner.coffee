@@ -3,7 +3,7 @@
 # Wrapper class for {OnigScanner} that caches them based on the presence of any
 # anchor characters that change based on the current position being scanned.
 #
-# See {Pattern.replaceAnchor} for more details.
+# See {Pattern::replaceAnchor} for more details.
 module.exports =
 class Scanner
   constructor: (@patterns=[]) ->

@@ -15,7 +15,7 @@ pathSplitRegex = new RegExp("[#{_.escapeRegExp(path.sep)}.]")
 # Public: Grammar that tokenizes lines of text.
 #
 # This class should not be instantiated directly but instead obtained from
-# a {GrammarRegistry} by calling {GrammarRegistry.loadGrammar}.
+# a {GrammarRegistry} by calling {GrammarRegistry::loadGrammar}.
 module.exports =
 class Grammar
   Emitter.includeInto(this)
