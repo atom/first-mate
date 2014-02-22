@@ -82,3 +82,4 @@ describe "ScopeSelector", ->
       expect(new ScopeSelector('a | b').toCssSelector()).toBe '.a, .b'
       expect(new ScopeSelector('a - (b.c d)').toCssSelector()).toBe '.a:not(.b.c .d)'
       expect(new ScopeSelector('a, b').toCssSelector()).toBe '.a, .b'
+      expect(new ScopeSelector('c++').toCssSelector()).toBe '.c\\+\\+'
