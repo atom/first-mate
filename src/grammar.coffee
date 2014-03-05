@@ -226,7 +226,7 @@ class Grammar
 
     # Pop last content name scope if an end pattern is matched since only
     # text between the begin/end patterns should have the content name scope
-    if endPatternMatch and rule?.contentScopeName and rule is _.last(stack)
+    if endPatternMatch and rule?.contentScopeName and rule is stack[stack.length - 1]
       scopes.pop()
 
     scopes
