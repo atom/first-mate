@@ -60,7 +60,7 @@ class Scanner
   # * stack: An array of {Rule} objects.
   # * line: The string being scanned.
   # * rule: The rule that matched.
-  # * endPatternMatch: true if the rule's end pattern matched, false otherwise.
+  # * endPatternMatch: true if the rule's end pattern matched.
   #
   # Returns an array of tokens representing the match.
   handleMatch: (match, stack, line, rule, endPatternMatch) ->
