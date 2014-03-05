@@ -17,13 +17,13 @@ class Scanner
     @firstLineScanner = null
     @scanner = null
 
-  # Private: Create a new {OnigScanner} with the given options.
+  # Create a new {OnigScanner} with the given options.
   createScanner: (firstLine, position, anchorPosition) ->
     patterns = @patterns.map (pattern) ->
       pattern.getRegex(firstLine, position, anchorPosition)
     scanner = new OnigScanner(patterns)
 
-  # Private: Get the {OnigScanner} for the given position and options.
+  # Get the {OnigScanner} for the given position and options.
   getScanner: (firstLine, position, anchorPosition) ->
     unless @anchored
       @scanner ?= @createScanner(firstLine, position, anchorPosition)
