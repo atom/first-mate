@@ -170,6 +170,30 @@ describe "Grammar tokenization", ->
         {tokens} = grammar.tokenizeLine('ok, cool')
         expect(tokens[0]).toEqual value: 'ok, cool',  scopes: ["text.plain", "meta.paragraph.text"]
 
+        grammar = registry.grammarForScopeName('text.plain')
+        {tokens} = grammar.tokenizeLine(' ok, cool')
+        expect(tokens[0]).toEqual value: ' ',  scopes: ["text.plain"]
+        expect(tokens[1]).toEqual value: 'ok, cool',  scopes: ["text.plain", "meta.paragraph.text"]
+
+        loadGrammarSync("content-name.json")
+
+        grammar = registry.grammarForScopeName("source.test")
+        lines = grammar.tokenizeLines "#if\ntest\n#endif"
+
+        [line1, line2, line3] = lines
+
+        expect(line1.length).toBe 1
+        expect(line1[0].value).toEqual "#if"
+        expect(line1[0].scopes).toEqual ["source.test", "pre"]
+
+        expect(line2.length).toBe 1
+        expect(line2[0].value).toEqual "test"
+        expect(line2[0].scopes).toEqual ["source.test", "pre", "nested"]
+
+        expect(line3.length).toBe 1
+        expect(line3[0].value).toEqual "#endif"
+        expect(line3[0].scopes).toEqual ["source.test", "pre"]
+
     describe "when the line matches a pattern with no `name` or `contentName`", ->
       it "creates tokens without adding a new scope", ->
         grammar = registry.grammarForScopeName('source.ruby')
@@ -234,9 +258,9 @@ describe "Grammar tokenization", ->
           expect(tokens[0]).toEqual value: '%Q+', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","punctuation.definition.string.begin.ruby"]
           expect(tokens[1]).toEqual value: 'matz had some ', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby"]
           expect(tokens[2]).toEqual value: '#{', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","meta.embedded.line.ruby","punctuation.section.embedded.begin.ruby"]
-          expect(tokens[3]).toEqual value: '%Q-', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","meta.embedded.line.ruby","string.quoted.other.literal.upper.ruby","punctuation.definition.string.begin.ruby"]
-          expect(tokens[4]).toEqual value: 'crazy ideas', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","meta.embedded.line.ruby","string.quoted.other.literal.upper.ruby"]
-          expect(tokens[5]).toEqual value: '-', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","meta.embedded.line.ruby","string.quoted.other.literal.upper.ruby","punctuation.definition.string.end.ruby"]
+          expect(tokens[3]).toEqual value: '%Q-', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","meta.embedded.line.ruby","source.ruby","string.quoted.other.literal.upper.ruby","punctuation.definition.string.begin.ruby"]
+          expect(tokens[4]).toEqual value: 'crazy ideas', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","meta.embedded.line.ruby","source.ruby","string.quoted.other.literal.upper.ruby"]
+          expect(tokens[5]).toEqual value: '-', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","meta.embedded.line.ruby","source.ruby","string.quoted.other.literal.upper.ruby","punctuation.definition.string.end.ruby"]
           expect(tokens[6]).toEqual value: '}', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","meta.embedded.line.ruby","punctuation.section.embedded.end.ruby", "source.ruby"]
           expect(tokens[7]).toEqual value: ' for ruby syntax', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby"]
           expect(tokens[8]).toEqual value: '+', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","punctuation.definition.string.end.ruby"]
@@ -420,7 +444,7 @@ describe "Grammar tokenization", ->
         expect(tokens[7].scopes).toEqual ["text.html.php", "meta.embedded.line.php", "source.php", "meta.function.php", "entity.name.function.php"]
 
         expect(tokens[14].value).toBe "?"
-        expect(tokens[14].scopes).toEqual ["text.html.php", "meta.embedded.line.php", "source.php", "punctuation.section.embedded.end.php", "source.php"]
+        expect(tokens[14].scopes).toEqual ["text.html.php", "meta.embedded.line.php", "punctuation.section.embedded.end.php", "source.php"]
 
         expect(tokens[15].value).toBe ">"
         expect(tokens[15].scopes).toEqual ["text.html.php", "meta.embedded.line.php", "punctuation.section.embedded.end.php"]
@@ -588,11 +612,11 @@ describe "Grammar tokenization", ->
         {tokens} = grammar.tokenizeLine '<% page_title "My Page" %>'
 
         expect(tokens[2].value).toEqual '"'
-        expect(tokens[2].scopes).toEqual ["text.html.erb", "meta.embedded.line.erb", "string.quoted.double.ruby", "punctuation.definition.string.begin.ruby"]
+        expect(tokens[2].scopes).toEqual ["text.html.erb", "meta.embedded.line.erb", "source.ruby", "string.quoted.double.ruby", "punctuation.definition.string.begin.ruby"]
         expect(tokens[3].value).toEqual 'My Page'
-        expect(tokens[3].scopes).toEqual ["text.html.erb", "meta.embedded.line.erb", "string.quoted.double.ruby"]
+        expect(tokens[3].scopes).toEqual ["text.html.erb", "meta.embedded.line.erb", "source.ruby", "string.quoted.double.ruby"]
         expect(tokens[4].value).toEqual '"'
-        expect(tokens[4].scopes).toEqual ["text.html.erb", "meta.embedded.line.erb", "string.quoted.double.ruby", "punctuation.definition.string.end.ruby"]
+        expect(tokens[4].scopes).toEqual ["text.html.erb", "meta.embedded.line.erb", "source.ruby", "string.quoted.double.ruby", "punctuation.definition.string.end.ruby"]
 
       it "does not loop infinitely on <%>", ->
         loadGrammarSync('html-rails.json')

@@ -58,9 +58,11 @@ class Scanner
   #
   # * match: An object returned from a previous call to `findNextMatch`.
   # * stack: An array of {Rule} objects.
-  # * line: the string being scanned.
+  # * line: The string being scanned.
+  # * rule: The rule that matched.
+  # * endPatternMatch: true if the rule's end pattern matched, false otherwise.
   #
   # Returns an array of tokens representing the match.
-  handleMatch: (match, stack, line) ->
+  handleMatch: (match, stack, line, rule, endPatternMatch) ->
     pattern = @patterns[match.index]
-    pattern.handleMatch(stack, line, match.captureIndices)
+    pattern.handleMatch(stack, line, match.captureIndices, rule, endPatternMatch)

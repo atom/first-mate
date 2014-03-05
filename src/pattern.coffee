@@ -15,7 +15,8 @@ class Pattern
     @pushRule = null
     @capture = null
     @backReferences = null
-    @scopeName = name ? contentName # TODO: We need special treatment of contentName
+    @scopeName = name
+    @contentScopeName = contentName
 
     if match
       if (end or @popRule) and @hasBackReferences ?= DigitRegex.test(match)
@@ -27,7 +28,7 @@ class Pattern
       @regexSource = begin
       @captures = beginCaptures ? captures
       endPattern = @grammar.createPattern({match: end, captures: endCaptures ? captures, popRule: true})
-      @pushRule = @grammar.createRule({@scopeName, patterns, endPattern})
+      @pushRule = @grammar.createRule({@scopeName, @contentScopeName, patterns, endPattern})
 
     if @captures?
       for group, capture of @captures
@@ -132,8 +133,8 @@ class Pattern
       else
         match
 
-  handleMatch: (stack, line, captureIndices) ->
-    scopes = @grammar.scopesFromStack(stack)
+  handleMatch: (stack, line, captureIndices, rule, endPatternMatch) ->
+    scopes = @grammar.scopesFromStack(stack, rule, endPatternMatch)
     if @scopeName and not @popRule
       scopes.push(@resolveScopeName(line, captureIndices))
 

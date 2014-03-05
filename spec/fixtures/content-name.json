@@ -1,0 +1,11 @@
+{
+  "scopeName": "source.test",
+  "patterns": [
+    {
+      "begin": "#if",
+      "end": "#endif",
+      "name": "pre",
+      "contentName": "nested"
+    }
+  ]
+}
