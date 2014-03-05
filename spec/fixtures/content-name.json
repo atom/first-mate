@@ -6,6 +6,12 @@
       "end": "#endif",
       "name": "pre",
       "contentName": "nested"
+    },
+    {
+      "begin": "\\s*",
+      "end": "fin",
+      "name": "all",
+      "contentName": "middle"
     }
   ]
 }

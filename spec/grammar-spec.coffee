@@ -194,6 +194,18 @@ describe "Grammar tokenization", ->
         expect(line3[0].value).toEqual "#endif"
         expect(line3[0].scopes).toEqual ["source.test", "pre"]
 
+        {tokens} = grammar.tokenizeLine "test"
+        expect(tokens.length).toBe 1
+        expect(tokens[0].value).toEqual "test"
+        expect(tokens[0].scopes).toEqual ["source.test", "all", "middle"]
+
+        {tokens} = grammar.tokenizeLine " test"
+        expect(tokens.length).toBe 2
+        expect(tokens[0].value).toEqual " "
+        expect(tokens[0].scopes).toEqual ["source.test", "all"]
+        expect(tokens[1].value).toEqual "test"
+        expect(tokens[1].scopes).toEqual ["source.test", "all", "middle"]
+
     describe "when the line matches a pattern with no `name` or `contentName`", ->
       it "creates tokens without adding a new scope", ->
         grammar = registry.grammarForScopeName('source.ruby')
