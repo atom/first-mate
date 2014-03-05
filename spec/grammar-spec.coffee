@@ -1,4 +1,5 @@
 path = require 'path'
+_ = require 'underscore-plus'
 fs = require 'fs-plus'
 GrammarRegistry = require '../lib/grammar-registry'
 
