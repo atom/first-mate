@@ -197,12 +197,12 @@ class Grammar
     @firstLineRegex.test(lines[0..numberOfNewlinesInRegex].join('\n'))
 
   getPathScore: (filePath) ->
-    return -1 unless filePath?
+    return -1 unless filePath
 
-    pathComponents = filePath.split(pathSplitRegex)
+    pathComponents = filePath.toLowerCase().split(pathSplitRegex)
     pathScore = -1
     for fileType in @fileTypes
-      fileTypeComponents = fileType.split(pathSplitRegex)
+      fileTypeComponents = fileType.toLowerCase().split(pathSplitRegex)
       pathSuffix = pathComponents[-fileTypeComponents.length..-1]
       if _.isEqual(pathSuffix, fileTypeComponents)
         pathScore = Math.max(pathScore, fileType.length)

@@ -1,6 +1,12 @@
+path = require 'path'
 GrammarRegistry = require '../lib/grammar-registry'
 
 describe "GrammarRegistry", ->
+  registry = null
+
+  loadGrammarSync = (name) ->
+    registry.loadGrammarSync(path.join(__dirname, 'fixtures', name))
+
   describe "grammar overrides", ->
     it "stores the override scope name for a path", ->
       registry = new GrammarRegistry()
@@ -29,3 +35,15 @@ describe "GrammarRegistry", ->
 
       registry.setGrammarOverrideForPath(undefined, 'source.coffee')
       expect(registry.grammarOverrideForPath(undefined)).toBeUndefined()
+
+  describe "::selectGrammar", ->
+    it "always returns a grammar", ->
+      expect(registry.selectGrammar().scopeName).toBe 'text.plain.null-grammar'
+
+    it "selects a grammar based on the file path case insensitively", ->
+      registry = new GrammarRegistry()
+      loadGrammarSync('javascript.json')
+      loadGrammarSync('coffee-script.json')
+
+      expect(registry.selectGrammar('/tmp/source.coffee').scopeName).toBe 'source.coffee'
+      expect(registry.selectGrammar('/tmp/source.COFFEE').scopeName).toBe 'source.coffee'
