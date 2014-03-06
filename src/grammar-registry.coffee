@@ -115,12 +115,13 @@ class GrammarRegistry
 
   # Public: Set the grammar override for the given file path.
   #
-  # filePath  - A {String} file path.
+  # filePath  - A non-empty {String} file path.
   # scopeName - A {String} such as `"source.js"`.
   #
   # Returns a {Grammar} or undefined.
   setGrammarOverrideForPath: (filePath, scopeName) ->
-    @grammarOverridesByPath[filePath] = scopeName
+    if filePath
+      @grammarOverridesByPath[filePath] = scopeName
 
   # Public: Remove the grammar override for the given file path.
   #

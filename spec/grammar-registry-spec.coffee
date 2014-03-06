@@ -20,3 +20,12 @@ describe "GrammarRegistry", ->
 
       registry.clearGrammarOverrides()
       expect(registry.grammarOverrideForPath('bar.js.txt')).toBeUndefined()
+
+      registry.setGrammarOverrideForPath('', 'source.coffee')
+      expect(registry.grammarOverrideForPath('')).toBeUndefined()
+
+      registry.setGrammarOverrideForPath(null, 'source.coffee')
+      expect(registry.grammarOverrideForPath(null)).toBeUndefined()
+
+      registry.setGrammarOverrideForPath(undefined, 'source.coffee')
+      expect(registry.grammarOverrideForPath(undefined)).toBeUndefined()
