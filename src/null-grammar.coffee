@@ -1,23 +1,12 @@
-{Emitter} = require 'emissary'
+Grammar = require './grammar'
 
+# A grammar with no patterns that is always available from a {GrammarRegistry}
+# even when it is completely empty.
 module.exports =
-class NullGrammar
-  Emitter.includeInto(this)
-
-  name: 'Null Grammar'
-  scopeName: 'text.plain.null-grammar'
-
-  constructor: (@registry) ->
+class NullGrammar extends Grammar
+  constructor: (registry) ->
+    name = 'Null Grammar'
+    scopeName = 'text.plain.null-grammar'
+    super(registry, {name, scopeName})
 
   getScore: -> 0
-
-  tokenizeLine: (line) ->
-    tokens: [@registry.createToken(line, ['null-grammar.text.plain'])]
-
-  tokenizeLines: (text) ->
-    lines = text.split('\n')
-    for line in lines
-      {tokens} = @tokenizeLine(line)
-      tokens
-
-  grammarUpdated: -> # noop

@@ -29,7 +29,16 @@ describe "Grammar tokenization", ->
       {tokens} = grammar.tokenizeLine('a = 1;')
       expect(tokens.length).toBe 1
       expect(tokens[0].value).toBe 'a = 1;'
-      expect(tokens[0].scopes).toEqual ['null-grammar.text.plain']
+      expect(tokens[0].scopes).toEqual ['text.plain.null-grammar']
+
+    it "allows injections into the null grammar", ->
+      registry = new GrammarRegistry()
+      loadGrammarSync('hyperlink.json')
+
+      {tokens} = registry.nullGrammar.tokenizeLine('http://github.com')
+      expect(tokens.length).toBe 1
+      expect(tokens[0].value).toEqual 'http://github.com'
+      expect(tokens[0].scopes).toEqual ['text.plain.null-grammar', 'markup.underline.link.http.hyperlink']
 
   describe "Registry::loadGrammarSync", ->
     it "returns a grammar for the file path specified", ->
