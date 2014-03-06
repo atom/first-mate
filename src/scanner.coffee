@@ -17,13 +17,13 @@ class Scanner
     @firstLineScanner = null
     @scanner = null
 
-  # Private: Create a new {OnigScanner} with the given options.
+  # Create a new {OnigScanner} with the given options.
   createScanner: (firstLine, position, anchorPosition) ->
     patterns = @patterns.map (pattern) ->
       pattern.getRegex(firstLine, position, anchorPosition)
     scanner = new OnigScanner(patterns)
 
-  # Private: Get the {OnigScanner} for the given position and options.
+  # Get the {OnigScanner} for the given position and options.
   getScanner: (firstLine, position, anchorPosition) ->
     unless @anchored
       @scanner ?= @createScanner(firstLine, position, anchorPosition)
@@ -58,9 +58,11 @@ class Scanner
   #
   # * match: An object returned from a previous call to `findNextMatch`.
   # * stack: An array of {Rule} objects.
-  # * line: the string being scanned.
+  # * line: The string being scanned.
+  # * rule: The rule that matched.
+  # * endPatternMatch: true if the rule's end pattern matched.
   #
   # Returns an array of tokens representing the match.
-  handleMatch: (match, stack, line) ->
+  handleMatch: (match, stack, line, rule, endPatternMatch) ->
     pattern = @patterns[match.index]
-    pattern.handleMatch(stack, line, match.captureIndices)
+    pattern.handleMatch(stack, line, match.captureIndices, rule, endPatternMatch)

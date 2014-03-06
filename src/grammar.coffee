@@ -218,7 +218,16 @@ class Grammar
   getMaxTokensPerLine: ->
     @maxTokensPerLine
 
-  scopesFromStack: (stack) ->
+  scopesFromStack: (stack, rule, endPatternMatch) ->
     scopes = []
-    scopes.push(rule.scopeName) for rule in stack when rule.scopeName
+    for {scopeName, contentScopeName} in stack
+      scopes.push(scopeName) if scopeName
+      scopes.push(contentScopeName) if contentScopeName
+
+    # Pop the last content name scope if the end pattern at the top of the stack
+    # was matched since only text between the begin/end patterns should have the
+    # content name scope
+    if endPatternMatch and rule?.contentScopeName and rule is stack[stack.length - 1]
+      scopes.pop()
+
     scopes

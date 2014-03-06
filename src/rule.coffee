@@ -4,7 +4,7 @@ Scanner = require './scanner'
 
 module.exports =
 class Rule
-  constructor: (@grammar, @registry, {@scopeName, patterns, @endPattern}={}) ->
+  constructor: (@grammar, @registry, {@scopeName, @contentScopeName, patterns, @endPattern}={}) ->
     @patterns = []
     for pattern in patterns ? []
       @patterns.push(@grammar.createPattern(pattern)) unless pattern.disabled
@@ -84,12 +84,13 @@ class Rule
 
     {index, captureIndices, scanner} = result
     [firstCapture] = captureIndices
-    nextTokens = scanner.handleMatch(result, ruleStack, line)
+    endPatternMatch = @endPattern is scanner.patterns[index]
+    nextTokens = scanner.handleMatch(result, ruleStack, line, this, endPatternMatch)
     {nextTokens, tokensStartPosition: firstCapture.start, tokensEndPosition: firstCapture.end}
 
   getRuleToPush: (line, beginPatternCaptureIndices) ->
     if @endPattern.hasBackReferences
-      rule = @grammar.createRule({@scopeName})
+      rule = @grammar.createRule({@scopeName, @contentScopeName})
       rule.endPattern = @endPattern.resolveBackReferences(line, beginPatternCaptureIndices)
       rule.patterns = [rule.endPattern, @patterns...]
       rule
