@@ -38,7 +38,14 @@ describe "GrammarRegistry", ->
 
   describe "::selectGrammar", ->
     it "always returns a grammar", ->
+      registry = new GrammarRegistry()
       expect(registry.selectGrammar().scopeName).toBe 'text.plain.null-grammar'
+
+    it "selects the text.plain grammar over the null grammar", ->
+      registry = new GrammarRegistry()
+      loadGrammarSync('text.json')
+
+      expect(registry.selectGrammar('test.txt').scopeName).toBe 'text.plain'
 
     it "selects a grammar based on the file path case insensitively", ->
       registry = new GrammarRegistry()
