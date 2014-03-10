@@ -26,7 +26,7 @@ class Grammar
 
     @repository = null
     @initialRule = null
-    @maxTokensPerLine = 100
+    @maxTokensPerLine = Infinity
 
     @rawPatterns = patterns
     @rawRepository = repository
@@ -86,12 +86,6 @@ class Grammar
       scopes = @scopesFromStack(ruleStack)
       previousRuleStackLength = ruleStack.length
       previousPosition = position
-
-      if tokens.length >= @getMaxTokensPerLine() - 1
-        token = @createToken(line[position..], scopes)
-        tokens.push token
-        ruleStack = originalRuleStack
-        break
 
       break if position == line.length + 1 # include trailing newline position
 
