@@ -67,7 +67,11 @@ class GrammarRegistry
   #
   # Returns a {Grammar}.
   readGrammarSync: (grammarPath) ->
-    @createGrammar(grammarPath, CSON.readFileSync(grammarPath))
+    grammar = CSON.readFileSync(grammarPath) ? {}
+    if typeof grammar.scopeName is 'string' and grammar.scopeName.length > 0
+      @createGrammar(grammarPath, grammar)
+    else
+      throw new Error("Grammar missing required scopeName property: #{grammarPath}")
 
   # Public: Read a grammar asynchronously but don't add it to the registry.
   #
@@ -75,11 +79,14 @@ class GrammarRegistry
   # callback    - A {Function} to call when loaded with `(error, grammar)`
   #               arguments.
   readGrammar: (grammarPath, callback) ->
-    CSON.readFile grammarPath, (error, object) =>
+    CSON.readFile grammarPath, (error, grammar={}) =>
       if error?
         callback?(error)
       else
-        callback?(null, @createGrammar(grammarPath, object))
+        if typeof grammar.scopeName is 'string' and grammar.scopeName.length > 0
+          callback?(null, @createGrammar(grammarPath, object))
+        else
+          callback?(new Error("Grammar missing required scopeName property: #{grammarPath}"))
 
   # Public: Read a grammar synchronously and add it to this registry.
   #
@@ -97,11 +104,10 @@ class GrammarRegistry
   # callback    - A {Function} to call when loaded with `(error, grammar)`
   #               arguments.
   loadGrammar: (grammarPath, callback) ->
-    CSON.readFile grammarPath, (error, object) =>
+    @readGrammar grammarPath, (error, grammar) =>
       if error?
         callback?(error)
       else
-        grammar = @createGrammar(grammarPath, object)
         @addGrammar(grammar)
         callback?(null, grammar)
 

@@ -54,3 +54,18 @@ describe "GrammarRegistry", ->
 
       expect(registry.selectGrammar('/tmp/source.coffee').scopeName).toBe 'source.coffee'
       expect(registry.selectGrammar('/tmp/source.COFFEE').scopeName).toBe 'source.coffee'
+
+  describe "when the grammar has no scope name", ->
+    it "throws an error", ->
+      grammarPath = path.join(__dirname, 'fixtures', 'no-scope-name.json')
+      registry = new GrammarRegistry()
+      expect(-> registry.loadGrammarSync(grammarPath)).toThrow()
+
+      callback = jasmine.createSpy('callback')
+      registry.loadGrammar(grammarPath, callback)
+
+      waitsFor ->
+        callback.callCount is 1
+
+      runs ->
+        expect(callback.argsForCall[0][0].message.length).toBeGreaterThan 0
