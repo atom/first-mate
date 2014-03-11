@@ -84,7 +84,7 @@ class GrammarRegistry
         callback?(error)
       else
         if typeof grammar.scopeName is 'string' and grammar.scopeName.length > 0
-          callback?(null, @createGrammar(grammarPath, object))
+          callback?(null, @createGrammar(grammarPath, grammar))
         else
           callback?(new Error("Grammar missing required scopeName property: #{grammarPath}"))
 
