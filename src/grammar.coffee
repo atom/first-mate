@@ -96,20 +96,23 @@ class Grammar
       break if position == line.length + 1 # include trailing newline position
 
       if match = _.last(ruleStack).getNextTokens(ruleStack, line, position, firstLine)
-        { nextTokens, tokensStartPosition, tokensEndPosition } = match
-        if position < tokensStartPosition # unmatched text before next tokens
+        {nextTokens, tokensStartPosition, tokensEndPosition} = match
+
+        # Unmatched text before next tokens
+        if position < tokensStartPosition
           tokens.push(@createToken(line[position...tokensStartPosition], scopes))
 
         tokens.push(nextTokens...)
         position = tokensEndPosition
 
-        # break if at end of the line and no tokens were in the match and no rule was pushed to the stack
+        # Break if at end of the line and no tokens were in the match and no rule was pushed to the stack
         if position is line.length and nextTokens.length is 0 and ruleStack.length is previousRuleStackLength
           if tokens.length is 0 # push filler token for unmatched text
             tokens.push(@createToken(line[position...line.length], scopes))
           break
 
-      else # push filler token for unmatched text at end of line
+      else
+        # Push filler token for unmatched text at end of line
         if position < line.length or line.length == 0
           tokens.push(@createToken(line[position...line.length], scopes))
         break
@@ -117,7 +120,12 @@ class Grammar
       if position == previousPosition
         if ruleStack.length == previousRuleStackLength
           console.error("Popping rule because it loops at column #{position} of line '#{line}'", _.clone(ruleStack))
-          ruleStack.pop()
+          if ruleStack.length > 1
+            ruleStack.pop()
+          else
+            if position < line.length or (line.length == 0 and tokens.length is 0)
+              tokens.push(@createToken(line[position...line.length], scopes))
+            break
         else if ruleStack.length > previousRuleStackLength # Stack size increased with zero length match
           [penultimateRule, lastRule] = ruleStack[-2..]
 

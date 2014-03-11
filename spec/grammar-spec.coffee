@@ -731,3 +731,16 @@ describe "Grammar tokenization", ->
             "meta.property-value.css"
             "support.constant.color.w3c-standard-color-name.css"
           ]
+
+  describe "when the position doesn't advance", ->
+    it "logs an error and tokenizes the remainder of the line", ->
+      spyOn(console, 'error')
+      loadGrammarSync("loops.json")
+      grammar = registry.grammarForScopeName("source.loops")
+      {ruleStack, tokens} = grammar.tokenizeLine('test')
+
+      expect(ruleStack.length).toBe 1
+      expect(console.error.callCount).toBe 1
+      expect(tokens.length).toBe 1
+      expect(tokens[0].value).toEqual 'test'
+      expect(tokens[0].scopes).toEqual ['source.loops']
