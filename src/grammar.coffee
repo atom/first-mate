@@ -26,7 +26,7 @@ class Grammar
 
     @repository = null
     @initialRule = null
-    @maxTokensPerLine = 100
+    @maxTokensPerLine = 10000
 
     @rawPatterns = patterns
     @rawRepository = repository
