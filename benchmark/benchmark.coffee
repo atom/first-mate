@@ -4,7 +4,9 @@ GrammarRegistry = require '../lib/grammar-registry'
 
 registry = new GrammarRegistry()
 jsGrammar = registry.loadGrammarSync(path.resolve(__dirname, '..', 'spec', 'fixtures', 'javascript.json'))
+jsGrammar.maxTokensPerLine = Infinity
 cssGrammar = registry.loadGrammarSync(path.resolve(__dirname, '..', 'spec', 'fixtures', 'css.json'))
+cssGrammar.maxTokensPerLine = Infinity
 
 tokenize = (grammar, content, lineCount) ->
   start = Date.now()
