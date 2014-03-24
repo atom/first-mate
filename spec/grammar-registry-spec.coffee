@@ -69,3 +69,14 @@ describe "GrammarRegistry", ->
 
       runs ->
         expect(callback.argsForCall[0][0].message.length).toBeGreaterThan 0
+
+  describe "maxTokensPerLine option", ->
+    it "set the value on each created grammar and limits the number of tokens per line to that value", ->
+      registry = new GrammarRegistry(maxTokensPerLine: 2)
+      loadGrammarSync('json.json')
+
+      grammar = registry.selectGrammar('test.json')
+      expect(grammar.maxTokensPerLine).toBe 2
+
+      {tokens} = grammar.tokenizeLine("{ }")
+      expect(tokens.length).toBe 2

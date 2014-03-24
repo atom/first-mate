@@ -10,7 +10,8 @@ module.exports =
 class GrammarRegistry
   Emitter.includeInto(this)
 
-  constructor: ->
+  constructor: (options={}) ->
+    @maxTokensPerLine = options.maxTokensPerLine ? 100
     @grammars = []
     @grammarsByScopeName = {}
     @injectionGrammars = []
@@ -158,6 +159,7 @@ class GrammarRegistry
       @emit 'grammar-updated', grammar if grammar.grammarUpdated(scopeName)
 
   createGrammar: (grammarPath, object) ->
+    object.maxTokensPerLine ?= @maxTokensPerLine
     grammar = new Grammar(this, object)
     grammar.path = grammarPath
     grammar
