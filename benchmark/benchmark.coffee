@@ -3,7 +3,9 @@ fs = require 'fs-plus'
 GrammarRegistry = require '../lib/grammar-registry'
 
 registry = new GrammarRegistry()
-grammar = registry.loadGrammarSync(path.resolve(__dirname, '..', 'spec', 'fixtures', 'javascript.json'))
+jsGrammar = registry.loadGrammarSync(path.resolve(__dirname, '..', 'spec', 'fixtures', 'javascript.json'))
+cssGrammar = registry.loadGrammarSync(path.resolve(__dirname, '..', 'spec', 'fixtures', 'css.json'))
+cssGrammar.maxTokensPerLine = Infinity
 
 tokenize = (grammar, content, lineCount) ->
   start = Date.now()
@@ -13,14 +15,24 @@ tokenize = (grammar, content, lineCount) ->
   tokensPerMillisecond = Math.round(tokenCount / duration)
   console.log "Generated #{tokenCount} tokens for #{lineCount} lines in #{duration}ms (#{tokensPerMillisecond} tokens/ms)"
 
+tokenizeFile = (filePath, grammar) ->
+  content = fs.readFileSync(filePath, 'utf8')
+  lineCount = content.split('\n').length
+  tokenize(grammar, content, lineCount)
+
 console.log 'Tokenizing jQuery v2.0.3'
-content = fs.readFileSync(path.join(__dirname, 'large.js'), 'utf8')
-lineCount = content.split('\n').length
-tokenize(grammar, content, lineCount)
+tokenizeFile(path.join(__dirname, 'large.js'), jsGrammar)
+
 
 console.log()
-
 console.log 'Tokenizing jQuery v2.0.3 minified'
-content = fs.readFileSync(path.join(__dirname, 'large.min.js'), 'utf8')
-lineCount = content.split('\n').length
-tokenize(grammar, content, lineCount)
+tokenizeFile(path.join(__dirname, 'large.min.js'), jsGrammar)
+
+console.log()
+console.log 'Tokenizing Bootstrap CSS v3.1.1'
+tokenizeFile(path.join(__dirname, 'bootstrap.css'), cssGrammar)
+
+
+console.log()
+console.log 'Tokenizing Bootstrap v3.1.1 minified'
+tokenizeFile(path.join(__dirname, 'bootstrap.min.css'), cssGrammar)
