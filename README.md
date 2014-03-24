@@ -75,4 +75,5 @@ Returns an array of tokens for each line tokenized.
   * Clone the repository
   * Run `npm install`
   * Run `npm test` to run the specs
-  * Run `npm run benchmark` to benchmark fully tokenizing jQuery 2.0.3
+  * Run `npm run benchmark` to benchmark fully tokenizing jQuery 2.0.3 and
+    the CSS for Twitter Bootstrap 3.1.1
