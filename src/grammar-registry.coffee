@@ -11,7 +11,7 @@ class GrammarRegistry
   Emitter.includeInto(this)
 
   constructor: (options={}) ->
-    @maxTokensPerLine = options.maxTokensPerLine ? 100
+    @maxTokensPerLine = options.maxTokensPerLine ? Infinity
     @grammars = []
     @grammarsByScopeName = {}
     @injectionGrammars = []
