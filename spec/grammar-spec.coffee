@@ -516,6 +516,15 @@ describe "Grammar tokenization", ->
         expect(tokens[2].value).toEqual "TODO"
         expect(tokens[2].scopes).toEqual ["source.ruby", "comment.line.number-sign.ruby", "storage.type.class.todo"]
 
+    describe "$number style pattern names", ->
+      it "replaces the number with the capture group and translates the text", ->
+        loadGrammarSync('makefile.json')
+        grammar = registry.grammarForScopeName('source.makefile')
+        tokens = grammar.tokenizeLines("ifeq")[0]
+        expect(tokens.length).toBe 1
+        expect(tokens[0].value).toEqual "ifeq"
+        expect(tokens[0].scopes).toEqual ["source.makefile", "meta.scope.conditional.makefile", "keyword.control.ifeq.makefile"]
+
   describe "language-specific integration tests", ->
     lines = null
 

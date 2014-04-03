@@ -114,8 +114,8 @@ class Pattern
     else
       [this]
 
-  resolveScopeName: (line, captureIndices) ->
-    resolvedScopeName = @scopeName.replace CustomCaptureIndexRegex, (match, index, command) ->
+  resolveScopeName: (scopeName, line, captureIndices) ->
+    resolvedScopeName = scopeName.replace CustomCaptureIndexRegex, (match, index, command) ->
       capture = captureIndices[parseInt(index)]
       if capture?
         replacement = line.substring(capture.start, capture.end)
@@ -136,7 +136,7 @@ class Pattern
   handleMatch: (stack, line, captureIndices, rule, endPatternMatch) ->
     scopes = @grammar.scopesFromStack(stack, rule, endPatternMatch)
     if @scopeName and not @popRule
-      scopes.push(@resolveScopeName(line, captureIndices))
+      scopes.push(@resolveScopeName(@scopeName, line, captureIndices))
 
     if @captures
       tokens = @getTokensForCaptureIndices(line, _.clone(captureIndices), scopes, stack)
@@ -166,7 +166,7 @@ class Pattern
 
     tokens = []
     if scope = @captures[parentCapture.index]?.name
-      scopes = scopes.concat(scope)
+      scopes = scopes.concat(@resolveScopeName(scope, line, @captures))
 
     if captureRule = @captures[parentCapture.index]?.rule
       captureTokens = @getTokensForCaptureRule(captureRule, line, parentCapture.start, parentCapture.end, scopes, stack)
