@@ -41,10 +41,10 @@ class Scanner
 
   # Public: Find the next match on the line start at the given position
   #
-  # * line: the string being scanned.
-  # * firstLine: true if the first line is being scanned.
-  # * position: numeric position to start scanning at.
-  # * anchorPosition: numeric position of the last anchored match.
+  # line - the string being scanned.
+  # firstLine - true if the first line is being scanned.
+  # position - numeric position to start scanning at.
+  # anchorPosition - numeric position of the last anchored match.
   #
   # Returns an Object with details about the match or null if no match found.
   findNextMatch: (line, firstLine, position, anchorPosition) ->
@@ -56,11 +56,11 @@ class Scanner
   # Public: Handle the given match by calling `handleMatch` on the
   # matched {Pattern}.
   #
-  # * match: An object returned from a previous call to `findNextMatch`.
-  # * stack: An array of {Rule} objects.
-  # * line: The string being scanned.
-  # * rule: The rule that matched.
-  # * endPatternMatch: true if the rule's end pattern matched.
+  # match - An object returned from a previous call to `findNextMatch`.
+  # stack - An array of {Rule} objects.
+  # line - The string being scanned.
+  # rule - The rule that matched.
+  # endPatternMatch - true if the rule's end pattern matched.
   #
   # Returns an array of tokens representing the match.
   handleMatch: (match, stack, line, rule, endPatternMatch) ->
