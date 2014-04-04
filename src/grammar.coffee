@@ -21,7 +21,7 @@ class Grammar
   Emitter.includeInto(this)
 
   constructor: (@registry, options={}) ->
-    {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine} = options
+    {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine, @keywords} = options
     {injections, injectionSelector, patterns, repository, firstLineMatch} = options
 
     @repository = null
