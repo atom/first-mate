@@ -49,7 +49,7 @@ class Scanner
   # Returns an Object with details about the match or null if no match found.
   findNextMatch: (line, firstLine, position, anchorPosition) ->
     scanner = @getScanner(firstLine, position, anchorPosition)
-    match = scanner.findNextMatch(line, position)
+    match = scanner.findNextMatchSync(line, position)
     match?.scanner = this
     match
 

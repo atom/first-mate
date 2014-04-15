@@ -200,7 +200,7 @@ class Grammar
         else
           escaped = false
     lines = contents.split('\n')
-    @firstLineRegex.test(lines[0..numberOfNewlinesInRegex].join('\n'))
+    @firstLineRegex.testSync(lines[0..numberOfNewlinesInRegex].join('\n'))
 
   getPathScore: (filePath) ->
     return -1 unless filePath
