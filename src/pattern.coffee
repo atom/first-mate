@@ -118,6 +118,8 @@ class Pattern
       capture = captureIndices[parseInt(index ? commandIndex)]
       if capture?
         replacement = line.substring(capture.start, capture.end)
+        # Remove leading dots that would make the selector invalid
+        replacement = replacement.substring(1) while replacement[0] is '.'
         switch command
           when 'downcase' then replacement.toLowerCase()
           when 'upcase'   then replacement.toUpperCase()
