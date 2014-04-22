@@ -1,8 +1,7 @@
 _ = require 'underscore-plus'
 
 AllDigitsRegex = /\\\d+/g
-CaptureIndexRegex = /\$(\d+)/
-CustomCaptureIndexRegex = /\${(\d+):\/(downcase|upcase)}/
+CustomCaptureIndexRegex = /\$(\d+)|\${(\d+):\/(downcase|upcase)}/
 DigitRegex = /\\\d+/
 
 module.exports =
@@ -115,21 +114,14 @@ class Pattern
       [this]
 
   resolveScopeName: (scopeName, line, captureIndices) ->
-    resolvedScopeName = scopeName.replace CustomCaptureIndexRegex, (match, index, command) ->
-      capture = captureIndices[parseInt(index)]
+    resolvedScopeName = scopeName.replace CustomCaptureIndexRegex, (match, index, commandIndex, command) ->
+      capture = captureIndices[parseInt(index ? commandIndex)]
       if capture?
         replacement = line.substring(capture.start, capture.end)
         switch command
           when 'downcase' then replacement.toLowerCase()
-          when 'upcase' then replacement.toUpperCase()
+          when 'upcase'   then replacement.toUpperCase()
           else replacement
-      else
-        match
-
-    resolvedScopeName.replace CaptureIndexRegex, (match, index) ->
-      capture = captureIndices[parseInt(index)]
-      if capture?
-        line.substring(capture.start, capture.end)
       else
         match
 
