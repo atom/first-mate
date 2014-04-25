@@ -47,7 +47,7 @@ class Pattern
     return false unless @regexSource
     escape = false
     for character in @regexSource
-      return true if escape and 'AGz'.indexOf(character) isnt -1
+      return true if escape and character in ['A', 'G', 'z']
       escape = not escape and character is '\\'
     false
 
