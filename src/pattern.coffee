@@ -12,7 +12,6 @@ class Pattern
     {@include, @popRule, @hasBackReferences} = options
 
     @pushRule = null
-    @capture = null
     @backReferences = null
     @scopeName = name
     @contentScopeName = contentName
