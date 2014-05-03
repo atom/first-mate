@@ -156,10 +156,11 @@ class Pattern
 
   # Get the tokens for the capture indices.
   #
-  # line - The string line being tokenized.
-  # currentCaptureIndices - The current array capture indices being processed.
-  #                         This method is called recursively and this array
-  #                         will be modified inside this method.
+  # line - The string being tokenized.
+  # currentCaptureIndices - The current array of capture indices being
+  #                         processed into tokens. This method is called
+  #                         recursively and this array will be modified inside
+  #                         this method.
   # allCaptureIndices - The array of all capture indices, this array will not
   #                     be modified.
   # scopes - An array of scopes.
