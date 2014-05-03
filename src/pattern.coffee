@@ -133,7 +133,7 @@ class Pattern
       scopes.push(@resolveScopeName(@scopeName, line, captureIndices))
 
     if @captures
-      tokens = @getTokensForCaptureIndices(line, _.clone(captureIndices), scopes, stack)
+      tokens = @getTokensForCaptureIndices(line, _.clone(captureIndices), captureIndices, scopes, stack)
     else
       {start, end} = captureIndices[0]
       zeroLengthMatch = end == start
@@ -155,34 +155,46 @@ class Pattern
     {tokens} = rule.grammar.tokenizeLine(captureText, [stack..., rule])
     tokens
 
-  getTokensForCaptureIndices: (line, captureIndices, scopes, stack) ->
-    parentCapture = captureIndices.shift()
+  # Get the tokens for the capture indices.
+  #
+  # line - The string line being tokenized.
+  # currentCaptureIndices - The current array capture indices being processed.
+  #                         This method is called recursively and this array
+  #                         will be modified inside this method.
+  # allCaptureIndices - The array of all capture indices, this array will not
+  #                     be modified.
+  # scopes - An array of scopes.
+  # stack - An array of rules.
+  #
+  # Returns a non-null but possibly empty array of tokens
+  getTokensForCaptureIndices: (line, currentCaptureIndices, allCaptureIndices, scopes, stack) ->
+    parentCapture = currentCaptureIndices.shift()
 
     tokens = []
     if scope = @captures[parentCapture.index]?.name
-      scopes = scopes.concat(@resolveScopeName(scope, line, @captures))
+      scopes = scopes.concat(@resolveScopeName(scope, line, allCaptureIndices))
 
     if captureRule = @captures[parentCapture.index]?.rule
       captureTokens = @getTokensForCaptureRule(captureRule, line, parentCapture.start, parentCapture.end, scopes, stack)
       tokens.push(captureTokens...)
       # Consume child captures
-      while captureIndices.length and captureIndices[0].start < parentCapture.end
-        captureIndices.shift()
+      while currentCaptureIndices.length and currentCaptureIndices[0].start < parentCapture.end
+        currentCaptureIndices.shift()
     else
       previousChildCaptureEnd = parentCapture.start
-      while captureIndices.length and captureIndices[0].start < parentCapture.end
-        childCapture = captureIndices[0]
+      while currentCaptureIndices.length and currentCaptureIndices[0].start < parentCapture.end
+        childCapture = currentCaptureIndices[0]
 
         emptyCapture = childCapture.end - childCapture.start == 0
         captureHasNoScope = not @captures[childCapture.index]
         if emptyCapture or captureHasNoScope
-          captureIndices.shift()
+          currentCaptureIndices.shift()
           continue
 
         if childCapture.start > previousChildCaptureEnd
           tokens.push(@grammar.createToken(line[previousChildCaptureEnd...childCapture.start], scopes))
 
-        captureTokens = @getTokensForCaptureIndices(line, captureIndices, scopes, stack)
+        captureTokens = @getTokensForCaptureIndices(line, currentCaptureIndices, allCaptureIndices, scopes, stack)
         tokens.push(captureTokens...)
         previousChildCaptureEnd = childCapture.end
 

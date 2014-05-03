@@ -525,6 +525,13 @@ describe "Grammar tokenization", ->
         expect(tokens[0].value).toEqual "ifeq"
         expect(tokens[0].scopes).toEqual ["source.makefile", "meta.scope.conditional.makefile", "keyword.control.ifeq.makefile"]
 
+        tokens = grammar.tokenizeLines("ifeq (")[0]
+        expect(tokens.length).toBe 2
+        expect(tokens[0].value).toEqual "ifeq"
+        expect(tokens[0].scopes).toEqual ["source.makefile", "meta.scope.conditional.makefile", "keyword.control.ifeq.makefile"]
+        expect(tokens[1].value).toEqual " ("
+        expect(tokens[1].scopes).toEqual ["source.makefile", "meta.scope.conditional.makefile", "meta.scope.condition.makefile"]
+
       it "removes leading dot characters from the replaced capture index placeholder", ->
         loadGrammarSync('makefile.json')
         grammar = registry.grammarForScopeName('source.makefile')
