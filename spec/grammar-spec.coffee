@@ -263,6 +263,21 @@ describe "Grammar tokenization", ->
           expect(tokens[2]).toEqual value: "\\t", scopes: ['source.coffee', 'string.quoted.double.heredoc.coffee', 'constant.character.escape.coffee']
           expect(tokens[3]).toEqual value: '"""', scopes: ['source.coffee', 'string.quoted.double.heredoc.coffee', 'punctuation.definition.string.end.coffee']
 
+      describe "when applyEndPatternLast flag is set in a pattern", ->
+        it "applies end pattern after the other patterns", ->
+          grammar = loadGrammarSync('apply-end-pattern-last.cson')
+          lines = grammar.tokenizeLines """
+            last
+            { some }excentricSyntax }
+
+            first
+            { some }excentricSyntax }
+          """
+
+          expect(lines[1][2].value).toBe "}excentricSyntax"
+          expect(lines[4][2].value).toBe "}"
+          expect(lines[4][3].value).toBe "excentricSyntax }"
+
       describe "when the end pattern contains a back reference", ->
         it "constructs the end rule based on its back-references to captures in the begin rule", ->
           grammar = registry.grammarForScopeName('source.ruby')

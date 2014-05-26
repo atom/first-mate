@@ -8,7 +8,7 @@ module.exports =
 class Pattern
   constructor: (@grammar, @registry, options={}) ->
     {name, contentName, match, begin, end, patterns} = options
-    {captures, beginCaptures, endCaptures} = options
+    {captures, beginCaptures, endCaptures, applyEndPatternLast} = options
     {@include, @popRule, @hasBackReferences} = options
 
     @pushRule = null
@@ -26,7 +26,7 @@ class Pattern
       @regexSource = begin
       @captures = beginCaptures ? captures
       endPattern = @grammar.createPattern({match: end, captures: endCaptures ? captures, popRule: true})
-      @pushRule = @grammar.createRule({@scopeName, @contentScopeName, patterns, endPattern})
+      @pushRule = @grammar.createRule({@scopeName, @contentScopeName, patterns, endPattern, applyEndPatternLast})
 
     if @captures?
       for group, capture of @captures
