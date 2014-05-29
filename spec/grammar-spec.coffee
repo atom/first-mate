@@ -274,9 +274,9 @@ describe "Grammar tokenization", ->
             { some }excentricSyntax }
           """
 
-          expect(lines[1][2].value).toBe "}excentricSyntax"
-          expect(lines[4][2].value).toBe "}"
-          expect(lines[4][3].value).toBe "excentricSyntax }"
+          expect(lines[1][2]).toEqual value: "}excentricSyntax", scopes: ['source.apply-end-pattern-last', 'end-pattern-last-env', 'scope', 'excentric']
+          expect(lines[4][2]).toEqual value: "}", scopes: ['source.apply-end-pattern-last', 'normal-env', 'scope']
+          expect(lines[4][3]).toEqual value: "excentricSyntax }", scopes: ['source.apply-end-pattern-last', 'normal-env']
 
       describe "when the end pattern contains a back reference", ->
         it "constructs the end rule based on its back-references to captures in the begin rule", ->
