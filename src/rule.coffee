@@ -4,13 +4,17 @@ Scanner = require './scanner'
 
 module.exports =
 class Rule
-  constructor: (@grammar, @registry, {@scopeName, @contentScopeName, patterns, @endPattern}={}) ->
+  constructor: (@grammar, @registry, {@scopeName, @contentScopeName, patterns, @endPattern, @applyEndPatternLast}={}) ->
     @patterns = []
     for pattern in patterns ? []
       @patterns.push(@grammar.createPattern(pattern)) unless pattern.disabled
 
     if @endPattern and not @endPattern.hasBackReferences
-      @patterns.unshift(@endPattern)
+      if @applyEndPatternLast
+        @patterns.push(@endPattern)
+      else
+        @patterns.unshift(@endPattern)
+
     @scannersByBaseGrammarName = {}
     @createEndPattern = null
     @anchorPosition = -1
