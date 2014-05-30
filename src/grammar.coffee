@@ -10,7 +10,7 @@ Pattern = require './pattern'
 Rule = require './rule'
 ScopeSelector = require './scope-selector'
 
-pathSplitRegex = new RegExp("[#{_.escapeRegExp(path.sep)}.]")
+pathSplitRegex = new RegExp("[/.]")
 
 # Public: Grammar that tokenizes lines of text.
 #
@@ -204,6 +204,8 @@ class Grammar
 
   getPathScore: (filePath) ->
     return -1 unless filePath
+
+    filePath = filePath.replace(/\\/g, '/') if process.platform is 'win32'
 
     pathComponents = filePath.toLowerCase().split(pathSplitRegex)
     pathScore = -1

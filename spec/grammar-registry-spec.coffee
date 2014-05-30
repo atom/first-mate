@@ -55,6 +55,23 @@ describe "GrammarRegistry", ->
       expect(registry.selectGrammar('/tmp/source.coffee').scopeName).toBe 'source.coffee'
       expect(registry.selectGrammar('/tmp/source.COFFEE').scopeName).toBe 'source.coffee'
 
+    describe "on Windows", ->
+      originalPlatform = null
+
+      beforeEach ->
+        originalPlatform = process.platform
+        Object.defineProperty process, 'platform', value: 'win32'
+
+      afterEach ->
+        Object.defineProperty process, 'platform', value: originalPlatform
+
+      it "normalizes back slashes to forward slashes when matching the fileTypes", ->
+        registry = new GrammarRegistry()
+        loadGrammarSync('file-types-with-slashes.json')
+
+        expect(registry.selectGrammar('C:\\.atom\\hello').scopeName).toBe 'fileTypes.withSlashes'
+        expect(registry.selectGrammar('/a/b/c/.atom/hello').scopeName).toBe 'fileTypes.withSlashes'
+
   describe "when the grammar has no scope name", ->
     it "throws an error", ->
       grammarPath = path.join(__dirname, 'fixtures', 'no-scope-name.json')
