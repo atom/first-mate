@@ -228,7 +228,7 @@
       "end": "\\s*(?:(,)|(?=[{;]))",
       "endCaptures": {
         "1": {
-          "name": "punctuation.definition.arbitrary-repitition.css"
+          "name": "punctuation.definition.arbitrary-repetition.css"
         }
       },
       "patterns": [
