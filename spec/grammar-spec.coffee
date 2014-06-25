@@ -391,6 +391,42 @@ describe "Grammar tokenization", ->
       expect(tokens[0].value).toBe "//"
       expect(tokens[1].value).toBe " a singleLineComment"
 
+    it "can parse multiline text using a grammar containing patterns with newlines", ->
+      grammar = loadGrammarSync('multiline.cson')
+      allTokens = []
+      ruleStack = null
+      lines = ['Xy\\', 'zX']
+      for line, index in lines
+        {tokens, ruleStack} = grammar.tokenizeLine(line, ruleStack, index == 0)
+        allTokens.push tokens
+
+      # Line 0
+      expect(allTokens[0][0]).toEqual
+        value: 'X'
+        scopes: ['source.multilineLanguage', 'outside-x', 'start']
+
+      expect(allTokens[0][1]).toEqual
+        value: 'y'
+        scopes: ['source.multilineLanguage', 'outside-x']
+
+      expect(allTokens[0][2]).toEqual
+        value: '\\'
+        scopes: ['source.multilineLanguage', 'outside-x', 'inside-x']
+
+      expect(allTokens[0][3]).not.toBeDefined()
+
+      # Line 1
+      expect(allTokens[1][0]).toEqual
+        value: 'z'
+        scopes: ['source.multilineLanguage', 'outside-x']
+
+      expect(allTokens[1][1]).toEqual
+        value: 'X'
+        scopes: ['source.multilineLanguage', 'outside-x', 'end']
+
+      expect(allTokens[1][2]).not.toBeDefined()
+
+
     it "does not loop infinitely (regression)", ->
       grammar = registry.grammarForScopeName('source.js')
       {tokens, ruleStack} = grammar.tokenizeLine("// line comment")
