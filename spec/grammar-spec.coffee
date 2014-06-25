@@ -199,9 +199,11 @@ describe "Grammar tokenization", ->
         expect(line2[0].value).toEqual "test"
         expect(line2[0].scopes).toEqual ["source.test", "pre", "nested"]
 
-        expect(line3.length).toBe 1
+        expect(line3.length).toBe 2
         expect(line3[0].value).toEqual "#endif"
         expect(line3[0].scopes).toEqual ["source.test", "pre"]
+        expect(line3[1].value).toEqual ""
+        expect(line3[1].scopes).toEqual ["source.test", "all"]
 
         {tokens} = grammar.tokenizeLine "test"
         expect(tokens.length).toBe 1
