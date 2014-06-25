@@ -387,9 +387,10 @@ describe "Grammar tokenization", ->
       expect(ruleStack.length).toBe 1
       expect(ruleStack[0].scopeName).toBe "source.imaginaryLanguage"
 
-      expect(tokens.length).toBe 2
+      expect(tokens.length).toBe 3
       expect(tokens[0].value).toBe "//"
       expect(tokens[1].value).toBe " a singleLineComment"
+      expect(tokens[2].value).toBe ""
 
     it "can parse multiline text using a grammar containing patterns with newlines", ->
       grammar = loadGrammarSync('multiline.cson')
