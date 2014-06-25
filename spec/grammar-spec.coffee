@@ -199,9 +199,11 @@ describe "Grammar tokenization", ->
         expect(line2[0].value).toEqual "test"
         expect(line2[0].scopes).toEqual ["source.test", "pre", "nested"]
 
-        expect(line3.length).toBe 1
+        expect(line3.length).toBe 2
         expect(line3[0].value).toEqual "#endif"
         expect(line3[0].scopes).toEqual ["source.test", "pre"]
+        expect(line3[1].value).toEqual ""
+        expect(line3[1].scopes).toEqual ["source.test", "all"]
 
         {tokens} = grammar.tokenizeLine "test"
         expect(tokens.length).toBe 1
@@ -387,9 +389,41 @@ describe "Grammar tokenization", ->
       expect(ruleStack.length).toBe 1
       expect(ruleStack[0].scopeName).toBe "source.imaginaryLanguage"
 
-      expect(tokens.length).toBe 2
+      expect(tokens.length).toBe 3
       expect(tokens[0].value).toBe "//"
       expect(tokens[1].value).toBe " a singleLineComment"
+      expect(tokens[2].value).toBe ""
+
+    it "can parse multiline text using a grammar containing patterns with newlines", ->
+      grammar = loadGrammarSync('multiline.cson')
+      tokens = grammar.tokenizeLines('Xy\\\nzX')
+
+      # Line 0
+      expect(tokens[0][0]).toEqual
+        value: 'X'
+        scopes: ['source.multilineLanguage', 'outside-x', 'start']
+
+      expect(tokens[0][1]).toEqual
+        value: 'y'
+        scopes: ['source.multilineLanguage', 'outside-x']
+
+      expect(tokens[0][2]).toEqual
+        value: '\\'
+        scopes: ['source.multilineLanguage', 'outside-x', 'inside-x']
+
+      expect(tokens[0][3]).not.toBeDefined()
+
+      # Line 1
+      expect(tokens[1][0]).toEqual
+        value: 'z'
+        scopes: ['source.multilineLanguage', 'outside-x']
+
+      expect(tokens[1][1]).toEqual
+        value: 'X'
+        scopes: ['source.multilineLanguage', 'outside-x', 'end']
+
+      expect(tokens[1][2]).not.toBeDefined()
+
 
     it "does not loop infinitely (regression)", ->
       grammar = registry.grammarForScopeName('source.js')
@@ -550,7 +584,7 @@ describe "Grammar tokenization", ->
       it "removes leading dot characters from the replaced capture index placeholder", ->
         loadGrammarSync('makefile.json')
         grammar = registry.grammarForScopeName('source.makefile')
-        tokens = grammar.tokenizeLines(".PHONY:")[0]
+        {tokens}  = grammar.tokenizeLine(".PHONY:")
         expect(tokens.length).toBe 2
         expect(tokens[0].value).toEqual ".PHONY"
         expect(tokens[0].scopes).toEqual ["source.makefile", "meta.scope.target.makefile", "support.function.target.PHONY.makefile"]
@@ -733,15 +767,6 @@ describe "Grammar tokenization", ->
         expect(line2[1].scopes).toEqual ["source.python"]
         expect(line2[2].value).toEqual "b"
         expect(line2[2].scopes).toEqual ["source.python"]
-
-    describe "clojure", ->
-      it "parses empty lines correctly", ->
-        loadGrammarSync('clojure.json')
-        grammar = registry.grammarForScopeName('source.clojure')
-        {tokens} = grammar.tokenizeLine ""
-        expect(tokens.length).toBe 1
-        expect(tokens[0].value).toEqual ""
-        expect(tokens[0].scopes).toEqual ["source.clojure"]
 
     describe "HTML", ->
       describe "when it contains CSS", ->
