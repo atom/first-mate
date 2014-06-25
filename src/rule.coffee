@@ -75,11 +75,11 @@ class Rule
 
     if results.length > 1
       _.min results, (result) =>
-        @normalizeCaptureIndices(line, result.captureIndices)
+        @normalizeCaptureIndices(lineWithNewline, result.captureIndices)
         result.captureIndices[0].start
     else if results.length is 1
       [result] = results
-      @normalizeCaptureIndices(line, result.captureIndices)
+      @normalizeCaptureIndices(lineWithNewline, result.captureIndices)
       result
 
   getNextTokens: (ruleStack, line, position, firstLine) ->
