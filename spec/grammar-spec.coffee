@@ -396,38 +396,33 @@ describe "Grammar tokenization", ->
 
     it "can parse multiline text using a grammar containing patterns with newlines", ->
       grammar = loadGrammarSync('multiline.cson')
-      allTokens = []
-      ruleStack = null
-      lines = ['Xy\\', 'zX']
-      for line, index in lines
-        {tokens, ruleStack} = grammar.tokenizeLine(line, ruleStack, index == 0)
-        allTokens.push tokens
+      tokens = grammar.tokenizeLines('Xy\\\nzX')
 
       # Line 0
-      expect(allTokens[0][0]).toEqual
+      expect(tokens[0][0]).toEqual
         value: 'X'
         scopes: ['source.multilineLanguage', 'outside-x', 'start']
 
-      expect(allTokens[0][1]).toEqual
+      expect(tokens[0][1]).toEqual
         value: 'y'
         scopes: ['source.multilineLanguage', 'outside-x']
 
-      expect(allTokens[0][2]).toEqual
+      expect(tokens[0][2]).toEqual
         value: '\\'
         scopes: ['source.multilineLanguage', 'outside-x', 'inside-x']
 
-      expect(allTokens[0][3]).not.toBeDefined()
+      expect(tokens[0][3]).not.toBeDefined()
 
       # Line 1
-      expect(allTokens[1][0]).toEqual
+      expect(tokens[1][0]).toEqual
         value: 'z'
         scopes: ['source.multilineLanguage', 'outside-x']
 
-      expect(allTokens[1][1]).toEqual
+      expect(tokens[1][1]).toEqual
         value: 'X'
         scopes: ['source.multilineLanguage', 'outside-x', 'end']
 
-      expect(allTokens[1][2]).not.toBeDefined()
+      expect(tokens[1][2]).not.toBeDefined()
 
 
     it "does not loop infinitely (regression)", ->
