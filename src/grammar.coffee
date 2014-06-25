@@ -80,14 +80,24 @@ class Grammar
 
     tokens = []
     position = 0
+    eol = '\u00ac'
+    actualLine = line + eol
+    console.log "\n-----------------------------------------"
 
     loop
+      console.log "<START AT COLUMN #{position}>"
       scopes = @scopesFromStack(ruleStack)
       previousRuleStackLength = ruleStack.length
       previousPosition = position
 
+
+      console.log _.multiplyString('_', position) + actualLine[position..]
+      console.log scopes.join(" > ")
+      console.log ""
+
       if tokens.length >= @getMaxTokensPerLine() - 1
-        token = @createToken(line[position..], scopes)
+        console.log "<MAX TOKENS(#{@getMaxTokensPerLine()}) REACHED>"
+        token = @createToken(actualLine[position..], scopes)
         tokens.push token
         ruleStack = originalRuleStack
         break
@@ -99,18 +109,28 @@ class Grammar
 
         # Unmatched text before next tokens
         if position < tokensStartPosition
+          console.log _.multiplyString('_', position) + actualLine[position...tokensStartPosition] + _.multiplyString('_', actualLine.length - tokensStartPosition)
+          console.log  "<UNMATCHED>", scopes.join(",")
+          console.log ""
           tokens.push(@createToken(line[position...tokensStartPosition], scopes))
 
         tokens.push(nextTokens...)
         position = tokensEndPosition
 
+        console.log actualLine[0...position] + _.multiplyString('_', actualLine.length - position)
+        console.log nextTokens.map((t) -> t.scopes.join(',')).join("+")
+        console.log ""
+
         # Break if at end of the line and no tokens were in the match and no rule was pushed to the stack
         if position is line.length and nextTokens.length is 0 and ruleStack.length is previousRuleStackLength
+          console.log "!!!OW OH, HEY YOU WHO SAID THAT? BABY, HOW YOU BEEN!!!"
+
           if tokens.length is 0 # push filler token for unmatched text
             tokens.push(@createToken(line[position...line.length], scopes))
           break
 
       else
+        console.log "<NO PATTERNS MATCHED>"
         # Push filler token for unmatched text at end of line
         if position < line.length or line.length == 0
           tokens.push(@createToken(line[position...line.length], scopes))
@@ -126,6 +146,7 @@ class Grammar
               tokens.push(@createToken(line[position...line.length], scopes))
             break
         else if ruleStack.length > previousRuleStackLength # Stack size increased with zero length match
+          console.log "<STACK IS GETTING BIGGER?>"
           [penultimateRule, lastRule] = ruleStack[-2..]
 
           # Same exact rule was pushed but position wasn't advanced
