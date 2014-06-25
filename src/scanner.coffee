@@ -19,7 +19,7 @@ class Scanner
 
   # Create a new {OnigScanner} with the given options.
   createScanner: (firstLine, position, anchorPosition) ->
-    patterns = @patterns.map (pattern) ->
+    patterns = @patterns.map (pattern) =>
       pattern.getRegex(firstLine, position, anchorPosition)
     scanner = new OnigScanner(patterns)
 

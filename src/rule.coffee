@@ -1,10 +1,11 @@
 _ = require 'underscore-plus'
 
 Scanner = require './scanner'
-
+ID = 0
 module.exports =
 class Rule
   constructor: (@grammar, @registry, {@scopeName, @contentScopeName, patterns, @endPattern, @applyEndPatternLast}={}) ->
+    @id = ID++
     @patterns = []
     for pattern in patterns ? []
       @patterns.push(@grammar.createPattern(pattern)) unless pattern.disabled
@@ -79,6 +80,7 @@ class Rule
         result.captureIndices[0].start
     else if results.length is 1
       [result] = results
+      console.log "[#{@id}]Rule::findNextMatch #{@scopeName}", {firstLine, position, @anchorPosition, result}
       @normalizeCaptureIndices(line, result.captureIndices)
       result
 

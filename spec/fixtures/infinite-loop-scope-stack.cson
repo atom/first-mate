@@ -1,0 +1,28 @@
+'name': 'infinite-loop-grammar'
+'scopeName': 'source.infinite-loop'
+
+# This grammar should loop forever if the line contains an `a`
+'patterns': [
+  {
+    'begin': '(?<=[=(:]|^|return|&&|\\|\\||!)\\s*(/)(?![/*+{}?])'
+    'end': '(/)[igm]*'
+    'name': 'string.regexp.js'
+    'patterns': [
+      {
+        'name': 'anything'
+        'match': '.'
+      }
+    ]
+  }
+  {
+    'begin': '(^[ \\t]+)?(?=//)'
+    'end': '(?!\\G)'
+    'patterns': [
+      {
+        'begin': '//'
+        'end': '\\n'
+        'name': 'comment.line.double-slash.js'
+      }
+    ]
+  }
+]

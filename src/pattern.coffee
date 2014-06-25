@@ -127,6 +127,7 @@ class Pattern
         match
 
   handleMatch: (stack, line, captureIndices, rule, endPatternMatch) ->
+    console.log "Pattern:handleMatch #{@scopeName} #{line[0..]} [#{captureIndices[0].start}, #{captureIndices[0].end}] pushRule=#{@pushRule?} /#{@regexSource}/ hasAnchor=#{@hasAnchor()}"
     scopes = @grammar.scopesFromStack(stack, rule, endPatternMatch)
     if @scopeName and not @popRule
       scopes.push(@resolveScopeName(@scopeName, line, captureIndices))
@@ -142,6 +143,7 @@ class Pattern
         tokens = [@grammar.createToken(line[start...end], scopes)]
     if @pushRule
       ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
+      console.log "Pattern:handleMatch setting anchor /#{@regexSource}/ #{line[0..]} anchorPos=#{captureIndices[0].end}"
       ruleToPush.anchorPosition = captureIndices[0].end
       stack.push(ruleToPush)
     else if @popRule

@@ -420,6 +420,28 @@ describe "Grammar tokenization", ->
         expect(tokens[1].value).toBe "bc"
         expect(console.error).toHaveBeenCalled()
 
+      fit "aborts tokenization when the scope stack keeps changing", ->
+        spyOn(console, 'error')
+        grammar = loadGrammarSync('infinite-loop-scope-stack.cson')
+        ruleStacks = []
+
+        # First pass is a success
+        lines = ['', '/// test']
+        for line, index in lines
+          {tokens, ruleStack} = grammar.tokenizeLine(line, ruleStacks[index], index == 0)
+          ruleStacks.push(ruleStack)
+
+        expect(console.error).not.toHaveBeenCalled()
+
+        console.log "\n\n\n"
+        # Second pass is a failure
+        lines = ['/', '/// test']
+        for line, index in lines
+          console.log ruleStacks[index]
+          {tokens, ruleStack} = grammar.tokenizeLine(line, ruleStacks[index], index == 0)
+
+        expect(console.error).toHaveBeenCalled()
+
     describe "when a grammar has a pattern that has back references in the match value", ->
       it "does not special handle the back references and instead allows oniguruma to resolve them", ->
         loadGrammarSync('scss.json')

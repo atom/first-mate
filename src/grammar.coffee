@@ -72,6 +72,7 @@ class Grammar
   #                end of the line. These should be passed back into this method
   #                when tokenizing the next line in the file.
   tokenizeLine: (line, ruleStack, firstLine=false) ->
+
     if ruleStack?
       ruleStack = ruleStack.slice()
     else
@@ -80,8 +81,10 @@ class Grammar
 
     tokens = []
     position = 0
-
+    loopCount = 0
     loop
+      loopCount++
+
       scopes = @scopesFromStack(ruleStack)
       previousRuleStackLength = ruleStack.length
       previousPosition = position
@@ -117,7 +120,7 @@ class Grammar
         break
 
       if position == previousPosition
-        if ruleStack.length == previousRuleStackLength
+        if ruleStack.length == previousRuleStackLength or loopCount > 1000
           console.error("Popping rule because it loops at column #{position} of line '#{line}'", _.clone(ruleStack))
           if ruleStack.length > 1
             ruleStack.pop()
