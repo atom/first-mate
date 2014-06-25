@@ -152,6 +152,9 @@ class Pattern
   getTokensForCaptureRule: (rule, line, captureStart, captureEnd, scopes, stack) ->
     captureText = line.substring(captureStart, captureEnd)
     {tokens} = rule.grammar.tokenizeLine(captureText, [stack..., rule])
+
+    # For capture matches, remove empty tokens caused by newline matches
+    tokens = tokens.filter (token) -> token.value != ''
     tokens
 
   # Get the tokens for the capture indices.
