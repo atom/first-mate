@@ -24,7 +24,7 @@
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
     "underscore-plus": "1.x",
-    "oniguruma": "^1.0.4",
+    "oniguruma": "^3.0.0",
     "emissary": "1.x",
     "fs-plus": "2.x",
     "season": "1.x"
