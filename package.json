@@ -30,7 +30,7 @@
     "season": "^1"
   },
   "devDependencies": {
-    "jasmine-focused": "1.x",
+    "jasmine-focused": "^1",
     "grunt-contrib-coffee": "~0.9.0",
     "grunt-cli": "~0.1.8",
     "grunt": "~0.4.1",
