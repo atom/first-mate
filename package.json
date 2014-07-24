@@ -1,6 +1,6 @@
 {
   "name": "first-mate",
-  "version": "1.7.1",
+  "version": "2.0.1",
   "description": "TextMate helpers",
   "main": "./lib/first-mate.js",
   "scripts": {
@@ -23,14 +23,14 @@
   },
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
-    "underscore-plus": "1.x",
-    "oniguruma": "^1.0.4",
-    "emissary": "1.x",
-    "fs-plus": "2.x",
-    "season": "1.x"
+    "underscore-plus": "^1",
+    "oniguruma": "^3",
+    "emissary": "^1",
+    "fs-plus": "^2",
+    "season": "^1"
   },
   "devDependencies": {
-    "jasmine-focused": "1.x",
+    "jasmine-focused": "^1",
     "grunt-contrib-coffee": "~0.9.0",
     "grunt-cli": "~0.1.8",
     "grunt": "~0.4.1",
