@@ -808,3 +808,16 @@ describe "Grammar tokenization", ->
       expect(tokens.length).toBe 1
       expect(tokens[0].value).toEqual 'test'
       expect(tokens[0].scopes).toEqual ['source.loops']
+
+  describe "::setConfigFileTypes", ->
+    it "adds additional file types", ->
+      grammar = registry.grammarForScopeName("text.html.basic")
+      grammar.setConfigFileTypes(["foozle"])
+
+      expect(grammar.getPathScore("galumph.foozle")).toBe 6
+
+    it "does not mess with built-in file types", ->
+      grammar = registry.grammarForScopeName("text.html.basic")
+      grammar.setConfigFileTypes(["foozle"])
+
+      expect(grammar.getPathScore("galumph.html")).toBe 4

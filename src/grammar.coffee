@@ -42,7 +42,17 @@ class Grammar
       @firstLineRegex = null
 
     @fileTypes ?= []
+    @configFileTypes = []
     @includedGrammarScopes = []
+
+  # Public: Sets the list of user-configured file types.
+  #
+  # This list is kept separate from the grammar-set file types so that when the
+  # user changes their configuration it can be easily modified without corrupting
+  # the file types list from the grammar itself.
+  #
+  # configFileTypes - An {Array} of file extensions to match.
+  setConfigFileTypes: (@configFileTypes) ->
 
   # Public: Tokenize all lines in the given text.
   #
@@ -204,7 +214,7 @@ class Grammar
 
     pathComponents = filePath.toLowerCase().split(pathSplitRegex)
     pathScore = -1
-    for fileType in @fileTypes
+    for fileType in @fileTypes.concat(@configFileTypes)
       fileTypeComponents = fileType.toLowerCase().split(pathSplitRegex)
       pathSuffix = pathComponents[-fileTypeComponents.length..-1]
       if _.isEqual(pathSuffix, fileTypeComponents)
