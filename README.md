@@ -49,6 +49,12 @@ Returns a `Grammar` instance.
 
 ### Grammar
 
+#### setConfigFileTypes([configFileTypes])
+
+Sets the list of user-configured file types for this grammar.
+
+`configFileTypes` - An array of file types to be matched against.
+
 #### tokenizeLine(line, [ruleStack], [firstLine])
 
 Generate the tokenize for the given line of text.
