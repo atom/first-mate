@@ -809,6 +809,26 @@ describe "Grammar tokenization", ->
       expect(tokens[0].value).toEqual 'test'
       expect(tokens[0].scopes).toEqual ['source.loops']
 
+  describe '::isGlob', ->
+    beforeEach ->
+      grammar = registry.grammarForScopeName("text.html.basic")
+
+    it 'returns true when a string is a glob', ->
+      expect(grammar.isGlob("*.html")).toBeTruthy
+
+    it 'returns fals when a string is not a glob', ->
+      expect(grammar.isGlob("html")).toBeFalsy
+
+  describe '::scoreFromGlob', ->
+    beforeEach ->
+      grammar = registry.grammarForScopeName("text.html.basic")
+
+    it 'returns -1 for no match', ->
+      expect(grammar.scoreFromGlob("foo.html", "*.foo")).toBe -1
+
+    it 'returns the length of the match when matched', ->
+      expect(grammar.scoreFromGlob("foo.html", "*.html")).toBe 8
+
   describe '::getScore', ->
     beforeEach ->
       grammar = registry.grammarForScopeName("text.html.basic")
@@ -826,3 +846,8 @@ describe "Grammar tokenization", ->
       registry.setGrammarOverrideForPath("foo.foo", "text.html.basic")
 
       expect(grammar.getScore("foo.foo", null)).toBe 9
+
+    it 'returns the length of the match when a file glob matches', ->
+      grammar.fileTypes = grammar.fileTypes.concat ["*.foo"]
+
+      expect(grammar.getScore("foo.foo", null)).toBe 7
