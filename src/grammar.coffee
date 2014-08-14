@@ -2,6 +2,7 @@ path = require 'path'
 
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
+minimatch = require 'minimatch'
 {OnigRegExp} = require 'oniguruma'
 {Emitter} = require 'emissary'
 
@@ -205,12 +206,21 @@ class Grammar
     pathComponents = filePath.toLowerCase().split(pathSplitRegex)
     pathScore = -1
     for fileType in @fileTypes
-      fileTypeComponents = fileType.toLowerCase().split(pathSplitRegex)
-      pathSuffix = pathComponents[-fileTypeComponents.length..-1]
-      if _.isEqual(pathSuffix, fileTypeComponents)
-        pathScore = Math.max(pathScore, fileType.length)
+      if @isGlob(fileType)
+        pathScore = Math.max(pathScore, @scoreFromGlob(filePath, fileType))
+      else
+        fileTypeComponents = fileType.toLowerCase().split(pathSplitRegex)
+        pathSuffix = pathComponents[-fileTypeComponents.length..-1]
+        if _.isEqual(pathSuffix, fileTypeComponents)
+          pathScore = Math.max(pathScore, fileType.length)
 
     pathScore
+
+  isGlob: (fileType) ->
+    /\*|\?|\{/.test(fileType)
+
+  scoreFromGlob: (filePath, fileType) ->
+    if minimatch(filePath, fileType) then fileType.replace(/\*|\?/, '').length else -1
 
   createToken: (value, scopes) -> @registry.createToken(value, scopes)
 
