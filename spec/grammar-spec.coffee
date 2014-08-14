@@ -816,7 +816,7 @@ describe "Grammar tokenization", ->
     it 'returns true when a string is a glob', ->
       expect(grammar.isGlob("*.html")).toBeTruthy
 
-    it 'returns fals when a string is not a glob', ->
+    it 'returns false when a string is not a glob', ->
       expect(grammar.isGlob("html")).toBeFalsy
 
   describe '::scoreFromGlob', ->
@@ -826,8 +826,8 @@ describe "Grammar tokenization", ->
     it 'returns -1 for no match', ->
       expect(grammar.scoreFromGlob("foo.html", "*.foo")).toBe -1
 
-    it 'returns the length of the match when matched', ->
-      expect(grammar.scoreFromGlob("foo.html", "*.html")).toBe 8
+    it 'returns the length of the pattern without wildcards when matched', ->
+      expect(grammar.scoreFromGlob("foo.html", "*.html")).toBe 5
 
   describe '::getScore', ->
     beforeEach ->
@@ -836,7 +836,7 @@ describe "Grammar tokenization", ->
     it 'returns -1 for no match', ->
       expect(grammar.getScore("foo.foo", null)).toBe -1
 
-    it 'returns the length of the match when the filename matches', ->
+    it 'returns the length of the match when the extension matches', ->
       expect(grammar.getScore("foo.html", null)).toBe 4
 
     it 'returns one more than the length of the filename when the contents match', ->
@@ -847,7 +847,7 @@ describe "Grammar tokenization", ->
 
       expect(grammar.getScore("foo.foo", null)).toBe 9
 
-    it 'returns the length of the match when a file glob matches', ->
+    it 'returns the length of the pattern without wildcards when a file glob matches', ->
       grammar.fileTypes = grammar.fileTypes.concat ["*.foo"]
 
-      expect(grammar.getScore("foo.foo", null)).toBe 7
+      expect(grammar.getScore("foo.foo", null)).toBe 4

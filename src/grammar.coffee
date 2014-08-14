@@ -220,12 +220,7 @@ class Grammar
     /\*|\?|\{/.test(fileType)
 
   scoreFromGlob: (filePath, fileType) ->
-    re = minimatch.makeRe(fileType)
-    match = re.exec(filePath)
-    if match
-      match[0].length
-    else
-      -1
+    if minimatch(filePath, fileType) then fileType.replace(/\*|\?/, '').length else -1
 
   createToken: (value, scopes) -> @registry.createToken(value, scopes)
 
