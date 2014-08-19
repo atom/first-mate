@@ -42,9 +42,13 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-shell')
   grunt.loadNpmTasks('grunt-coffeelint')
   grunt.loadNpmTasks('grunt-peg')
+  grunt.loadNpmTasks('grunt-atomdoc')
 
-  grunt.registerTask 'clean', -> require('rimraf').sync('lib')
+  grunt.registerTask 'clean', ->
+    require('rimraf').sync('lib')
+    require('rimraf').sync('api.json')
+
   grunt.registerTask('lint', ['coffeelint'])
   grunt.registerTask('default', ['coffee', 'peg', 'lint'])
-  grunt.registerTask('prepublish', ['clean', 'coffee', 'peg', 'lint'])
+  grunt.registerTask('prepublish', ['clean', 'coffee', 'peg', 'lint', 'atomdoc'])
   grunt.registerTask('test', ['default', 'shell:test'])
