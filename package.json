@@ -39,6 +39,6 @@
     "rimraf": "~2.1.4",
     "coffee-script": "~1.7.0",
     "grunt-peg": "~1.1.0",
-    "grunt-atomdoc": "^0.2.0"
+    "grunt-atomdoc": "^1.0.0"
   }
 }
