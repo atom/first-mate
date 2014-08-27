@@ -60,17 +60,16 @@ class Grammar
   #
   # * `line` A {String} of text to tokenize.
   # * `ruleStack` An optional {Array} of rules previously returned from this
-  #               method. This should be null when tokenizing the first line in
-  #               the file.
+  #   method. This should be null when tokenizing the first line in the file.
   # * `firstLine` A optional {Boolean} denoting whether this is the first line
-  #               in the file which defaults to `false`. This should be `true`
-  #               when tokenizing the first line in the file.
+  #   in the file which defaults to `false`. This should be `true`
+  #   when tokenizing the first line in the file.
   #
   # Returns an {Object} containing the following properties:
-  #   * `token` An {Array} of tokens covering the entire line of text.
-  #   * `ruleStack` An {Array} of rules representing the tokenized state at the
-  #                 end of the line. These should be passed back into this
-  #                 method when tokenizing the next line in the file.
+  # * `token` An {Array} of tokens covering the entire line of text.
+  # * `ruleStack` An {Array} of rules representing the tokenized state at the
+  #   end of the line. These should be passed back into this method when
+  #   tokenizing the next line in the file.
   tokenizeLine: (line, ruleStack, firstLine=false) ->
     if ruleStack?
       ruleStack = ruleStack.slice()
