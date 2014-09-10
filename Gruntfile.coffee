@@ -38,6 +38,13 @@ module.exports = (grunt) ->
           stderr: true
           failOnError: true
 
+      'update-atomdoc':
+        command: 'npm update grunt-atomdoc'
+        options:
+          stdout: true
+          stderr: true
+          failOnError: true
+
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-shell')
   grunt.loadNpmTasks('grunt-coffeelint')
@@ -50,5 +57,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask('lint', ['coffeelint'])
   grunt.registerTask('default', ['coffee', 'peg', 'lint'])
-  grunt.registerTask('prepublish', ['clean', 'coffee', 'peg', 'lint', 'atomdoc'])
+  grunt.registerTask('prepublish', ['clean', 'coffee', 'peg', 'lint', 'shell:update-atomdoc', 'atomdoc'])
   grunt.registerTask('test', ['default', 'shell:test'])
