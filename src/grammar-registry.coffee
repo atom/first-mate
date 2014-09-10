@@ -223,6 +223,11 @@ class GrammarRegistry
   selectGrammar: (filePath, fileContents) ->
     _.max @grammars, (grammar) -> grammar.getScore(filePath, fileContents)
 
+  # Test-Only: Clear all observers registered with ::on* methods.
+  clearObservers: ->
+    @off()
+    @emitter = new Emitter
+
   createToken: (value, scopes) -> {value, scopes}
 
   grammarUpdated: (scopeName) ->
