@@ -345,7 +345,7 @@ describe "Grammar tokenization", ->
 
             grammar = registry.grammarForScopeName('text.html.ruby')
             grammarUpdatedHandler = jasmine.createSpy("grammarUpdatedHandler")
-            grammar.on 'grammar-updated', grammarUpdatedHandler
+            grammar.onDidUpdate grammarUpdatedHandler
 
             {tokens} = grammar.tokenizeLine("<div class='name'><% <<-SQL select * from users;")
             expect(tokens[12].value).toBe " select * from users;"

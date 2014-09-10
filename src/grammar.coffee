@@ -3,7 +3,9 @@ path = require 'path'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {OnigRegExp} = require 'oniguruma'
-{Emitter} = require 'emissary'
+EmitterMixin = require('emissary').Emitter
+{Emitter} = require 'event-kit'
+Grim = require 'grim'
 
 Injections = require './injections'
 Pattern = require './pattern'
@@ -18,12 +20,13 @@ pathSplitRegex = new RegExp("[/.]")
 # a {GrammarRegistry} by calling {GrammarRegistry::loadGrammar}.
 module.exports =
 class Grammar
-  Emitter.includeInto(this)
+  EmitterMixin.includeInto(this)
 
   constructor: (@registry, options={}) ->
     {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine} = options
     {injections, injectionSelector, patterns, repository, firstLineMatch} = options
 
+    @emitter = new Emitter
     @repository = null
     @initialRule = null
 
@@ -43,6 +46,23 @@ class Grammar
 
     @fileTypes ?= []
     @includedGrammarScopes = []
+
+  # Public: Invoke the given callback when this grammar is updated due to a
+  # grammar it depends on being added or removed from the registry.
+  #
+  # * `callback` {Function} to call when this grammar is updated.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidUpdate: (callback) ->
+    @emitter.on 'did-update', callback
+
+  on: (eventName) ->
+    if eventName is 'did-update'
+      Grim.deprecate("Call Grammar::onDidUpdate instead")
+    else
+      Grim.deprecate("Call explicit event subscription methods instead")
+
+    EmitterMixin::on.apply(this, arguments)
 
   # Public: Tokenize all lines in the given text.
   #
@@ -142,6 +162,7 @@ class Grammar
     @registry.addGrammar(this)
 
   deactivate: ->
+    @emitter = new Emitter
     @registry.removeGrammar(this)
 
   clearRules: ->
@@ -167,6 +188,7 @@ class Grammar
     @clearRules()
     @registry.grammarUpdated(@scopeName)
     @emit 'grammar-updated'
+    @emitter.emit 'did-update'
     true
 
   getScore: (filePath, contents) ->
