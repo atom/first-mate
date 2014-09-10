@@ -162,7 +162,7 @@ class Grammar
     @registry.addGrammar(this)
 
   deactivate: ->
-    @emitter.dispose()
+    @emitter = new Emitter
     @registry.removeGrammar(this)
 
   clearRules: ->
