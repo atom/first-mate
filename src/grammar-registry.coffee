@@ -2,6 +2,7 @@ _ = require 'underscore-plus'
 CSON = require 'season'
 EmitterMixin = require('emissary').Emitter
 {Emitter} = require 'event-kit'
+Grim = require 'grim'
 
 Grammar = require './grammar'
 NullGrammar = require './null-grammar'
@@ -41,6 +42,17 @@ class GrammarRegistry
 
   onDidUpdateGrammar: (callback) ->
     @emitter.on 'did-update-grammar', callback
+
+  on: (eventName) ->
+    switch eventName
+      when 'grammar-added'
+        Grim.deprecate("Call GrammarRegistry::onDidAddGrammar instead")
+      when 'grammar-updated'
+        Grim.deprecate("Call GrammarRegistry::onDidUpdateGrammar instead")
+      else
+        Grim.deprecate("Call explicit event subscription methods instead")
+
+    EmitterMixin::on.apply(this, arguments)
 
   # Public: Get all the grammars in this registry.
   #

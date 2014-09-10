@@ -5,6 +5,7 @@ fs = require 'fs-plus'
 {OnigRegExp} = require 'oniguruma'
 EmitterMixin = require('emissary').Emitter
 {Emitter} = require 'event-kit'
+Grim = require 'grim'
 
 Injections = require './injections'
 Pattern = require './pattern'
@@ -48,6 +49,14 @@ class Grammar
 
   onDidUpdate: (callback) ->
     @emitter.on 'did-update', callback
+
+  on: (eventName) ->
+    if eventName is 'did-update'
+      Grim.deprecate("Call Grammar::onDidUpdate instead")
+    else
+      Grim.deprecate("Call explicit event subscription methods instead")
+
+    EmitterMixin::on.apply(this, arguments)
 
   # Public: Tokenize all lines in the given text.
   #

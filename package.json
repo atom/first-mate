@@ -23,12 +23,13 @@
   },
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
-    "underscore-plus": "^1",
-    "oniguruma": "^3",
     "emissary": "^1",
     "event-kit": "^0.7.1",
     "fs-plus": "^2",
-    "season": "^1"
+    "grim": "^0.12.0",
+    "oniguruma": "^3",
+    "season": "^1",
+    "underscore-plus": "^1"
   },
   "devDependencies": {
     "jasmine-focused": "^1",
