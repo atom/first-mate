@@ -1,6 +1,7 @@
 _ = require 'underscore-plus'
 CSON = require 'season'
-{Emitter} = require 'emissary'
+EmitterMixin = require('emissary').Emitter
+{Emitter} = require 'event-kit'
 
 Grammar = require './grammar'
 NullGrammar = require './null-grammar'
@@ -23,16 +24,23 @@ NullGrammar = require './null-grammar'
 # * `grammar` The {Grammar} that was updated.
 module.exports =
 class GrammarRegistry
-  Emitter.includeInto(this)
+  EmitterMixin.includeInto(this)
 
   constructor: (options={}) ->
     @maxTokensPerLine = options.maxTokensPerLine ? Infinity
+    @emitter = new Emitter
     @grammars = []
     @grammarsByScopeName = {}
     @injectionGrammars = []
     @grammarOverridesByPath = {}
     @nullGrammar = new NullGrammar(this)
     @addGrammar(@nullGrammar)
+
+  onDidAddGrammar: (callback) ->
+    @emitter.on 'did-add-grammar', callback
+
+  onDidUpdateGrammar: (callback) ->
+    @emitter.on 'did-update-grammar', callback
 
   # Public: Get all the grammars in this registry.
   #
@@ -82,6 +90,7 @@ class GrammarRegistry
     @injectionGrammars.push(grammar) if grammar.injectionSelector?
     @grammarUpdated(grammar.scopeName)
     @emit 'grammar-added', grammar
+    @emitter.emit 'did-add-grammar', grammar
 
   # Public: Read a grammar synchronously but don't add it to the registry.
   #
@@ -193,7 +202,9 @@ class GrammarRegistry
 
   grammarUpdated: (scopeName) ->
     for grammar in @grammars when grammar.scopeName isnt scopeName
-      @emit 'grammar-updated', grammar if grammar.grammarUpdated(scopeName)
+      if grammar.grammarUpdated(scopeName)
+        @emit 'grammar-updated', grammar
+        @emitter.emit 'did-update-grammar', grammar
 
   createGrammar: (grammarPath, object) ->
     object.maxTokensPerLine ?= @maxTokensPerLine

@@ -26,6 +26,7 @@
     "underscore-plus": "^1",
     "oniguruma": "^3",
     "emissary": "^1",
+    "event-kit": "^0.7.1",
     "fs-plus": "^2",
     "season": "^1"
   },
