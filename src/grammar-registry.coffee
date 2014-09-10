@@ -37,9 +37,22 @@ class GrammarRegistry
     @nullGrammar = new NullGrammar(this)
     @addGrammar(@nullGrammar)
 
+  # Public: Invoke the given callback when a grammar is added to the registry.
+  #
+  # * `callback` {Function} to call when a grammar is added.
+  #   * `grammar` {Grammar} that was added.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddGrammar: (callback) ->
     @emitter.on 'did-add-grammar', callback
 
+  # Public: Invoke the given callback when a grammar is updated due to a grammar
+  # it depends on being added or removed from the registry.
+  #
+  # * `callback` {Function} to call when a grammar is updated.
+  #   * `grammar` {Grammar} that was updated.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidUpdateGrammar: (callback) ->
     @emitter.on 'did-update-grammar', callback
 

@@ -47,6 +47,12 @@ class Grammar
     @fileTypes ?= []
     @includedGrammarScopes = []
 
+  # Public: Invoke the given callback when this grammar is updated due to a
+  # grammar it depends on being added or removed from the registry.
+  #
+  # * `callback` {Function} to call when this grammar is updated.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidUpdate: (callback) ->
     @emitter.on 'did-update', callback
 
