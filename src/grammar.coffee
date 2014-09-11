@@ -14,7 +14,7 @@ ScopeSelector = require './scope-selector'
 
 pathSplitRegex = new RegExp("[/.]")
 
-# Public: Grammar that tokenizes lines of text.
+# Extended: Grammar that tokenizes lines of text.
 #
 # This class should not be instantiated directly but instead obtained from
 # a {GrammarRegistry} by calling {GrammarRegistry::loadGrammar}.
@@ -47,6 +47,10 @@ class Grammar
     @fileTypes ?= []
     @includedGrammarScopes = []
 
+  ###
+  Section: Event Subscription
+  ###
+
   # Public: Invoke the given callback when this grammar is updated due to a
   # grammar it depends on being added or removed from the registry.
   #
@@ -63,6 +67,10 @@ class Grammar
       Grim.deprecate("Call explicit event subscription methods instead")
 
     EmitterMixin::on.apply(this, arguments)
+
+  ###
+  Section: Tokenizing
+  ###
 
   # Public: Tokenize all lines in the given text.
   #

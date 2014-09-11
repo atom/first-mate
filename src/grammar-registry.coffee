@@ -7,22 +7,7 @@ Grim = require 'grim'
 Grammar = require './grammar'
 NullGrammar = require './null-grammar'
 
-# Public: Registry containing one or more grammars.
-#
-# ## Events
-#
-# ### grammar-added
-#
-# Fired when a grammar has been added to the registry.
-#
-# * `grammar` The {Grammar} that was added.
-#
-# ### grammar-updated
-#
-# Fired whenever a grammar has been updated due to a grammar it depends on
-# being added to or removed from the registry.
-#
-# * `grammar` The {Grammar} that was updated.
+# Extended: Registry containing one or more grammars.
 module.exports =
 class GrammarRegistry
   EmitterMixin.includeInto(this)
@@ -36,6 +21,10 @@ class GrammarRegistry
     @grammarOverridesByPath = {}
     @nullGrammar = new NullGrammar(this)
     @addGrammar(@nullGrammar)
+
+  ###
+  Section: Event Subscription
+  ###
 
   # Public: Invoke the given callback when a grammar is added to the registry.
   #
@@ -67,6 +56,10 @@ class GrammarRegistry
 
     EmitterMixin::on.apply(this, arguments)
 
+  ###
+  Section: Managing Grammars
+  ###
+
   # Public: Get all the grammars in this registry.
   #
   # Returns a non-empty {Array} of {Grammar} instances.
@@ -80,6 +73,20 @@ class GrammarRegistry
   # Returns a {Grammar} or undefined.
   grammarForScopeName: (scopeName) ->
     @grammarsByScopeName[scopeName]
+
+  # Public: Add a grammar to this registry.
+  #
+  # A 'grammar-added' event is emitted after the grammar is added.
+  #
+  # * `grammar` The {Grammar} to add. This should be a value previously returned
+  #   from {::readGrammar} or {::readGrammarSync}.
+  addGrammar: (grammar) ->
+    @grammars.push(grammar)
+    @grammarsByScopeName[grammar.scopeName] = grammar
+    @injectionGrammars.push(grammar) if grammar.injectionSelector?
+    @grammarUpdated(grammar.scopeName)
+    @emit 'grammar-added', grammar
+    @emitter.emit 'did-add-grammar', grammar
 
   # Public: Remove a grammar from this registry.
   #
@@ -102,20 +109,6 @@ class GrammarRegistry
     grammar = @grammarForScopeName(scopeName)
     @removeGrammar(grammar) if grammar?
     grammar
-
-  # Public: Add a grammar to this registry.
-  #
-  # A 'grammar-added' event is emitted after the grammar is added.
-  #
-  # * `grammar` The {Grammar} to add. This should be a value previously returned
-  #   from {::readGrammar} or {::readGrammarSync}.
-  addGrammar: (grammar) ->
-    @grammars.push(grammar)
-    @grammarsByScopeName[grammar.scopeName] = grammar
-    @injectionGrammars.push(grammar) if grammar.injectionSelector?
-    @grammarUpdated(grammar.scopeName)
-    @emit 'grammar-added', grammar
-    @emitter.emit 'did-add-grammar', grammar
 
   # Public: Read a grammar synchronously but don't add it to the registry.
   #
