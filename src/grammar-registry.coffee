@@ -8,21 +8,6 @@ Grammar = require './grammar'
 NullGrammar = require './null-grammar'
 
 # Public: Registry containing one or more grammars.
-#
-# ## Events
-#
-# ### grammar-added
-#
-# Fired when a grammar has been added to the registry.
-#
-# * `grammar` The {Grammar} that was added.
-#
-# ### grammar-updated
-#
-# Fired whenever a grammar has been updated due to a grammar it depends on
-# being added to or removed from the registry.
-#
-# * `grammar` The {Grammar} that was updated.
 module.exports =
 class GrammarRegistry
   EmitterMixin.includeInto(this)
