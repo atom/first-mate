@@ -22,6 +22,10 @@ class GrammarRegistry
     @nullGrammar = new NullGrammar(this)
     @addGrammar(@nullGrammar)
 
+  ###
+  Section: Event Subscription
+  ###
+
   # Public: Invoke the given callback when a grammar is added to the registry.
   #
   # * `callback` {Function} to call when a grammar is added.
@@ -51,6 +55,10 @@ class GrammarRegistry
         Grim.deprecate("Call explicit event subscription methods instead")
 
     EmitterMixin::on.apply(this, arguments)
+
+  ###
+  Section: Managing Grammars
+  ###
 
   # Public: Get all the grammars in this registry.
   #
