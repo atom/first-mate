@@ -74,6 +74,20 @@ class GrammarRegistry
   grammarForScopeName: (scopeName) ->
     @grammarsByScopeName[scopeName]
 
+  # Public: Add a grammar to this registry.
+  #
+  # A 'grammar-added' event is emitted after the grammar is added.
+  #
+  # * `grammar` The {Grammar} to add. This should be a value previously returned
+  #   from {::readGrammar} or {::readGrammarSync}.
+  addGrammar: (grammar) ->
+    @grammars.push(grammar)
+    @grammarsByScopeName[grammar.scopeName] = grammar
+    @injectionGrammars.push(grammar) if grammar.injectionSelector?
+    @grammarUpdated(grammar.scopeName)
+    @emit 'grammar-added', grammar
+    @emitter.emit 'did-add-grammar', grammar
+
   # Public: Remove a grammar from this registry.
   #
   # * `grammar` The {Grammar} to remove.
@@ -95,20 +109,6 @@ class GrammarRegistry
     grammar = @grammarForScopeName(scopeName)
     @removeGrammar(grammar) if grammar?
     grammar
-
-  # Public: Add a grammar to this registry.
-  #
-  # A 'grammar-added' event is emitted after the grammar is added.
-  #
-  # * `grammar` The {Grammar} to add. This should be a value previously returned
-  #   from {::readGrammar} or {::readGrammarSync}.
-  addGrammar: (grammar) ->
-    @grammars.push(grammar)
-    @grammarsByScopeName[grammar.scopeName] = grammar
-    @injectionGrammars.push(grammar) if grammar.injectionSelector?
-    @grammarUpdated(grammar.scopeName)
-    @emit 'grammar-added', grammar
-    @emitter.emit 'did-add-grammar', grammar
 
   # Public: Read a grammar synchronously but don't add it to the registry.
   #
