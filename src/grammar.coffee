@@ -14,7 +14,7 @@ ScopeSelector = require './scope-selector'
 
 pathSplitRegex = new RegExp("[/.]")
 
-# Public: Grammar that tokenizes lines of text.
+# Extended: Grammar that tokenizes lines of text.
 #
 # This class should not be instantiated directly but instead obtained from
 # a {GrammarRegistry} by calling {GrammarRegistry::loadGrammar}.

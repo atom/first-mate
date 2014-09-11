@@ -7,7 +7,7 @@ Grim = require 'grim'
 Grammar = require './grammar'
 NullGrammar = require './null-grammar'
 
-# Public: Registry containing one or more grammars.
+# Extended: Registry containing one or more grammars.
 module.exports =
 class GrammarRegistry
   EmitterMixin.includeInto(this)
