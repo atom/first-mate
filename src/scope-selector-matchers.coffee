@@ -1,8 +1,6 @@
-_ = require 'underscore-plus'
-
 class SegmentMatcher
-  constructor: (segment) ->
-    @segment = _.flatten(segment).join('')
+  constructor: (segments) ->
+    @segment = segments[0].join('') + segments[1].join('')
 
   matches: (scope) -> scope is @segment
 
