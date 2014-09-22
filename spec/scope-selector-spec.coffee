@@ -70,6 +70,7 @@ describe "ScopeSelector", ->
       expect(new ScopeSelector('a|b').matches('a')).toBeTruthy()
       expect(new ScopeSelector('a|b').matches('b')).toBeTruthy()
       expect(new ScopeSelector('a|b').matches('c')).toBeFalsy()
+      expect(new ScopeSelector('test').matches('test')).toBeTruthy()
 
   describe ".toCssSelector()", ->
     it "converts the TextMate scope selector to a CSS selector", ->

@@ -12,7 +12,9 @@ class ScopeSelector
   # scopes - An {Array} of {String}s or a single {String}.
   #
   # Returns a {Boolean}.
-  matches: (scopes) -> @matcher.matches(scopes)
+  matches: (scopes) ->
+    scopes = [scopes] if typeof scopes is 'string'
+    @matcher.matches(scopes)
 
   # Convert this TextMate scope selector to a CSS selector.
   #
