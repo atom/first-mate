@@ -22,6 +22,8 @@ module.exports =
 class Grammar
   EmitterMixin.includeInto(this)
 
+  registration: null
+
   constructor: (@registry, options={}) ->
     {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine} = options
     {injections, injectionSelector, patterns, repository, firstLineMatch} = options
@@ -167,11 +169,11 @@ class Grammar
     {tokens, ruleStack}
 
   activate: ->
-    @registry.addGrammar(this)
+    @registration = @registry.addGrammar(this)
 
   deactivate: ->
     @emitter = new Emitter
-    @registry.removeGrammar(this)
+    @registration.dispose()
 
   clearRules: ->
     @initialRule = null

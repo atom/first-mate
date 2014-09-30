@@ -1,7 +1,7 @@
 _ = require 'underscore-plus'
 CSON = require 'season'
 EmitterMixin = require('emissary').Emitter
-{Emitter} = require 'event-kit'
+{Emitter, Disposable} = require 'event-kit'
 Grim = require 'grim'
 
 Grammar = require './grammar'
@@ -80,6 +80,9 @@ class GrammarRegistry
   #
   # * `grammar` The {Grammar} to add. This should be a value previously returned
   #   from {::readGrammar} or {::readGrammarSync}.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to remove the
+  # grammar.
   addGrammar: (grammar) ->
     @grammars.push(grammar)
     @grammarsByScopeName[grammar.scopeName] = grammar
@@ -87,12 +90,8 @@ class GrammarRegistry
     @grammarUpdated(grammar.scopeName)
     @emit 'grammar-added', grammar
     @emitter.emit 'did-add-grammar', grammar
+    new Disposable => @removeGrammar(grammar)
 
-  # Public: Remove a grammar from this registry.
-  #
-  # * `grammar` The {Grammar} to remove.
-  #
-  # Returns undefined.
   removeGrammar: (grammar) ->
     _.remove(@grammars, grammar)
     delete @grammarsByScopeName[grammar.scopeName]
