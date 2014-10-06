@@ -1120,7 +1120,7 @@
     "selector_id": {
       "captures": {
         "1": {
-          "name": "punctuationctuation.definition.entity.css"
+          "name": "punctuation.definition.entity.css"
         }
       },
       "match": "(#)[a-zA-Z][a-zA-Z0-9_-]*",
