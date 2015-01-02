@@ -24,7 +24,7 @@
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
     "emissary": "^1",
-    "event-kit": "^0.7.1",
+    "event-kit": "^1.0.0",
     "fs-plus": "^2",
     "grim": "^1.0.0",
     "oniguruma": "^3",
