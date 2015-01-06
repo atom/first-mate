@@ -808,3 +808,10 @@ describe "Grammar tokenization", ->
       expect(tokens.length).toBe 1
       expect(tokens[0].value).toEqual 'test'
       expect(tokens[0].scopes).toEqual ['source.loops']
+
+  describe "when the injection references an included grammar", ->
+    it "adds a pattern for that grammar", ->
+      loadGrammarSync("injection-with-include.cson")
+      grammar = registry.grammarForScopeName("test.injections")
+      expect(grammar).not.toBeNull()
+      expect(grammar.includedGrammarScopes).toEqual ['text.plain']

@@ -34,7 +34,6 @@ class Grammar
 
     @rawPatterns = patterns
     @rawRepository = repository
-    @injections = new Injections(this, injections)
 
     if injectionSelector?
       @injectionSelector = new ScopeSelector(injectionSelector)
@@ -48,6 +47,9 @@ class Grammar
 
     @fileTypes ?= []
     @includedGrammarScopes = []
+
+    # Create last since Injections uses APIs from this class
+    @injections = new Injections(this, injections)
 
   ###
   Section: Event Subscription
