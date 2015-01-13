@@ -28,7 +28,7 @@
     "fs-plus": "^2",
     "grim": "^1.0.0",
     "oniguruma": "^3",
-    "season": "^1",
+    "season": "^5.0.2",
     "underscore-plus": "^1"
   },
   "devDependencies": {
