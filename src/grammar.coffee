@@ -107,7 +107,7 @@ class Grammar
       ruleStack = ruleStack.slice()
     else
       ruleStack = [@getInitialRule()]
-    originalRuleStack = ruleStack
+    originalRuleStack = ruleStack.slice()
 
     tokens = []
     position = 0
