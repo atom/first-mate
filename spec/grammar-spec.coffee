@@ -464,9 +464,8 @@ describe "Grammar tokenization", ->
     describe "when a line has more tokens than `maxTokensPerLine`", ->
       it "creates a final token with the remaining text and resets the ruleStack to match the begining of the line", ->
         grammar = registry.grammarForScopeName('source.js')
-        grammar.tokenizeLine('')
+        originalRuleStack = grammar.tokenizeLine('').ruleStack
         spyOn(grammar, 'getMaxTokensPerLine').andCallFake -> 5
-        originalRuleStack = [grammar.initialRule, grammar.initialRule, grammar.initialRule]
         {tokens, ruleStack} = grammar.tokenizeLine("var x = /[a-z]/;", originalRuleStack)
         expect(tokens.length).toBe 6
         expect(tokens[5].value).toBe "[a-z]/;"
