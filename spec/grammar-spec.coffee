@@ -471,6 +471,7 @@ describe "Grammar tokenization", ->
         expect(tokens.length).toBe 6
         expect(tokens[5].value).toBe "[a-z]/;"
         expect(ruleStack).toEqual originalRuleStack
+        expect(ruleStack).not.toBe originalRuleStack
 
     describe "when a grammar has a capture with patterns", ->
       it "matches the patterns and includes the scope specified as the pattern's match name", ->
