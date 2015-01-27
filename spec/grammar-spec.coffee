@@ -467,9 +467,9 @@ describe "Grammar tokenization", ->
         grammar.tokenizeLine('')
         spyOn(grammar, 'getMaxTokensPerLine').andCallFake -> 5
         originalRuleStack = [grammar.initialRule, grammar.initialRule, grammar.initialRule]
-        {tokens, ruleStack} = grammar.tokenizeLine("one(two(three(four(five(_param_)))))", originalRuleStack)
-        expect(tokens.length).toBe 5
-        expect(tokens[4].value).toBe "three(four(five(_param_)))))"
+        {tokens, ruleStack} = grammar.tokenizeLine("var x = /[a-z]/;", originalRuleStack)
+        expect(tokens.length).toBe 6
+        expect(tokens[5].value).toBe "[a-z]/;"
         expect(ruleStack).toEqual originalRuleStack
 
     describe "when a grammar has a capture with patterns", ->
