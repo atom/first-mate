@@ -796,6 +796,64 @@ describe "Grammar tokenization", ->
             "support.constant.color.w3c-standard-color-name.css"
           ]
 
+    describe "Jade", ->
+      describe "it handles comments", ->
+        it "correctly handles a single line comment", ->
+          loadGrammarSync "jade.cson"
+          grammar = registry.grammarForScopeName("source.jade")
+          {tokens} = grammar.tokenizeLine "//- A comment"
+
+          expect(tokens[0].scopes).toEqual [
+            'source.jade'
+            'comment.unbuffered.block.jade'
+          ]
+
+          expect(tokens[1].scopes).toEqual [
+            'source.jade'
+            'comment.unbuffered.block.jade'
+          ]
+
+        it "correctly handles a single line comment after content", ->
+          loadGrammarSync "jade.cson"
+          grammar = registry.grammarForScopeName("source.jade")
+          lines = grammar.tokenizeLines """
+            h1 Header
+
+            //- A comment
+          """
+
+          expect(lines[2][0].scopes).toEqual [
+            'source.jade'
+            'comment.unbuffered.block.jade'
+          ]
+
+          expect(lines[2][1].scopes).toEqual [
+            'source.jade'
+            'comment.unbuffered.block.jade'
+          ]
+
+        it "correctly handles odd-line comments", ->
+          loadGrammarSync "jade.cson"
+          grammar = registry.grammarForScopeName("source.jade")
+          lines = grammar.tokenizeLines """
+            h1 Header
+
+
+
+            //- A comment
+          """
+
+          expect(lines[4][0].scopes).toEqual [
+            'source.jade'
+            'comment.unbuffered.block.jade'
+          ]
+
+          expect(lines[4][1].scopes).toEqual [
+            'source.jade'
+            'comment.unbuffered.block.jade'
+          ]
+
+
   describe "when the position doesn't advance", ->
     it "logs an error and tokenizes the remainder of the line", ->
       spyOn(console, 'error')
