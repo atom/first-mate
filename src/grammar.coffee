@@ -3,7 +3,6 @@ path = require 'path'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {OnigRegExp} = require 'oniguruma'
-EmitterMixin = require('emissary').Emitter
 {Emitter} = require 'event-kit'
 Grim = require 'grim'
 
@@ -260,6 +259,7 @@ class Grammar
     scopes
 
 if Grim.includeDeprecatedAPIs
+  EmitterMixin = require('emissary').Emitter
   EmitterMixin.includeInto(Grammar)
   Grammar::on = (eventName) ->
     if eventName is 'did-update'

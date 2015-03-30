@@ -1,6 +1,5 @@
 _ = require 'underscore-plus'
 CSON = require 'season'
-EmitterMixin = require('emissary').Emitter
 {Emitter, Disposable} = require 'event-kit'
 Grim = require 'grim'
 
@@ -217,6 +216,7 @@ class GrammarRegistry
     grammar
 
 if Grim.includeDeprecatedAPIs
+  EmitterMixin = require('emissary').Emitter
   EmitterMixin.includeInto(GrammarRegistry)
   GrammarRegistry::on = (eventName) ->
     switch eventName
