@@ -10,8 +10,6 @@ NullGrammar = require './null-grammar'
 # Extended: Registry containing one or more grammars.
 module.exports =
 class GrammarRegistry
-  EmitterMixin.includeInto(this)
-
   constructor: (options={}) ->
     @maxTokensPerLine = options.maxTokensPerLine ? Infinity
     @emitter = new Emitter
@@ -45,17 +43,6 @@ class GrammarRegistry
   onDidUpdateGrammar: (callback) ->
     @emitter.on 'did-update-grammar', callback
 
-  on: (eventName) ->
-    switch eventName
-      when 'grammar-added'
-        Grim.deprecate("Call GrammarRegistry::onDidAddGrammar instead")
-      when 'grammar-updated'
-        Grim.deprecate("Call GrammarRegistry::onDidUpdateGrammar instead")
-      else
-        Grim.deprecate("Call explicit event subscription methods instead")
-
-    EmitterMixin::on.apply(this, arguments)
-
   ###
   Section: Managing Grammars
   ###
@@ -88,7 +75,7 @@ class GrammarRegistry
     @grammarsByScopeName[grammar.scopeName] = grammar
     @injectionGrammars.push(grammar) if grammar.injectionSelector?
     @grammarUpdated(grammar.scopeName)
-    @emit 'grammar-added', grammar
+    @emit 'grammar-added', grammar if Grammar.includeDeprecatedAPIs
     @emitter.emit 'did-add-grammar', grammar
     new Disposable => @removeGrammar(grammar)
 
@@ -225,7 +212,7 @@ class GrammarRegistry
   grammarUpdated: (scopeName) ->
     for grammar in @grammars when grammar.scopeName isnt scopeName
       if grammar.grammarUpdated(scopeName)
-        @emit 'grammar-updated', grammar
+        @emit 'grammar-updated', grammar if Grammar.includeDeprecatedAPIs
         @emitter.emit 'did-update-grammar', grammar
 
   createGrammar: (grammarPath, object) ->
@@ -233,3 +220,16 @@ class GrammarRegistry
     grammar = new Grammar(this, object)
     grammar.path = grammarPath
     grammar
+
+if Grim.includeDeprecatedAPIs
+  EmitterMixin.includeInto(GrammarRegistry)
+  GrammarRegistry::on = (eventName) ->
+    switch eventName
+      when 'grammar-added'
+        Grim.deprecate("Call GrammarRegistry::onDidAddGrammar instead")
+      when 'grammar-updated'
+        Grim.deprecate("Call GrammarRegistry::onDidUpdateGrammar instead")
+      else
+        Grim.deprecate("Call explicit event subscription methods instead")
+
+    EmitterMixin::on.apply(this, arguments)
