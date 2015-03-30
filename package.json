@@ -26,7 +26,7 @@
     "emissary": "^1",
     "event-kit": "^1.0.0",
     "fs-plus": "^2",
-    "grim": "^1.0.0",
+    "grim": "^1.2.1",
     "oniguruma": "^4.0.0",
     "season": "^5.0.2",
     "underscore-plus": "^1"
