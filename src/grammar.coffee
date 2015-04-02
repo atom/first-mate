@@ -261,6 +261,7 @@ class Grammar
 if Grim.includeDeprecatedAPIs
   EmitterMixin = require('emissary').Emitter
   EmitterMixin.includeInto(Grammar)
+
   Grammar::on = (eventName) ->
     if eventName is 'did-update'
       Grim.deprecate("Call Grammar::onDidUpdate instead")

@@ -219,6 +219,7 @@ class GrammarRegistry
 if Grim.includeDeprecatedAPIs
   EmitterMixin = require('emissary').Emitter
   EmitterMixin.includeInto(GrammarRegistry)
+
   GrammarRegistry::on = (eventName) ->
     switch eventName
       when 'grammar-added'
