@@ -2,6 +2,7 @@ path = require 'path'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 GrammarRegistry = require '../lib/grammar-registry'
+Grammar = require '../lib/grammar'
 
 describe "Grammar tokenization", ->
   [grammar, registry] = []
@@ -815,3 +816,16 @@ describe "Grammar tokenization", ->
       grammar = registry.grammarForScopeName("test.injections")
       expect(grammar).not.toBeNull()
       expect(grammar.includedGrammarScopes).toEqual ['text.plain']
+
+  describe "when the grammar is activated/deactivated", ->
+    it "adds/removes it from the registry", ->
+      grammar = new Grammar(registry, {scopeName: 'test-activate'})
+
+      grammar.deactivate()
+      expect(registry.grammarForScopeName('test-activate')).toBeUndefined()
+
+      grammar.activate()
+      expect(registry.grammarForScopeName('test-activate')).toBe grammar
+
+      grammar.deactivate()
+      expect(registry.grammarForScopeName('test-activate')).toBeUndefined()

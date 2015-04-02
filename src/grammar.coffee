@@ -175,7 +175,8 @@ class Grammar
 
   deactivate: ->
     @emitter = new Emitter
-    @registration.dispose()
+    @registration?.dispose()
+    @registration = null
 
   clearRules: ->
     @initialRule = null
