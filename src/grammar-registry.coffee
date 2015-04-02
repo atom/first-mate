@@ -208,6 +208,7 @@ class GrammarRegistry
       if grammar.grammarUpdated(scopeName)
         @emit 'grammar-updated', grammar if Grammar.includeDeprecatedAPIs
         @emitter.emit 'did-update-grammar', grammar
+    return
 
   createGrammar: (grammarPath, object) ->
     object.maxTokensPerLine ?= @maxTokensPerLine
