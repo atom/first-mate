@@ -1,0 +1,1 @@
+require('grim').includeDeprecatedAPIs = false

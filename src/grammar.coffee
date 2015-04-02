@@ -3,7 +3,6 @@ path = require 'path'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {OnigRegExp} = require 'oniguruma'
-EmitterMixin = require('emissary').Emitter
 {Emitter} = require 'event-kit'
 Grim = require 'grim'
 
@@ -20,8 +19,6 @@ pathSplitRegex = new RegExp("[/.]")
 # a {GrammarRegistry} by calling {GrammarRegistry::loadGrammar}.
 module.exports =
 class Grammar
-  EmitterMixin.includeInto(this)
-
   registration: null
 
   constructor: (@registry, options={}) ->
@@ -63,14 +60,6 @@ class Grammar
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidUpdate: (callback) ->
     @emitter.on 'did-update', callback
-
-  on: (eventName) ->
-    if eventName is 'did-update'
-      Grim.deprecate("Call Grammar::onDidUpdate instead")
-    else
-      Grim.deprecate("Call explicit event subscription methods instead")
-
-    EmitterMixin::on.apply(this, arguments)
 
   ###
   Section: Tokenizing
@@ -200,7 +189,7 @@ class Grammar
     return false unless _.include(@includedGrammarScopes, scopeName)
     @clearRules()
     @registry.grammarUpdated(@scopeName)
-    @emit 'grammar-updated'
+    @emit 'grammar-updated' if Grim.includeDeprecatedAPIs
     @emitter.emit 'did-update'
     true
 
@@ -268,3 +257,15 @@ class Grammar
       scopes.pop()
 
     scopes
+
+if Grim.includeDeprecatedAPIs
+  EmitterMixin = require('emissary').Emitter
+  EmitterMixin.includeInto(Grammar)
+
+  Grammar::on = (eventName) ->
+    if eventName is 'did-update'
+      Grim.deprecate("Call Grammar::onDidUpdate instead")
+    else
+      Grim.deprecate("Call explicit event subscription methods instead")
+
+    EmitterMixin::on.apply(this, arguments)

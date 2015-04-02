@@ -50,6 +50,7 @@ class Rule
     for capture in captureIndices
       capture.end = Math.min(capture.end, lineLength)
       capture.start = Math.min(capture.start, lineLength)
+    return
 
   findNextMatch: (ruleStack, line, position, firstLine) ->
     lineWithNewline = "#{line}\n"
