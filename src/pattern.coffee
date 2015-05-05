@@ -95,11 +95,11 @@ class Pattern
     @grammar.createPattern({hasBackReferences: false, match: resolvedMatch, @captures, @popRule})
 
   ruleForInclude: (baseGrammar, name) ->
-    if name[0] == "#"
+    if name[0] is "#"
       @grammar.getRepository()[name[1..]]
-    else if name == "$self"
+    else if name is "$self"
       @grammar.getInitialRule()
-    else if name == "$base"
+    else if name is "$base"
       baseGrammar.getInitialRule()
     else
       @grammar.addIncludedGrammarScope(name)
@@ -127,35 +127,39 @@ class Pattern
         match
 
   handleMatch: (stack, line, captureIndices, rule, endPatternMatch) ->
-    scopes = @grammar.scopesFromStack(stack, rule, endPatternMatch)
-    if @scopeName and not @popRule
-      scopes.push(@resolveScopeName(@scopeName, line, captureIndices))
+    content = []
+
+    if @popRule
+      {contentScopeName} = _.last(stack)
+      content.push(-@grammar.idForScope(contentScopeName)) if contentScopeName
+    else if @scopeName
+      scopeName = @resolveScopeName(@scopeName, line, captureIndices)
+      content.push(@grammar.idForScope(scopeName))
 
     if @captures
-      tokens = @getTokensForCaptureIndices(line, _.clone(captureIndices), captureIndices, scopes, stack)
+      content.push(@contentForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
     else
       {start, end} = captureIndices[0]
-      zeroLengthMatch = end == start
-      if zeroLengthMatch
-        tokens = []
-      else
-        tokens = [@grammar.createToken(line[start...end], scopes)]
+      content.push(line[start...end]) unless end is start
+
     if @pushRule
       ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
       ruleToPush.anchorPosition = captureIndices[0].end
       stack.push(ruleToPush)
-    else if @popRule
-      stack.pop()
+      {contentScopeName} = ruleToPush
+      content.push(@grammar.idForScope(contentScopeName)) if contentScopeName
+    else
+      {scopeName} = stack.pop() if @popRule
+      content.push(-@grammar.idForScope(scopeName)) if scopeName
 
-    tokens
+    content
 
-  getTokensForCaptureRule: (rule, line, captureStart, captureEnd, scopes, stack) ->
+  contentForCaptureRule: (rule, line, captureStart, captureEnd, stack) ->
     captureText = line.substring(captureStart, captureEnd)
-    {tokens} = rule.grammar.tokenizeLine(captureText, [stack..., rule])
+    {content} = rule.grammar.tokenizeLine(captureText, [stack..., rule])
 
-    # For capture matches, remove empty tokens caused by newline matches
-    tokens = tokens.filter (token) -> token.value != ''
-    tokens
+    # For capture matches, remove empty content caused by newline matches
+    content.filter (symbol) -> symbol isnt ''
 
   # Get the tokens for the capture indices.
   #
@@ -166,20 +170,20 @@ class Pattern
   #                         this method.
   # allCaptureIndices - The array of all capture indices, this array will not
   #                     be modified.
-  # scopes - An array of scopes.
   # stack - An array of rules.
   #
   # Returns a non-null but possibly empty array of tokens
-  getTokensForCaptureIndices: (line, currentCaptureIndices, allCaptureIndices, scopes, stack) ->
+  contentForCaptureIndices: (line, currentCaptureIndices, allCaptureIndices, stack) ->
     parentCapture = currentCaptureIndices.shift()
 
-    tokens = []
+    content = []
     if scope = @captures[parentCapture.index]?.name
-      scopes = scopes.concat(@resolveScopeName(scope, line, allCaptureIndices))
+      parentCaptureScope = @resolveScopeName(scope, line, allCaptureIndices)
+      content.push(@grammar.idForScope(parentCaptureScope))
 
     if captureRule = @captures[parentCapture.index]?.rule
-      captureTokens = @getTokensForCaptureRule(captureRule, line, parentCapture.start, parentCapture.end, scopes, stack)
-      tokens.push(captureTokens...)
+      captureContent = @contentForCaptureRule(captureRule, line, parentCapture.start, parentCapture.end, stack)
+      content.push(captureContent...)
       # Consume child captures
       while currentCaptureIndices.length and currentCaptureIndices[0].start < parentCapture.end
         currentCaptureIndices.shift()
@@ -188,20 +192,26 @@ class Pattern
       while currentCaptureIndices.length and currentCaptureIndices[0].start < parentCapture.end
         childCapture = currentCaptureIndices[0]
 
-        emptyCapture = childCapture.end - childCapture.start == 0
+        emptyCapture = childCapture.end - childCapture.start is 0
         captureHasNoScope = not @captures[childCapture.index]
         if emptyCapture or captureHasNoScope
           currentCaptureIndices.shift()
           continue
 
         if childCapture.start > previousChildCaptureEnd
-          tokens.push(@grammar.createToken(line[previousChildCaptureEnd...childCapture.start], scopes))
+          content.push(line[previousChildCaptureEnd...childCapture.start])
 
-        captureTokens = @getTokensForCaptureIndices(line, currentCaptureIndices, allCaptureIndices, scopes, stack)
-        tokens.push(captureTokens...)
+        captureContent = @contentForCaptureIndices(line, currentCaptureIndices, allCaptureIndices, stack)
+        content.push(captureContent...)
         previousChildCaptureEnd = childCapture.end
 
       if parentCapture.end > previousChildCaptureEnd
-        tokens.push(@grammar.createToken(line[previousChildCaptureEnd...parentCapture.end], scopes))
+        content.push(line[previousChildCaptureEnd...parentCapture.end])
 
-    tokens
+    if parentCaptureScope
+      if content.length > 1
+        content.push(-@grammar.idForScope(parentCaptureScope))
+      else
+        content.pop()
+
+    content

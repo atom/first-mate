@@ -16,6 +16,10 @@ class GrammarRegistry
     @grammarsByScopeName = {}
     @injectionGrammars = []
     @grammarOverridesByPath = {}
+    @scopeIdCounter = 1
+    @idsByScope = {}
+    @scopesById = {}
+
     @nullGrammar = new NullGrammar(this)
     @addGrammar(@nullGrammar)
 
@@ -201,7 +205,15 @@ class GrammarRegistry
   selectGrammar: (filePath, fileContents) ->
     _.max @grammars, (grammar) -> grammar.getScore(filePath, fileContents)
 
-  createToken: (value, scopes) -> {value, scopes}
+  idForScope: (scope) ->
+    unless id = @idsByScope[scope]
+      id = @scopeIdCounter++
+      @idsByScope[scope] = id
+      @scopesById[id] = scope
+    id
+
+  scopeForId: (id) ->
+    @scopesById[id]
 
   grammarUpdated: (scopeName) ->
     for grammar in @grammars when grammar.scopeName isnt scopeName
@@ -215,6 +227,22 @@ class GrammarRegistry
     grammar = new Grammar(this, object)
     grammar.path = grammarPath
     grammar
+
+  decodeContent: (content, scopes = []) ->
+    tokens = []
+    for symbol in content
+      switch typeof symbol
+        when 'number'
+          scope = @scopeForId(Math.abs(symbol))
+          if symbol > 0
+            scopes.push(scope)
+          else
+            poppedScope = scopes.pop()
+            unless poppedScope is scope
+              throw new Error("Top of stack should have been #{scope}, but was #{poppedScope}")
+        when 'string'
+          tokens.push({value: symbol, scopes: scopes.slice()})
+    tokens
 
 if Grim.includeDeprecatedAPIs
   EmitterMixin = require('emissary').Emitter
