@@ -83,7 +83,7 @@ class Pattern
     beginCaptures = []
 
     for {start, end} in beginCaptureIndices
-      beginCaptures.push line[start...end]
+      beginCaptures.push(line[start...end])
 
     resolvedMatch = @match.replace AllDigitsRegex, (match) ->
       index = parseInt(match[1..])
@@ -127,39 +127,42 @@ class Pattern
         match
 
   handleMatch: (stack, line, captureIndices, rule, endPatternMatch) ->
-    content = []
+    tags = []
 
     if @popRule
       {contentScopeName} = _.last(stack)
-      content.push(-@grammar.idForScope(contentScopeName)) if contentScopeName
+      tags.push(@grammar.idForScope(contentScopeName) - 1) if contentScopeName
     else if @scopeName
       scopeName = @resolveScopeName(@scopeName, line, captureIndices)
-      content.push(@grammar.idForScope(scopeName))
+      tags.push(@grammar.idForScope(scopeName))
 
     if @captures
-      content.push(@contentForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
+      tags.push(@tagsForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
     else
       {start, end} = captureIndices[0]
-      content.push(line[start...end]) unless end is start
+      tags.push(end - start) unless end is start
 
     if @pushRule
       ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
       ruleToPush.anchorPosition = captureIndices[0].end
       stack.push(ruleToPush)
       {contentScopeName} = ruleToPush
-      content.push(@grammar.idForScope(contentScopeName)) if contentScopeName
+      tags.push(@grammar.idForScope(contentScopeName)) if contentScopeName
     else
       {scopeName} = stack.pop() if @popRule
-      content.push(-@grammar.idForScope(scopeName)) if scopeName
+      tags.push(@grammar.idForScope(scopeName) - 1) if scopeName
 
-    content
+    tags
 
-  contentForCaptureRule: (rule, line, captureStart, captureEnd, stack) ->
+  tagsForCaptureRule: (rule, line, captureStart, captureEnd, stack) ->
     captureText = line.substring(captureStart, captureEnd)
-    {content} = rule.grammar.tokenizeLine(captureText, [stack..., rule])
+    {tags} = rule.grammar.tokenizeLine(captureText, [stack..., rule])
 
-    # For capture matches, remove empty content caused by newline matches
-    content.filter (symbol) -> symbol isnt ''
+    # only accept non empty tokens that don't exceed the capture end
+    offset = 0
+    for tag in tags when tag < 0 or (tag > 0 and offset < captureEnd)
+      offset += tag if tag > 0
+      tag
 
   # Get the tokens for the capture indices.
   #
@@ -173,17 +176,17 @@ class Pattern
   # stack - An array of rules.
   #
   # Returns a non-null but possibly empty array of tokens
-  contentForCaptureIndices: (line, currentCaptureIndices, allCaptureIndices, stack) ->
+  tagsForCaptureIndices: (line, currentCaptureIndices, allCaptureIndices, stack) ->
     parentCapture = currentCaptureIndices.shift()
 
-    content = []
+    tags = []
     if scope = @captures[parentCapture.index]?.name
       parentCaptureScope = @resolveScopeName(scope, line, allCaptureIndices)
-      content.push(@grammar.idForScope(parentCaptureScope))
+      tags.push(@grammar.idForScope(parentCaptureScope))
 
     if captureRule = @captures[parentCapture.index]?.rule
-      captureContent = @contentForCaptureRule(captureRule, line, parentCapture.start, parentCapture.end, stack)
-      content.push(captureContent...)
+      captureTags = @tagsForCaptureRule(captureRule, line, parentCapture.start, parentCapture.end, stack)
+      tags.push(captureTags...)
       # Consume child captures
       while currentCaptureIndices.length and currentCaptureIndices[0].start < parentCapture.end
         currentCaptureIndices.shift()
@@ -199,19 +202,19 @@ class Pattern
           continue
 
         if childCapture.start > previousChildCaptureEnd
-          content.push(line[previousChildCaptureEnd...childCapture.start])
+          tags.push(childCapture.start - previousChildCaptureEnd)
 
-        captureContent = @contentForCaptureIndices(line, currentCaptureIndices, allCaptureIndices, stack)
-        content.push(captureContent...)
+        captureTags = @tagsForCaptureIndices(line, currentCaptureIndices, allCaptureIndices, stack)
+        tags.push(captureTags...)
         previousChildCaptureEnd = childCapture.end
 
       if parentCapture.end > previousChildCaptureEnd
-        content.push(line[previousChildCaptureEnd...parentCapture.end])
+        tags.push(parentCapture.end - previousChildCaptureEnd)
 
     if parentCaptureScope
-      if content.length > 1
-        content.push(-@grammar.idForScope(parentCaptureScope))
+      if tags.length > 1
+        tags.push(@grammar.idForScope(parentCaptureScope) - 1)
       else
-        content.pop()
+        tags.pop()
 
-    content
+    tags

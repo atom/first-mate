@@ -73,9 +73,12 @@ class Grammar
   tokenizeLines: (text) ->
     lines = text.split('\n')
     ruleStack = null
-    for line, lineNumber in lines
-      {content, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
-      content
+
+    tags = for line, lineNumber in lines
+      {tags: lineTags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
+      lineTags
+
+    {lines, tags}
 
   # Public: Tokenize the line of text.
   #
@@ -95,15 +98,15 @@ class Grammar
   #   end of the line. These should be passed back into this method when
   #   tokenizing the next line in the file.
   tokenizeLine: (line, ruleStack, firstLine=false) ->
-    content = []
+    tags = []
 
     if ruleStack?
       ruleStack = ruleStack.slice()
     else
       initialRule = @getInitialRule()
       ruleStack = [initialRule]
-      content.push(@idForScope(initialRule.scopeName)) if initialRule.scopeName
-      content.push(@idForScope(initialRule.contentScopeName)) if initialRule.contentScopeName
+      tags.push(@idForScope(initialRule.scopeName)) if initialRule.scopeName
+      tags.push(@idForScope(initialRule.contentScopeName)) if initialRule.contentScopeName
 
     originalRuleStack = ruleStack.slice()
 
@@ -115,28 +118,28 @@ class Grammar
       previousPosition = position
 
       if tokenCount >= @getMaxTokensPerLine() - 1
-        content.push(line[position..])
+        tags.push(line.length - position)
         ruleStack = originalRuleStack
         break
 
       break if position is line.length + 1 # include trailing newline position
 
-      if match = _.last(ruleStack).getNextContent(ruleStack, line, position, firstLine)
-        {nextContent, contentStart, contentEnd} = match
+      if match = _.last(ruleStack).getNextTags(ruleStack, line, position, firstLine)
+        {nextTags, tagsStart, tagsEnd} = match
 
-        # Unmatched text before next content
-        if position < contentStart
-          content.push(line[position...contentStart])
+        # Unmatched text before next tags
+        if position < tagsStart
+          tags.push(tagsStart - position)
           tokenCount++
 
-        content.push(nextContent...)
-        tokenCount++ for symbol in nextContent when typeof symbol is 'string'
-        position = contentEnd
+        tags.push(nextTags...)
+        tokenCount++ for tag in nextTags when tag >= 0
+        position = tagsEnd
 
       else
         # Push filler token for unmatched text at end of line
         if position < line.length or line.length is 0
-          content.push(line[position...line.length])
+          tags.push(line.length - position)
         break
 
       if position is previousPosition
@@ -145,8 +148,8 @@ class Grammar
           if ruleStack.length > 1
             ruleStack.pop()
           else
-            if position < line.length or (line.length is 0 and content.length is 0)
-              content.push(line[position...])
+            if position < line.length or (line.length is 0 and tags.length is 0)
+              tags.push(line.length - position)
             break
         else if ruleStack.length > previousRuleStackLength # Stack size increased with zero length match
           [penultimateRule, lastRule] = ruleStack[-2..]
@@ -161,14 +164,14 @@ class Grammar
 
           if popStack
             ruleStack.pop()
-            lastSymbol = _.last(content)
-            if typeof(lastSymbol) is 'number' and lastSymbol > 0 and lastSymbol is @idForScope(lastRule.scopeName)
-              content.pop() # also pop the duplicated start scope if it was pushed
-            content.push(line[position...])
+            lastSymbol = _.last(tags)
+            if lastSymbol < 0 and lastSymbol is @idForScope(lastRule.scopeName)
+              tags.pop() # also pop the duplicated start scope if it was pushed
+            tags.push(line.length - position)
             break
 
     rule.clearAnchorPosition() for rule in ruleStack
-    {content, ruleStack}
+    {line, tags, ruleStack}
 
   activate: ->
     @registration = @registry.addGrammar(this)

@@ -16,7 +16,7 @@ class GrammarRegistry
     @grammarsByScopeName = {}
     @injectionGrammars = []
     @grammarOverridesByPath = {}
-    @scopeIdCounter = 1
+    @scopeIdCounter = -1
     @idsByScope = {}
     @scopesById = {}
 
@@ -207,7 +207,8 @@ class GrammarRegistry
 
   idForScope: (scope) ->
     unless id = @idsByScope[scope]
-      id = @scopeIdCounter++
+      id = @scopeIdCounter
+      @scopeIdCounter -= 2
       @idsByScope[scope] = id
       @scopesById[id] = scope
     id
@@ -228,20 +229,33 @@ class GrammarRegistry
     grammar.path = grammarPath
     grammar
 
-  decodeContent: (content, scopes = []) ->
+  decodeContent: (lineText, tags, scopeTags = []) ->
+    offset = 0
+    scopeNames = scopeTags.map (tag) => @scopeForId(tag)
+
     tokens = []
-    for symbol in content
-      switch typeof symbol
-        when 'number'
-          scope = @scopeForId(Math.abs(symbol))
-          if symbol > 0
-            scopes.push(scope)
-          else
-            poppedScope = scopes.pop()
-            unless poppedScope is scope
-              throw new Error("Top of stack should have been #{scope}, but was #{poppedScope}")
-        when 'string'
-          tokens.push({value: symbol, scopes: scopes.slice()})
+    for tag in tags
+      # positive numbers indicate string content with length equaling the number
+      if tag >= 0
+        tokens.push({
+          value: lineText.substring(offset, offset + tag)
+          scopes: scopeNames.slice()
+        })
+        offset += tag
+
+      # odd negative numbers are begin scope tags
+      else if (tag % 2) is -1
+        scopeTags.push(tag)
+        scopeNames.push(@scopeForId(tag))
+
+      # even negative numbers are end scope tags
+      else
+        scopeTags.pop()
+        expectedScopeName = @scopeForId(tag + 1)
+        poppedScopeName = scopeNames.pop()
+        unless poppedScopeName is expectedScopeName
+          throw new Error("Expected popped scope to be #{expectedScopeName}, but it was #{poppedScopeName}")
+
     tokens
 
 if Grim.includeDeprecatedAPIs
