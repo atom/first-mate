@@ -229,18 +229,20 @@ class GrammarRegistry
     grammar.path = grammarPath
     grammar
 
-  decodeContent: (lineText, tags, scopeTags = []) ->
+  decodeContent: (lineText, tags, scopeTags = [], fn) ->
     offset = 0
     scopeNames = scopeTags.map (tag) => @scopeForId(tag)
 
     tokens = []
-    for tag in tags
+    for tag, index in tags
       # positive numbers indicate string content with length equaling the number
       if tag >= 0
-        tokens.push({
+        token = {
           value: lineText.substring(offset, offset + tag)
           scopes: scopeNames.slice()
-        })
+        }
+        token = fn(token, index) if fn?
+        tokens.push(token)
         offset += tag
 
       # odd negative numbers are begin scope tags
