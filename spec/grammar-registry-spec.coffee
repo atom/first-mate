@@ -96,5 +96,5 @@ describe "GrammarRegistry", ->
       expect(grammar.maxTokensPerLine).toBe 2
 
       {line, tags} = grammar.tokenizeLine("{ }")
-      tokens = registry.decodeContent(line, tags)
+      tokens = registry.decodeTokens(line, tags)
       expect(tokens.length).toBe 2

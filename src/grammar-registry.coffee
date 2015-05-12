@@ -229,7 +229,7 @@ class GrammarRegistry
     grammar.path = grammarPath
     grammar
 
-  decodeContent: (lineText, tags, scopeTags = [], fn) ->
+  decodeTokens: (lineText, tags, scopeTags = [], fn) ->
     offset = 0
     scopeNames = scopeTags.map (tag) => @scopeForId(tag)
 

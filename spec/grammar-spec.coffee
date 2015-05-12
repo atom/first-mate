@@ -28,7 +28,7 @@ describe "Grammar tokenization", ->
       emptyRegistry = new GrammarRegistry()
       grammar = emptyRegistry.selectGrammar('foo.js', '')
       {line, tags} = grammar.tokenizeLine('a = 1;')
-      tokens = emptyRegistry.decodeContent(line, tags)
+      tokens = emptyRegistry.decodeTokens(line, tags)
       expect(tokens.length).toBe 1
       expect(tokens[0].value).toBe 'a = 1;'
       expect(tokens[0].scopes).toEqual ['text.plain.null-grammar']
@@ -39,7 +39,7 @@ describe "Grammar tokenization", ->
 
       grammar = registry.nullGrammar
       {line, tags} = grammar.tokenizeLine('http://github.com')
-      tokens = registry.decodeContent(line, tags)
+      tokens = registry.decodeTokens(line, tags)
       expect(tokens.length).toBe 1
       expect(tokens[0].value).toEqual 'http://github.com'
       expect(tokens[0].scopes).toEqual ['text.plain.null-grammar', 'markup.underline.link.http.hyperlink']
@@ -51,7 +51,7 @@ describe "Grammar tokenization", ->
       expect(grammar).not.toBeNull()
 
       {line, tags} = grammar.tokenizeLine('hello world!')
-      tokens = registry.decodeContent(line, tags)
+      tokens = registry.decodeTokens(line, tags)
       expect(tokens.length).toBe 4
 
       expect(tokens[0].value).toBe 'hello'
@@ -72,7 +72,7 @@ describe "Grammar tokenization", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine("return")
 
-        expect(registry.decodeContent(line, tags)).toEqual [
+        expect(registry.decodeTokens(line, tags)).toEqual [
           {value: 'return', scopes: ['source.coffee', 'keyword.control.coffee']}
         ]
 
@@ -80,7 +80,7 @@ describe "Grammar tokenization", ->
       it "returns a single token with the correct scope", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine("new foo.bar.Baz")
-        expect(registry.decodeContent(line, tags)).toEqual [
+        expect(registry.decodeTokens(line, tags)).toEqual [
           {value: 'new', scopes: ['source.coffee', 'meta.class.instance.constructor', 'keyword.operator.new.coffee']}
           {value: ' ', scopes: ['source.coffee', 'meta.class.instance.constructor']}
           {value: 'foo.bar.Baz', scopes: ['source.coffee', 'meta.class.instance.constructor', 'entity.name.type.instance.coffee']}
@@ -90,7 +90,7 @@ describe "Grammar tokenization", ->
       it "returns the entire line as a single simple token with the grammar's scope", ->
         textGrammar = registry.grammarForScopeName('text.plain')
         {line, tags} = textGrammar.tokenizeLine("abc def")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens.length).toBe 1
 
     describe "when the line matches multiple patterns", ->
@@ -98,7 +98,7 @@ describe "Grammar tokenization", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine(" return new foo.bar.Baz ")
 
-        expect(registry.decodeContent(line, tags)).toEqual [
+        expect(registry.decodeTokens(line, tags)).toEqual [
           {value: ' ', scopes: ['source.coffee']}
           {value: 'return', scopes: ['source.coffee', 'keyword.control.coffee']}
           {value: ' ', scopes: ['source.coffee']}
@@ -112,7 +112,7 @@ describe "Grammar tokenization", ->
       it "only returns tokens for capture groups that matched", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine("class Quicksort")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens.length).toBe 3
         expect(tokens[0].value).toBe "class"
@@ -124,7 +124,7 @@ describe "Grammar tokenization", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine("  destroy: ->")
 
-        expect(registry.decodeContent(line, tags)).toEqual [
+        expect(registry.decodeTokens(line, tags)).toEqual [
           {value: '  ', scopes: ["source.coffee"]}
           {value: 'destro', scopes: ["source.coffee", "meta.function.coffee", "entity.name.function.coffee"]}
           # duplicated scope looks wrong, but textmate yields the same behavior. probably a quirk in the coffee grammar.
@@ -138,7 +138,7 @@ describe "Grammar tokenization", ->
       it "returns tokens based on the included rule", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine("7777777")
-        expect(registry.decodeContent(line, tags)).toEqual [
+        expect(registry.decodeTokens(line, tags)).toEqual [
           {value: '7777777', scopes: ['source.coffee', 'constant.numeric.coffee']}
         ]
 
@@ -147,7 +147,7 @@ describe "Grammar tokenization", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine('"the value is #{@x} my friend"')
 
-        expect(registry.decodeContent(line, tags)).toEqual [
+        expect(registry.decodeTokens(line, tags)).toEqual [
           {value: '"', scopes: ["source.coffee","string.quoted.double.coffee","punctuation.definition.string.begin.coffee"]}
           {value: "the value is ", scopes: ["source.coffee","string.quoted.double.coffee"]}
           {value: '#{', scopes: ["source.coffee","string.quoted.double.coffee","source.coffee.embedded.source","punctuation.section.embedded.coffee"]}
@@ -162,7 +162,7 @@ describe "Grammar tokenization", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine('"#{"#{@x}"}"')
 
-        expect(registry.decodeContent(line, tags)).toEqual [
+        expect(registry.decodeTokens(line, tags)).toEqual [
           {value: '"',  scopes: ["source.coffee","string.quoted.double.coffee","punctuation.definition.string.begin.coffee"]}
           {value: '#{', scopes: ["source.coffee","string.quoted.double.coffee","source.coffee.embedded.source","punctuation.section.embedded.coffee"]}
           {value: '"',  scopes: ["source.coffee","string.quoted.double.coffee","source.coffee.embedded.source","string.quoted.double.coffee","punctuation.definition.string.begin.coffee"]}
@@ -178,24 +178,24 @@ describe "Grammar tokenization", ->
       it "returns a single token which has the global scope", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine('')
-        expect(registry.decodeContent(line, tags)).toEqual [{value: '',  scopes: ["source.coffee"]}]
+        expect(registry.decodeTokens(line, tags)).toEqual [{value: '',  scopes: ["source.coffee"]}]
 
     describe "when the line matches no patterns", ->
       it "does not infinitely loop", ->
         grammar = registry.grammarForScopeName('text.plain')
         {line, tags} = grammar.tokenizeLine('hoo')
-        expect(registry.decodeContent(line, tags)).toEqual [{value: 'hoo',  scopes: ["text.plain", "meta.paragraph.text"]}]
+        expect(registry.decodeTokens(line, tags)).toEqual [{value: 'hoo',  scopes: ["text.plain", "meta.paragraph.text"]}]
 
     describe "when the line matches a pattern with a 'contentName'", ->
       it "creates tokens using the content of contentName as the token name", ->
         grammar = registry.grammarForScopeName('text.plain')
         {line, tags} = grammar.tokenizeLine('ok, cool')
-        expect(registry.decodeContent(line, tags)).toEqual [{value: 'ok, cool',  scopes: ["text.plain", "meta.paragraph.text"]}]
+        expect(registry.decodeTokens(line, tags)).toEqual [{value: 'ok, cool',  scopes: ["text.plain", "meta.paragraph.text"]}]
 
         grammar = registry.grammarForScopeName('text.plain')
         {line, tags} = grammar.tokenizeLine(' ok, cool')
 
-        expect(registry.decodeContent(line, tags)).toEqual [
+        expect(registry.decodeTokens(line, tags)).toEqual [
           {value: ' ',  scopes: ["text.plain"]}
           {value: 'ok, cool', scopes: ["text.plain", "meta.paragraph.text"]}
         ]
@@ -206,9 +206,9 @@ describe "Grammar tokenization", ->
         {lines, tags} = grammar.tokenizeLines "#if\ntest\n#endif"
 
         scopes = []
-        line1 = registry.decodeContent(lines[0], tags[0], scopes)
-        line2 = registry.decodeContent(lines[1], tags[1], scopes)
-        line3 = registry.decodeContent(lines[2], tags[2], scopes)
+        line1 = registry.decodeTokens(lines[0], tags[0], scopes)
+        line2 = registry.decodeTokens(lines[1], tags[1], scopes)
+        line3 = registry.decodeTokens(lines[2], tags[2], scopes)
 
         expect(line1.length).toBe 1
         expect(line1[0].value).toEqual "#if"
@@ -225,13 +225,13 @@ describe "Grammar tokenization", ->
         expect(line3[1].scopes).toEqual ["source.test", "all"]
 
         {line, tags} = grammar.tokenizeLine "test"
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens.length).toBe 1
         expect(tokens[0].value).toEqual "test"
         expect(tokens[0].scopes).toEqual ["source.test", "all", "middle"]
 
         {line, tags} = grammar.tokenizeLine " test"
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens.length).toBe 2
         expect(tokens[0].value).toEqual " "
         expect(tokens[0].scopes).toEqual ["source.test", "all"]
@@ -242,7 +242,7 @@ describe "Grammar tokenization", ->
       it "creates tokens without adding a new scope", ->
         grammar = registry.grammarForScopeName('source.ruby')
         {line, tags} = grammar.tokenizeLine('%w|oh \\look|')
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens.length).toBe 5
         expect(tokens[0]).toEqual value: '%w|', scopes: ["source.ruby", "string.quoted.other.literal.lower.ruby", "punctuation.definition.string.begin.ruby"]
@@ -254,7 +254,7 @@ describe "Grammar tokenization", ->
       it "returns tokens based on the beginCaptures, endCaptures and the child scope", ->
         grammar = registry.grammarForScopeName('source.coffee')
         {line, tags} = grammar.tokenizeLine("'''single-quoted heredoc'''")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens.length).toBe 3
 
@@ -269,8 +269,8 @@ describe "Grammar tokenization", ->
           {line: line2, tags: tags2, ruleStack} = grammar.tokenizeLine("heredoc'''", ruleStack)
 
           scopes = []
-          firstTokens = registry.decodeContent(line1, tags1, scopes)
-          secondTokens = registry.decodeContent(line2, tags2, scopes)
+          firstTokens = registry.decodeTokens(line1, tags1, scopes)
+          secondTokens = registry.decodeTokens(line2, tags2, scopes)
 
           expect(firstTokens.length).toBe 2
           expect(secondTokens.length).toBe 2
@@ -285,7 +285,7 @@ describe "Grammar tokenization", ->
         it "returns tokens within the begin/end scope based on the sub-patterns", ->
           grammar = registry.grammarForScopeName('source.coffee')
           {line, tags} = grammar.tokenizeLine('"""heredoc with character escape \\t"""')
-          tokens = registry.decodeContent(line, tags)
+          tokens = registry.decodeTokens(line, tags)
 
           expect(tokens.length).toBe 4
 
@@ -306,11 +306,11 @@ describe "Grammar tokenization", ->
           """
 
           scopes = []
-          lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-          lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
-          lines[2] = registry.decodeContent(lines[2], tags[2], scopes)
-          lines[3] = registry.decodeContent(lines[3], tags[3], scopes)
-          lines[4] = registry.decodeContent(lines[4], tags[4], scopes)
+          lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+          lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
+          lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
+          lines[3] = registry.decodeTokens(lines[3], tags[3], scopes)
+          lines[4] = registry.decodeTokens(lines[4], tags[4], scopes)
 
           expect(lines[1][2]).toEqual value: "}excentricSyntax", scopes: ['source.apply-end-pattern-last', 'end-pattern-last-env', 'scope', 'excentric']
           expect(lines[4][2]).toEqual value: "}", scopes: ['source.apply-end-pattern-last', 'normal-env', 'scope']
@@ -320,7 +320,7 @@ describe "Grammar tokenization", ->
         it "constructs the end rule based on its back-references to captures in the begin rule", ->
           grammar = registry.grammarForScopeName('source.ruby')
           {line, tags} = grammar.tokenizeLine('%w|oh|,')
-          tokens = registry.decodeContent(line, tags)
+          tokens = registry.decodeTokens(line, tags)
 
           expect(tokens.length).toBe 4
           expect(tokens[0]).toEqual value: '%w|',  scopes: ["source.ruby", "string.quoted.other.literal.lower.ruby", "punctuation.definition.string.begin.ruby"]
@@ -331,7 +331,7 @@ describe "Grammar tokenization", ->
         it "allows the rule containing that end pattern to be pushed to the stack multiple times", ->
           grammar = registry.grammarForScopeName('source.ruby')
           {line, tags} = grammar.tokenizeLine('%Q+matz had some #{%Q-crazy ideas-} for ruby syntax+ # damn.')
-          tokens = registry.decodeContent(line, tags)
+          tokens = registry.decodeTokens(line, tags)
 
           expect(tokens[0]).toEqual value: '%Q+', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby","punctuation.definition.string.begin.ruby"]
           expect(tokens[1]).toEqual value: 'matz had some ', scopes: ["source.ruby","string.quoted.other.literal.upper.ruby"]
@@ -354,7 +354,7 @@ describe "Grammar tokenization", ->
 
             grammar = registry.grammarForScopeName('text.html.ruby')
             {line, tags} = grammar.tokenizeLine("<div class='name'><%= User.find(2).full_name %></div>")
-            tokens = registry.decodeContent(line, tags)
+            tokens = registry.decodeTokens(line, tags)
 
             expect(tokens[0]).toEqual value: '<', scopes: ["text.html.ruby","meta.tag.block.any.html","punctuation.definition.tag.begin.html"]
             expect(tokens[1]).toEqual value: 'div', scopes: ["text.html.ruby","meta.tag.block.any.html","entity.name.tag.block.any.html"]
@@ -389,13 +389,13 @@ describe "Grammar tokenization", ->
             grammar.onDidUpdate grammarUpdatedHandler
 
             {line, tags} = grammar.tokenizeLine("<div class='name'><% <<-SQL select * from users;")
-            tokens = registry.decodeContent(line, tags)
+            tokens = registry.decodeTokens(line, tags)
             expect(tokens[12].value).toBe " select * from users;"
 
             loadGrammarSync('sql.json')
             expect(grammarUpdatedHandler).toHaveBeenCalled()
             {line, tags} = grammar.tokenizeLine("<div class='name'><% <<-SQL select * from users;")
-            tokens = registry.decodeContent(line, tags)
+            tokens = registry.decodeTokens(line, tags)
             expect(tokens[12].value).toBe " "
             expect(tokens[13].value).toBe "select"
 
@@ -407,7 +407,7 @@ describe "Grammar tokenization", ->
 
             grammar = registry.grammarForScopeName('text.html.ruby')
             {line, tags} = grammar.tokenizeLine("<div class='name'><%= User.find(2).full_name %></div>")
-            tokens = registry.decodeContent(line, tags)
+            tokens = registry.decodeTokens(line, tags)
             expect(tokens[0]).toEqual value: "<div class='name'>", scopes: ["text.html.ruby"]
             expect(tokens[1]).toEqual value: '<%=', scopes: ["text.html.ruby","source.ruby.rails.embedded.html","punctuation.section.embedded.ruby"]
             expect(tokens[2]).toEqual value: ' ', scopes: ["text.html.ruby","source.ruby.rails.embedded.html"]
@@ -415,7 +415,7 @@ describe "Grammar tokenization", ->
 
             loadGrammarSync('html.json')
             {line, tags} = grammar.tokenizeLine("<div class='name'><%= User.find(2).full_name %></div>")
-            tokens = registry.decodeContent(line, tags)
+            tokens = registry.decodeTokens(line, tags)
             expect(tokens[0]).toEqual value: '<', scopes: ["text.html.ruby","meta.tag.block.any.html","punctuation.definition.tag.begin.html"]
             expect(tokens[1]).toEqual value: 'div', scopes: ["text.html.ruby","meta.tag.block.any.html","entity.name.tag.block.any.html"]
             expect(tokens[2]).toEqual value: ' ', scopes: ["text.html.ruby","meta.tag.block.any.html"]
@@ -431,7 +431,7 @@ describe "Grammar tokenization", ->
     it "can parse a grammar with newline characters in its regular expressions (regression)", ->
       grammar = loadGrammarSync('imaginary.cson')
       {line, tags, ruleStack} = grammar.tokenizeLine("// a singleLineComment")
-      tokens = registry.decodeContent(line, tags)
+      tokens = registry.decodeTokens(line, tags)
       expect(ruleStack.length).toBe 1
       expect(ruleStack[0].scopeName).toBe "source.imaginaryLanguage"
 
@@ -444,8 +444,8 @@ describe "Grammar tokenization", ->
       grammar = loadGrammarSync('multiline.cson')
       {lines, tags} = grammar.tokenizeLines('Xy\\\nzX')
       scopes = []
-      lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-      lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
+      lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+      lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
 
       # Line 0
       expect(lines[0][0]).toEqual
@@ -486,12 +486,12 @@ describe "Grammar tokenization", ->
 
       it "correctly parses a method. (regression)", ->
         {line, tags, ruleStack} = grammar.tokenizeLine("if(1){m()}")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens[5]).toEqual value: "m", scopes: ["source.c", "meta.block.c", "meta.function-call.c", "support.function.any-method.c"]
 
       it "correctly parses nested blocks. (regression)", ->
         {line, tags, ruleStack} = grammar.tokenizeLine("if(1){if(1){m()}}")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens[5]).toEqual value: "if", scopes: ["source.c", "meta.block.c", "keyword.control.c"]
         expect(tokens[10]).toEqual value: "m", scopes: ["source.c", "meta.block.c", "meta.block.c", "meta.function-call.c", "support.function.any-method.c"]
 
@@ -500,7 +500,7 @@ describe "Grammar tokenization", ->
         spyOn(console, 'error')
         grammar = loadGrammarSync('infinite-loop.cson')
         {line, tags} = grammar.tokenizeLine("abc")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens[0].value).toBe "a"
         expect(tokens[1].value).toBe "bc"
         expect(console.error).toHaveBeenCalled()
@@ -510,7 +510,7 @@ describe "Grammar tokenization", ->
         loadGrammarSync('scss.json')
         grammar = registry.grammarForScopeName('source.css.scss')
         {line, tags} = grammar.tokenizeLine("@mixin x() { -moz-selector: whatever; }")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens[9]).toEqual value: "-moz-selector", scopes: ["source.css.scss", "meta.property-list.scss", "meta.property-name.scss"]
 
     describe "when a line has more tokens than `maxTokensPerLine`", ->
@@ -519,7 +519,7 @@ describe "Grammar tokenization", ->
         originalRuleStack = grammar.tokenizeLine('').ruleStack
         spyOn(grammar, 'getMaxTokensPerLine').andCallFake -> 5
         {line, tags, ruleStack} = grammar.tokenizeLine("var x = /[a-z]/;", originalRuleStack)
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens.length).toBe 6
         expect(tokens[5].value).toBe "[a-z]/;"
         expect(ruleStack).toEqual originalRuleStack
@@ -529,7 +529,7 @@ describe "Grammar tokenization", ->
       it "matches the patterns and includes the scope specified as the pattern's match name", ->
         grammar = registry.grammarForScopeName('text.html.php')
         {line, tags} = grammar.tokenizeLine("<?php public final function meth() {} ?>")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens[2].value).toBe "public"
         expect(tokens[2].scopes).toEqual ["text.html.php", "meta.embedded.line.php", "source.php", "meta.function.php", "storage.modifier.php"]
@@ -549,7 +549,7 @@ describe "Grammar tokenization", ->
       it "ignores child captures of a capture with patterns", ->
         grammar = loadGrammarSync('nested-captures.cson')
         {line, tags} = grammar.tokenizeLine("ab")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens[0].value).toBe "ab"
         expect(tokens[0].scopes).toEqual ["nested", "text", "a"]
@@ -558,7 +558,7 @@ describe "Grammar tokenization", ->
       it "correctly includes the injected patterns when tokenizing", ->
         grammar = registry.grammarForScopeName('text.html.php')
         {line, tags} = grammar.tokenizeLine("<div><?php function hello() {} ?></div>")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens[3].value).toBe "<?php"
         expect(tokens[3].scopes).toEqual ["text.html.php", "meta.embedded.line.php", "punctuation.section.embedded.begin.php"]
@@ -585,7 +585,7 @@ describe "Grammar tokenization", ->
       it "replaces the group number with the matched captured text", ->
         grammar = loadGrammarSync('hyperlink.json')
         {line, tags} = grammar.tokenizeLine("https://github.com")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens[0].scopes).toEqual ["text.hyperlink", "markup.underline.link.https.hyperlink"]
 
     describe "when the grammar has an injection selector", ->
@@ -593,7 +593,7 @@ describe "Grammar tokenization", ->
         loadGrammarSync('hyperlink.json')
         grammar = registry.grammarForScopeName("source.js")
         {line, tags} = grammar.tokenizeLine("var i; // http://github.com")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens[0].value).toBe "var"
         expect(tokens[0].scopes).toEqual ["source.js", "storage.modifier.js"]
@@ -605,7 +605,7 @@ describe "Grammar tokenization", ->
       it "tokenizes the entire line using the rule", ->
         grammar = loadGrammarSync('forever.cson')
         {line, tags} = grammar.tokenizeLine("forever and ever")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens.length).toBe 1
         expect(tokens[0].value).toBe "forever and ever"
@@ -616,7 +616,7 @@ describe "Grammar tokenization", ->
         loadGrammarSync('todo.json')
         grammar = registry.grammarForScopeName('source.ruby')
         {line, tags} = grammar.tokenizeLine "# TODO be nicer"
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens[2].value).toEqual "TODO"
         expect(tokens[2].scopes).toEqual ["source.ruby", "comment.line.number-sign.ruby", "storage.type.class.todo"]
@@ -626,13 +626,13 @@ describe "Grammar tokenization", ->
         loadGrammarSync('makefile.json')
         grammar = registry.grammarForScopeName('source.makefile')
         {line, tags} = grammar.tokenizeLine("ifeq")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens.length).toBe 1
         expect(tokens[0].value).toEqual "ifeq"
         expect(tokens[0].scopes).toEqual ["source.makefile", "meta.scope.conditional.makefile", "keyword.control.ifeq.makefile"]
 
         {line, tags} = grammar.tokenizeLine("ifeq (")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens.length).toBe 2
         expect(tokens[0].value).toEqual "ifeq"
         expect(tokens[0].scopes).toEqual ["source.makefile", "meta.scope.conditional.makefile", "keyword.control.ifeq.makefile"]
@@ -643,7 +643,7 @@ describe "Grammar tokenization", ->
         loadGrammarSync('makefile.json')
         grammar = registry.grammarForScopeName('source.makefile')
         {line, tags}  = grammar.tokenizeLine(".PHONY:")
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         expect(tokens.length).toBe 2
         expect(tokens[0].scopes).toEqual ["source.makefile", "meta.scope.target.makefile", "support.function.target.PHONY.makefile"]
         expect(tokens[0].value).toEqual ".PHONY"
@@ -659,8 +659,8 @@ describe "Grammar tokenization", ->
           # Please enter the commit message for your changes. Lines starting
         """
         scopes = []
-        lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
+        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
 
       it "correctly parses a long line", ->
         tokens = lines[0]
@@ -681,8 +681,8 @@ describe "Grammar tokenization", ->
           #include "b.h"
         """
         scopes = []
-        lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
+        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
 
       it "correctly parses the first include line", ->
         tokens = lines[0]
@@ -707,9 +707,9 @@ describe "Grammar tokenization", ->
           }
         """
         scopes = []
-        lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
-        lines[2] = registry.decodeContent(lines[2], tags[2], scopes)
+        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
+        lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
 
       it "doesn't loop infinitely (regression)", ->
         expect(_.pluck(lines[0], 'value').join('')).toBe 'a = {'
@@ -729,9 +729,9 @@ describe "Grammar tokenization", ->
           }
         """
         scopes = []
-        lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
-        lines[2] = registry.decodeContent(lines[2], tags[2], scopes)
+        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
+        lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
 
       it "correctly parses variable type when it is a built-in Cocoa class", ->
         tokens = lines[1]
@@ -761,9 +761,9 @@ describe "Grammar tokenization", ->
           }
         """
         scopes = []
-        lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
-        lines[2] = registry.decodeContent(lines[2], tags[2], scopes)
+        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
+        lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
 
         tokens = lines[1]
         expect(tokens[0].scopes).toEqual ["source.java", "comment.line.double-slash.java", "punctuation.definition.comment.java"]
@@ -773,7 +773,7 @@ describe "Grammar tokenization", ->
 
       it "correctly parses nested method calls", ->
         {line, tags} = grammar.tokenizeLine('a(b(new Object[0]));')
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
         lastToken = _.last(tokens)
         expect(lastToken.scopes).toEqual ['source.java', 'punctuation.terminator.java']
         expect(lastToken.value).toEqual ';'
@@ -782,7 +782,7 @@ describe "Grammar tokenization", ->
       it "correctly parses strings inside tags", ->
         grammar = registry.grammarForScopeName('text.html.erb')
         {line, tags} = grammar.tokenizeLine '<% page_title "My Page" %>'
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens[2].value).toEqual '"'
         expect(tokens[2].scopes).toEqual ["text.html.erb", "meta.embedded.line.erb", "source.ruby", "string.quoted.double.ruby", "punctuation.definition.string.begin.ruby"]
@@ -797,7 +797,7 @@ describe "Grammar tokenization", ->
 
         grammar = registry.grammarForScopeName('text.html.erb')
         {line, tags} = grammar.tokenizeLine('<%>')
-        tokens = registry.decodeContent(line, tags)
+        tokens = registry.decodeTokens(line, tags)
 
         expect(tokens.length).toBe 1
         expect(tokens[0].value).toEqual '<%>'
@@ -808,7 +808,7 @@ describe "Grammar tokenization", ->
         it "correctly parses JavaScript strings containing surrogate pair characters", ->
           grammar = registry.grammarForScopeName('source.js')
           {line, tags} = grammar.tokenizeLine "'\uD835\uDF97'"
-          tokens = registry.decodeContent(line, tags)
+          tokens = registry.decodeTokens(line, tags)
 
           expect(tokens.length).toBe 3
           expect(tokens[0].value).toBe "'"
@@ -820,7 +820,7 @@ describe "Grammar tokenization", ->
           loadGrammarSync('json.json')
           grammar = registry.grammarForScopeName('source.json')
           {line, tags} = grammar.tokenizeLine '{"\u2026": 1}'
-          tokens = registry.decodeContent(line, tags)
+          tokens = registry.decodeTokens(line, tags)
 
           expect(tokens.length).toBe 8
           expect(tokens[6].value).toBe '1'
@@ -831,8 +831,8 @@ describe "Grammar tokenization", ->
         grammar = registry.grammarForScopeName('source.python')
         {lines, tags} = grammar.tokenizeLines "import a\nimport b"
         scopes = []
-        lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
+        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
 
         line1 = lines[0]
         expect(line1.length).toBe 3
@@ -870,11 +870,11 @@ describe "Grammar tokenization", ->
             </html>
           """
           scopes = []
-          lines[0] = registry.decodeContent(lines[0], tags[0], scopes)
-          lines[1] = registry.decodeContent(lines[1], tags[1], scopes)
-          lines[2] = registry.decodeContent(lines[2], tags[2], scopes)
-          lines[3] = registry.decodeContent(lines[3], tags[3], scopes)
-          lines[4] = registry.decodeContent(lines[4], tags[4], scopes)
+          lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
+          lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
+          lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
+          lines[3] = registry.decodeTokens(lines[3], tags[3], scopes)
+          lines[4] = registry.decodeTokens(lines[4], tags[4], scopes)
 
 
           line4 = lines[4]
@@ -893,7 +893,7 @@ describe "Grammar tokenization", ->
       loadGrammarSync("loops.json")
       grammar = registry.grammarForScopeName("source.loops")
       {line, tags, ruleStack} = grammar.tokenizeLine('test')
-      tokens = registry.decodeContent(line, tags)
+      tokens = registry.decodeTokens(line, tags)
 
       expect(ruleStack.length).toBe 1
       expect(console.error.callCount).toBe 1
