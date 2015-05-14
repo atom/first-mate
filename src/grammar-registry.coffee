@@ -16,6 +16,10 @@ class GrammarRegistry
     @grammarsByScopeName = {}
     @injectionGrammars = []
     @grammarOverridesByPath = {}
+    @scopeIdCounter = -1
+    @idsByScope = {}
+    @scopesById = {}
+
     @nullGrammar = new NullGrammar(this)
     @addGrammar(@nullGrammar)
 
@@ -201,7 +205,16 @@ class GrammarRegistry
   selectGrammar: (filePath, fileContents) ->
     _.max @grammars, (grammar) -> grammar.getScore(filePath, fileContents)
 
-  createToken: (value, scopes) -> {value, scopes}
+  idForScope: (scope) ->
+    unless id = @idsByScope[scope]
+      id = @scopeIdCounter
+      @scopeIdCounter -= 2
+      @idsByScope[scope] = id
+      @scopesById[id] = scope
+    id
+
+  scopeForId: (id) ->
+    @scopesById[id]
 
   grammarUpdated: (scopeName) ->
     for grammar in @grammars when grammar.scopeName isnt scopeName
@@ -215,6 +228,37 @@ class GrammarRegistry
     grammar = new Grammar(this, object)
     grammar.path = grammarPath
     grammar
+
+  decodeTokens: (lineText, tags, scopeTags = [], fn) ->
+    offset = 0
+    scopeNames = scopeTags.map (tag) => @scopeForId(tag)
+
+    tokens = []
+    for tag, index in tags
+      # positive numbers indicate string content with length equaling the number
+      if tag >= 0
+        token = {
+          value: lineText.substring(offset, offset + tag)
+          scopes: scopeNames.slice()
+        }
+        token = fn(token, index) if fn?
+        tokens.push(token)
+        offset += tag
+
+      # odd negative numbers are begin scope tags
+      else if (tag % 2) is -1
+        scopeTags.push(tag)
+        scopeNames.push(@scopeForId(tag))
+
+      # even negative numbers are end scope tags
+      else
+        scopeTags.pop()
+        expectedScopeName = @scopeForId(tag + 1)
+        poppedScopeName = scopeNames.pop()
+        unless poppedScopeName is expectedScopeName
+          throw new Error("Expected popped scope to be #{expectedScopeName}, but it was #{poppedScopeName}")
+
+    tokens
 
 if Grim.includeDeprecatedAPIs
   EmitterMixin = require('emissary').Emitter

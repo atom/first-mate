@@ -95,5 +95,6 @@ describe "GrammarRegistry", ->
       grammar = registry.selectGrammar('test.json')
       expect(grammar.maxTokensPerLine).toBe 2
 
-      {tokens} = grammar.tokenizeLine("{ }")
+      {line, tags} = grammar.tokenizeLine("{ }")
+      tokens = registry.decodeTokens(line, tags)
       expect(tokens.length).toBe 2

@@ -25,7 +25,9 @@ selector.matches(['a']) # true
 {GrammarRegistry} = require 'first-mate'
 registry = new GrammarRegistry()
 grammar = registry.loadGrammarSync('./spec/fixtures/javascript.json')
-{tokens} = grammar.tokenizeLine('var offset = 3;')
+{line, tags} = grammar.tokenizeLine('var offset = 3;')
+# convert compact tags representation into convenient, space-inefficient tokens
+tokens = registry.decodeTokens(line, tags)
 for {value, scopes} in tokens
   console.log("Token text: '#{value}' with scopes: #{scopes}")
 ```
@@ -47,6 +49,28 @@ Synchronously load a grammar and add it to the registry.
 
 Returns a `Grammar` instance.
 
+#### scopeForId(id)
+
+Translate an integer representing an open scope tag from a `tags` array to a
+scope name.
+
+`id` - A negative, odd integer.
+
+Returns a scope `String`.
+
+#### decodeTokens(line, tags)
+
+Convert a line and a corresponding tags array returned from
+`Grammar::tokenizeLine` into an array of token objects.
+
+`line` - A `String` representing a line of text.
+
+`tags` - An `Array` of integers returned from `Grammar::tokenizeLine`.
+
+Returns an `Array` of token objects, each with a `value` field containing a
+string of the token's text and a `scopes` field pointing to an array of every
+scope name containing the token.
+
 ### Grammar
 
 #### tokenizeLine(line, [ruleStack], [firstLine])
@@ -60,15 +84,33 @@ to this method.
 
 `firstLine` - `true` to indicate that the very first line is being tokenized.
 
-Returns an object with a `tokens` key pointing to an array of token objects
-and a `ruleStack` key pointing to an array of rules to pass to this method
-on future calls for lines proceeding the line that was just tokenized.
+Returns an object with a `tags` key pointing to an array of integers encoding
+the scope structure of the line, a `line` key returning the line provided for
+convenience, and a `ruleStack` key pointing to an array of rules to pass to this
+method on future calls for lines proceeding the line that was just tokenized.
+
+The `tags` array encodes the structure of the line as integers for efficient
+storage. This can be converted to a more convenient representation if storage
+is not an issue by passing the `line` string and `tags` array to `GrammarRegistry::decodeTokens`.
+
+Otherwise, the integers can be interpreted as follows:
+
+* Positive integers represent tokens, with the number indicating the length of
+the token. All positive integers in the array should total to the length of the
+line passed to this method.
+
+* Negative integers represent scope start/stop tags. Odd integers are scope
+starts, and even integers are scope stops. An odd scope tag can be converted to
+a string via `GrammarRegistry::scopeForId`. If you want to convert an even scope
+tag, representing a scope end, add 1 to it to determine the corresponding scope
+start tag before calling `::scopeForId`.
 
 #### tokenizeLines(text)
 
 `text` - The string text possibly containing newlines.
 
-Returns an array of tokens for each line tokenized.
+Returns an object containing a `lines` key, pointing to an array of tokenized
+lines and a `tags` key, pointing to an array of tags arrays described above.
 
 ## Developing
 

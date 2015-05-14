@@ -83,15 +83,15 @@ class Rule
       @normalizeCaptureIndices(lineWithNewline, result.captureIndices)
       result
 
-  getNextTokens: (ruleStack, line, position, firstLine) ->
+  getNextTags: (ruleStack, line, position, firstLine) ->
     result = @findNextMatch(ruleStack, line, position, firstLine)
     return null unless result?
 
     {index, captureIndices, scanner} = result
     [firstCapture] = captureIndices
     endPatternMatch = @endPattern is scanner.patterns[index]
-    nextTokens = scanner.handleMatch(result, ruleStack, line, this, endPatternMatch)
-    {nextTokens, tokensStartPosition: firstCapture.start, tokensEndPosition: firstCapture.end}
+    nextTags = scanner.handleMatch(result, ruleStack, line, this, endPatternMatch)
+    {nextTags, tagsStart: firstCapture.start, tagsEnd: firstCapture.end}
 
   getRuleToPush: (line, beginPatternCaptureIndices) ->
     if @endPattern.hasBackReferences

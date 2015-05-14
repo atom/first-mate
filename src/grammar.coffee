@@ -73,9 +73,12 @@ class Grammar
   tokenizeLines: (text) ->
     lines = text.split('\n')
     ruleStack = null
-    for line, lineNumber in lines
-      {tokens, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
-      tokens
+
+    tags = for line, lineNumber in lines
+      {tags: lineTags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
+      lineTags
+
+    {lines, tags}
 
   # Public: Tokenize the line of text.
   #
@@ -87,77 +90,88 @@ class Grammar
   #   when tokenizing the first line in the file.
   #
   # Returns an {Object} containing the following properties:
-  # * `token` An {Array} of tokens covering the entire line of text.
+  # * `content` An {Array} of integer scope ids and strings. Positive ids
+  #   indicate the beginning of a scope, and negative tags indicate the end.
+  #   To resolve ids to scope names, call {GrammarRegistry::scopeForId} with the
+  #   absolute value of the id.
   # * `ruleStack` An {Array} of rules representing the tokenized state at the
   #   end of the line. These should be passed back into this method when
   #   tokenizing the next line in the file.
   tokenizeLine: (line, ruleStack, firstLine=false) ->
+    tags = []
+
     if ruleStack?
       ruleStack = ruleStack.slice()
     else
-      ruleStack = [@getInitialRule()]
+      initialRule = @getInitialRule()
+      ruleStack = [initialRule]
+      tags.push(@idForScope(initialRule.scopeName)) if initialRule.scopeName
+      tags.push(@idForScope(initialRule.contentScopeName)) if initialRule.contentScopeName
+
     originalRuleStack = ruleStack.slice()
 
-    tokens = []
     position = 0
+    tokenCount = 0
 
     loop
-      scopes = @scopesFromStack(ruleStack)
       previousRuleStackLength = ruleStack.length
       previousPosition = position
 
-      if tokens.length >= @getMaxTokensPerLine() - 1
-        token = @createToken(line[position..], scopes)
-        tokens.push token
+      if tokenCount >= @getMaxTokensPerLine() - 1
+        tags.push(line.length - position)
         ruleStack = originalRuleStack
         break
 
-      break if position == line.length + 1 # include trailing newline position
+      break if position is line.length + 1 # include trailing newline position
 
-      if match = _.last(ruleStack).getNextTokens(ruleStack, line, position, firstLine)
-        {nextTokens, tokensStartPosition, tokensEndPosition} = match
+      if match = _.last(ruleStack).getNextTags(ruleStack, line, position, firstLine)
+        {nextTags, tagsStart, tagsEnd} = match
 
-        # Unmatched text before next tokens
-        if position < tokensStartPosition
-          tokens.push(@createToken(line[position...tokensStartPosition], scopes))
+        # Unmatched text before next tags
+        if position < tagsStart
+          tags.push(tagsStart - position)
+          tokenCount++
 
-        tokens.push(nextTokens...)
-        position = tokensEndPosition
-
+        tags.push(nextTags...)
+        tokenCount++ for tag in nextTags when tag >= 0
+        position = tagsEnd
 
       else
         # Push filler token for unmatched text at end of line
-        if position < line.length or line.length == 0
-          tokens.push(@createToken(line[position...line.length], scopes))
+        if position < line.length or line.length is 0
+          tags.push(line.length - position)
         break
 
-      if position == previousPosition
-        if ruleStack.length == previousRuleStackLength
+      if position is previousPosition
+        if ruleStack.length is previousRuleStackLength
           console.error("Popping rule because it loops at column #{position} of line '#{line}'", _.clone(ruleStack))
           if ruleStack.length > 1
             ruleStack.pop()
           else
-            if position < line.length or (line.length == 0 and tokens.length is 0)
-              tokens.push(@createToken(line[position...line.length], scopes))
+            if position < line.length or (line.length is 0 and tags.length is 0)
+              tags.push(line.length - position)
             break
         else if ruleStack.length > previousRuleStackLength # Stack size increased with zero length match
           [penultimateRule, lastRule] = ruleStack[-2..]
 
           # Same exact rule was pushed but position wasn't advanced
-          if lastRule? and lastRule == penultimateRule
+          if lastRule? and lastRule is penultimateRule
             popStack = true
 
           # Rule with same scope name as previous rule was pushed but position wasn't advanced
-          if lastRule?.scopeName? and penultimateRule.scopeName == lastRule.scopeName
+          if lastRule?.scopeName? and penultimateRule.scopeName is lastRule.scopeName
             popStack = true
 
           if popStack
             ruleStack.pop()
-            tokens.push(@createToken(line[position...line.length], scopes))
+            lastSymbol = _.last(tags)
+            if lastSymbol < 0 and lastSymbol is @idForScope(lastRule.scopeName)
+              tags.pop() # also pop the duplicated start scope if it was pushed
+            tags.push(line.length - position)
             break
 
     rule.clearAnchorPosition() for rule in ruleStack
-    {tokens, ruleStack}
+    {line, tags, ruleStack}
 
   activate: ->
     @registration = @registry.addGrammar(this)
@@ -235,7 +249,9 @@ class Grammar
 
     pathScore
 
-  createToken: (value, scopes) -> @registry.createToken(value, scopes)
+  idForScope: (scope) -> @registry.idForScope(scope)
+
+  scopeForId: (id) -> @registry.scopeForId(id)
 
   createRule: (options) -> new Rule(this, @registry, options)
 
