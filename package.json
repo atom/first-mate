@@ -6,7 +6,7 @@
   "scripts": {
     "test": "grunt test",
     "prepublish": "grunt prepublish",
-    "benchmark": "node_modules/.bin/coffee --nodejs --harmony_collections benchmark/benchmark.coffee"
+    "benchmark": "node_modules/.bin/coffee benchmark/benchmark.coffee"
   },
   "repository": {
     "type": "git",
