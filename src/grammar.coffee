@@ -74,11 +74,10 @@ class Grammar
     lines = text.split('\n')
     ruleStack = null
 
-    tags = for line, lineNumber in lines
-      {tags: lineTags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
-      lineTags
-
-    {lines, tags}
+    scopes = []
+    for line, lineNumber in lines
+      {tags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
+      @registry.decodeTokens(line, tags, scopes)
 
   # Public: Tokenize the line of text.
   #
@@ -90,10 +89,14 @@ class Grammar
   #   when tokenizing the first line in the file.
   #
   # Returns an {Object} containing the following properties:
-  # * `content` An {Array} of integer scope ids and strings. Positive ids
+  # * `line` The {String} of text that was tokenized.
+  # * `tags` An {Array} of integer scope ids and strings. Positive ids
   #   indicate the beginning of a scope, and negative tags indicate the end.
   #   To resolve ids to scope names, call {GrammarRegistry::scopeForId} with the
   #   absolute value of the id.
+  # * `tokens` This is a dynamic property. Invoking it will incur additional
+  #   overhead, but will automatically translate the `tags` into token objects
+  #   with `value` and `scopes` properties.
   # * `ruleStack` An {Array} of rules representing the tokenized state at the
   #   end of the line. These should be passed back into this method when
   #   tokenizing the next line in the file.
@@ -171,7 +174,7 @@ class Grammar
             break
 
     rule.clearAnchorPosition() for rule in ruleStack
-    {line, tags, ruleStack}
+    new TokenizeLineResult(line, tags, ruleStack, @registry)
 
   activate: ->
     @registration = @registry.addGrammar(this)
@@ -285,3 +288,9 @@ if Grim.includeDeprecatedAPIs
       Grim.deprecate("Call explicit event subscription methods instead")
 
     EmitterMixin::on.apply(this, arguments)
+
+class TokenizeLineResult
+  constructor: (@line, @tags, @ruleStack, @registry) ->
+
+  Object.defineProperty @prototype, 'tokens', get: ->
+    @registry.decodeTokens(@line, @tags)

@@ -203,26 +203,21 @@ describe "Grammar tokenization", ->
         loadGrammarSync("content-name.json")
 
         grammar = registry.grammarForScopeName("source.test")
-        {lines, tags} = grammar.tokenizeLines "#if\ntest\n#endif"
+        lines = grammar.tokenizeLines "#if\ntest\n#endif"
 
-        scopes = []
-        line1 = registry.decodeTokens(lines[0], tags[0], scopes)
-        line2 = registry.decodeTokens(lines[1], tags[1], scopes)
-        line3 = registry.decodeTokens(lines[2], tags[2], scopes)
+        expect(lines[0].length).toBe 1
+        expect(lines[0][0].value).toEqual "#if"
+        expect(lines[0][0].scopes).toEqual ["source.test", "pre"]
 
-        expect(line1.length).toBe 1
-        expect(line1[0].value).toEqual "#if"
-        expect(line1[0].scopes).toEqual ["source.test", "pre"]
+        expect(lines[1].length).toBe 1
+        expect(lines[1][0].value).toEqual "test"
+        expect(lines[1][0].scopes).toEqual ["source.test", "pre", "nested"]
 
-        expect(line2.length).toBe 1
-        expect(line2[0].value).toEqual "test"
-        expect(line2[0].scopes).toEqual ["source.test", "pre", "nested"]
-
-        expect(line3.length).toBe 2
-        expect(line3[0].value).toEqual "#endif"
-        expect(line3[0].scopes).toEqual ["source.test", "pre"]
-        expect(line3[1].value).toEqual ""
-        expect(line3[1].scopes).toEqual ["source.test", "all"]
+        expect(lines[2].length).toBe 2
+        expect(lines[2][0].value).toEqual "#endif"
+        expect(lines[2][0].scopes).toEqual ["source.test", "pre"]
+        expect(lines[2][1].value).toEqual ""
+        expect(lines[2][1].scopes).toEqual ["source.test", "all"]
 
         {line, tags} = grammar.tokenizeLine "test"
         tokens = registry.decodeTokens(line, tags)
@@ -297,20 +292,13 @@ describe "Grammar tokenization", ->
       describe "when applyEndPatternLast flag is set in a pattern", ->
         it "applies end pattern after the other patterns", ->
           grammar = loadGrammarSync('apply-end-pattern-last.cson')
-          {lines, tags} = grammar.tokenizeLines """
+          lines = grammar.tokenizeLines """
             last
             { some }excentricSyntax }
 
             first
             { some }excentricSyntax }
           """
-
-          scopes = []
-          lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-          lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
-          lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
-          lines[3] = registry.decodeTokens(lines[3], tags[3], scopes)
-          lines[4] = registry.decodeTokens(lines[4], tags[4], scopes)
 
           expect(lines[1][2]).toEqual value: "}excentricSyntax", scopes: ['source.apply-end-pattern-last', 'end-pattern-last-env', 'scope', 'excentric']
           expect(lines[4][2]).toEqual value: "}", scopes: ['source.apply-end-pattern-last', 'normal-env', 'scope']
@@ -442,10 +430,7 @@ describe "Grammar tokenization", ->
 
     it "can parse multiline text using a grammar containing patterns with newlines", ->
       grammar = loadGrammarSync('multiline.cson')
-      {lines, tags} = grammar.tokenizeLines('Xy\\\nzX')
-      scopes = []
-      lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-      lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
+      lines = grammar.tokenizeLines('Xy\\\nzX')
 
       # Line 0
       expect(lines[0][0]).toEqual
@@ -654,13 +639,10 @@ describe "Grammar tokenization", ->
     describe "Git commit messages", ->
       beforeEach ->
         grammar = loadGrammarSync('git-commit.json')
-        {lines, tags} = grammar.tokenizeLines """
+        lines = grammar.tokenizeLines """
           longggggggggggggggggggggggggggggggggggggggggggggggg
           # Please enter the commit message for your changes. Lines starting
         """
-        scopes = []
-        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
 
       it "correctly parses a long line", ->
         tokens = lines[0]
@@ -676,13 +658,10 @@ describe "Grammar tokenization", ->
       beforeEach ->
         loadGrammarSync('c.json')
         grammar = loadGrammarSync('c-plus-plus.json')
-        {lines, tags} = grammar.tokenizeLines """
+        lines = grammar.tokenizeLines """
           #include "a.h"
           #include "b.h"
         """
-        scopes = []
-        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
 
       it "correctly parses the first include line", ->
         tokens = lines[0]
@@ -701,15 +680,11 @@ describe "Grammar tokenization", ->
     describe "Ruby", ->
       beforeEach ->
         grammar = registry.grammarForScopeName('source.ruby')
-        {lines, tags} = grammar.tokenizeLines """
+        lines = grammar.tokenizeLines """
           a = {
             "b" => "c",
           }
         """
-        scopes = []
-        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
-        lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
 
       it "doesn't loop infinitely (regression)", ->
         expect(_.pluck(lines[0], 'value').join('')).toBe 'a = {'
@@ -723,15 +698,11 @@ describe "Grammar tokenization", ->
         loadGrammarSync('c-plus-plus.json')
         loadGrammarSync('objective-c.json')
         grammar = loadGrammarSync('objective-c-plus-plus.json')
-        {lines, tags} = grammar.tokenizeLines """
+        lines = grammar.tokenizeLines """
           void test() {
           NSString *a = @"a\\nb";
           }
         """
-        scopes = []
-        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
-        lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
 
       it "correctly parses variable type when it is a built-in Cocoa class", ->
         tokens = lines[1]
@@ -755,15 +726,11 @@ describe "Grammar tokenization", ->
         grammar = registry.grammarForScopeName('source.java')
 
       it "correctly parses single line comments", ->
-        {lines, tags} = grammar.tokenizeLines """
+        lines = grammar.tokenizeLines """
           public void test() {
           //comment
           }
         """
-        scopes = []
-        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
-        lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
 
         tokens = lines[1]
         expect(tokens[0].scopes).toEqual ["source.java", "comment.line.double-slash.java", "punctuation.definition.comment.java"]
@@ -829,10 +796,7 @@ describe "Grammar tokenization", ->
     describe "python", ->
       it "parses import blocks correctly", ->
         grammar = registry.grammarForScopeName('source.python')
-        {lines, tags} = grammar.tokenizeLines "import a\nimport b"
-        scopes = []
-        lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-        lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
+        lines = grammar.tokenizeLines "import a\nimport b"
 
         line1 = lines[0]
         expect(line1.length).toBe 3
@@ -858,7 +822,7 @@ describe "Grammar tokenization", ->
           loadGrammarSync("css.json")
           grammar = registry.grammarForScopeName("text.html.basic")
 
-          {lines, tags} = grammar.tokenizeLines """
+          lines = grammar.tokenizeLines """
             <html>
               <head>
                 <style>
@@ -869,13 +833,6 @@ describe "Grammar tokenization", ->
               </head>
             </html>
           """
-          scopes = []
-          lines[0] = registry.decodeTokens(lines[0], tags[0], scopes)
-          lines[1] = registry.decodeTokens(lines[1], tags[1], scopes)
-          lines[2] = registry.decodeTokens(lines[2], tags[2], scopes)
-          lines[3] = registry.decodeTokens(lines[3], tags[3], scopes)
-          lines[4] = registry.decodeTokens(lines[4], tags[4], scopes)
-
 
           line4 = lines[4]
           expect(line4[4].value).toEqual "blue"
