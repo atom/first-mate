@@ -100,12 +100,18 @@ class Grammar
   # * `ruleStack` An {Array} of rules representing the tokenized state at the
   #   end of the line. These should be passed back into this method when
   #   tokenizing the next line in the file.
-  tokenizeLine: (line, ruleStack, firstLine=false) ->
+  tokenizeLine: (line, ruleStack, firstLine=false, compatibilityMode=true) ->
     tags = []
 
     if ruleStack?
       ruleStack = ruleStack.slice()
+      if compatibilityMode
+        openScopeTags = []
+        for {scopeName, contentScopeName} in ruleStack
+          openScopeTags.push(@registry.idForScope(scopeName)) if scopeName
+          openScopeTags.push(@registry.idForScope(contentScopeName)) if contentScopeName
     else
+      openScopeTags = [] if compatibilityMode
       initialRule = @getInitialRule()
       ruleStack = [initialRule]
       tags.push(@idForScope(initialRule.scopeName)) if initialRule.scopeName
@@ -174,7 +180,11 @@ class Grammar
             break
 
     rule.clearAnchorPosition() for rule in ruleStack
-    new TokenizeLineResult(line, tags, ruleStack, @registry)
+
+    if compatibilityMode
+      new TokenizeLineResult(line, openScopeTags, tags, ruleStack, @registry)
+    else
+      {line, tags, ruleStack}
 
   activate: ->
     @registration = @registry.addGrammar(this)
@@ -290,7 +300,7 @@ if Grim.includeDeprecatedAPIs
     EmitterMixin::on.apply(this, arguments)
 
 class TokenizeLineResult
-  constructor: (@line, @tags, @ruleStack, @registry) ->
+  constructor: (@line, @openScopeTags, @tags, @ruleStack, @registry) ->
 
   Object.defineProperty @prototype, 'tokens', get: ->
-    @registry.decodeTokens(@line, @tags)
+    @registry.decodeTokens(@line, @tags, @openScopeTags)
