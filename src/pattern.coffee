@@ -159,10 +159,24 @@ class Pattern
     {tags} = rule.grammar.tokenizeLine(captureText, [stack..., rule])
 
     # only accept non empty tokens that don't exceed the capture end
+    openScopes = []
+    captureTags = []
     offset = 0
     for tag in tags when tag < 0 or (tag > 0 and offset < captureEnd)
-      offset += tag if tag > 0
-      tag
+      captureTags.push(tag)
+      if tag >= 0
+        offset += tag
+      else
+        if tag % 2 is 0
+          openScopes.pop()
+        else
+          openScopes.push(tag)
+
+    # close any scopes left open by matching this rule since we don't pass our stack
+    while openScopes.length > 0
+      captureTags.push(openScopes.pop() - 1)
+
+    captureTags
 
   # Get the tokens for the capture indices.
   #

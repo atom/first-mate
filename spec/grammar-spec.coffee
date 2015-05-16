@@ -20,8 +20,8 @@ describe "Grammar tokenization", ->
     loadGrammarSync('html-erb.json')
     loadGrammarSync('html.json')
     loadGrammarSync('php.json')
-    loadGrammarSync('python.json')
-    loadGrammarSync('python-regex.json')
+    loadGrammarSync('python.cson')
+    loadGrammarSync('python-regex.cson')
 
   describe "when the registry is empty", ->
     it "tokenizes using the null grammar", ->
@@ -815,6 +815,10 @@ describe "Grammar tokenization", ->
         expect(line2[1].scopes).toEqual ["source.python"]
         expect(line2[2].value).toEqual "b"
         expect(line2[2].scopes).toEqual ["source.python"]
+
+      it "closes all scopes opened when matching rules within a capture", ->
+        grammar = registry.grammarForScopeName('source.python')
+        grammar.tokenizeLines("r'%d(' #foo") # should not throw exception due to invalid tag sequence
 
     describe "HTML", ->
       describe "when it contains CSS", ->
