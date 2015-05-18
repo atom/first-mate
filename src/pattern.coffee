@@ -145,8 +145,8 @@ class Pattern
     if @pushRule
       ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
       ruleToPush.anchorPosition = captureIndices[0].end
-      stack.push(ruleToPush)
       {contentScopeName} = ruleToPush
+      stack.push({rule: ruleToPush, scopeName, contentScopeName})
       tags.push(@grammar.idForScope(contentScopeName)) if contentScopeName
     else
       {scopeName} = stack.pop() if @popRule
@@ -156,7 +156,7 @@ class Pattern
 
   tagsForCaptureRule: (rule, line, captureStart, captureEnd, stack) ->
     captureText = line.substring(captureStart, captureEnd)
-    {tags} = rule.grammar.tokenizeLine(captureText, [stack..., rule])
+    {tags} = rule.grammar.tokenizeLine(captureText, [stack..., {rule}])
 
     # only accept non empty tokens that don't exceed the capture end
     openScopes = []

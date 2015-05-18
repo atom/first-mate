@@ -39,7 +39,7 @@ class Rule
     scanner
 
   scanInjections: (ruleStack, line, position, firstLine) ->
-    baseGrammar = ruleStack[0].grammar
+    baseGrammar = ruleStack[0].rule.grammar
     if injections = baseGrammar.injections
       for scanner in injections.getScanners(ruleStack)
         result = scanner.findNextMatch(line, firstLine, position, @anchorPosition)
@@ -54,7 +54,7 @@ class Rule
 
   findNextMatch: (ruleStack, line, position, firstLine) ->
     lineWithNewline = "#{line}\n"
-    baseGrammar = ruleStack[0].grammar
+    baseGrammar = ruleStack[0].rule.grammar
     results = []
 
     scanner = @getScanner(baseGrammar)

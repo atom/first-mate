@@ -113,9 +113,10 @@ class Grammar
     else
       openScopeTags = [] if compatibilityMode
       initialRule = @getInitialRule()
-      ruleStack = [initialRule]
-      tags.push(@idForScope(initialRule.scopeName)) if initialRule.scopeName
-      tags.push(@idForScope(initialRule.contentScopeName)) if initialRule.contentScopeName
+      {scopeName, contentScopeName} = initialRule
+      ruleStack = [{rule: initialRule, scopeName, contentScopeName}]
+      tags.push(@idForScope(initialRule.scopeName)) if scopeName
+      tags.push(@idForScope(initialRule.contentScopeName)) if contentScopeName
 
     originalRuleStack = ruleStack.slice()
 
@@ -133,7 +134,7 @@ class Grammar
 
       break if position is line.length + 1 # include trailing newline position
 
-      if match = _.last(ruleStack).getNextTags(ruleStack, line, position, firstLine)
+      if match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)
         {nextTags, tagsStart, tagsEnd} = match
 
         # Unmatched text before next tags
@@ -161,7 +162,7 @@ class Grammar
               tags.push(line.length - position)
             break
         else if ruleStack.length > previousRuleStackLength # Stack size increased with zero length match
-          [penultimateRule, lastRule] = ruleStack[-2..]
+          [{rule: penultimateRule}, {rule: lastRule}] = ruleStack[-2..]
 
           # Same exact rule was pushed but position wasn't advanced
           if lastRule? and lastRule is penultimateRule
@@ -179,7 +180,7 @@ class Grammar
             tags.push(line.length - position)
             break
 
-    rule.clearAnchorPosition() for rule in ruleStack
+    rule.clearAnchorPosition() for {rule} in ruleStack
 
     if compatibilityMode
       new TokenizeLineResult(line, openScopeTags, tags, ruleStack, @registry)

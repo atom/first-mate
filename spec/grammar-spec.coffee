@@ -848,6 +848,13 @@ describe "Grammar tokenization", ->
             "support.constant.color.w3c-standard-color-name.css"
           ]
 
+    describe "Latex", ->
+      it "properly emits close tags for scope names containing back-references", ->
+        loadGrammarSync("latex.cson")
+        grammar = registry.grammarForScopeName("text.tex.latex")
+        {line, tags} = grammar.tokenizeLine("\\chapter*{test}")
+        registry.decodeTokens(line, tags)
+
   describe "when the position doesn't advance", ->
     it "logs an error and tokenizes the remainder of the line", ->
       spyOn(console, 'error')
