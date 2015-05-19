@@ -131,10 +131,10 @@ class Pattern
 
     if @popRule
       {contentScopeName} = _.last(stack)
-      tags.push(@grammar.idForScope(contentScopeName) - 1) if contentScopeName
+      tags.push(@grammar.endIdForScope(contentScopeName)) if contentScopeName
     else if @scopeName
       scopeName = @resolveScopeName(@scopeName, line, captureIndices)
-      tags.push(@grammar.idForScope(scopeName))
+      tags.push(@grammar.startIdForScope(scopeName))
 
     if @captures
       tags.push(@tagsForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
@@ -147,10 +147,10 @@ class Pattern
       ruleToPush.anchorPosition = captureIndices[0].end
       {contentScopeName} = ruleToPush
       stack.push({rule: ruleToPush, scopeName, contentScopeName})
-      tags.push(@grammar.idForScope(contentScopeName)) if contentScopeName
+      tags.push(@grammar.startIdForScope(contentScopeName)) if contentScopeName
     else
       {scopeName} = stack.pop() if @popRule
-      tags.push(@grammar.idForScope(scopeName) - 1) if scopeName
+      tags.push(@grammar.endIdForScope(scopeName)) if scopeName
 
     tags
 
@@ -196,7 +196,7 @@ class Pattern
     tags = []
     if scope = @captures[parentCapture.index]?.name
       parentCaptureScope = @resolveScopeName(scope, line, allCaptureIndices)
-      tags.push(@grammar.idForScope(parentCaptureScope))
+      tags.push(@grammar.startIdForScope(parentCaptureScope))
 
     if captureRule = @captures[parentCapture.index]?.rule
       captureTags = @tagsForCaptureRule(captureRule, line, parentCapture.start, parentCapture.end, stack)
@@ -227,7 +227,7 @@ class Pattern
 
     if parentCaptureScope
       if tags.length > 1
-        tags.push(@grammar.idForScope(parentCaptureScope) - 1)
+        tags.push(@grammar.endIdForScope(parentCaptureScope))
       else
         tags.pop()
 

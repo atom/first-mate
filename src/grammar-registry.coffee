@@ -205,7 +205,7 @@ class GrammarRegistry
   selectGrammar: (filePath, fileContents) ->
     _.max @grammars, (grammar) -> grammar.getScore(filePath, fileContents)
 
-  idForScope: (scope) ->
+  startIdForScope: (scope) ->
     unless id = @idsByScope[scope]
       id = @scopeIdCounter
       @scopeIdCounter -= 2
@@ -213,8 +213,14 @@ class GrammarRegistry
       @scopesById[id] = scope
     id
 
+  endIdForScope: (scope) ->
+    @startIdForScope(scope) - 1
+
   scopeForId: (id) ->
-    @scopesById[id]
+    if (id % 2) is -1
+      @scopesById[id] # start id
+    else
+      @scopesById[id + 1] # end id
 
   grammarUpdated: (scopeName) ->
     for grammar in @grammars when grammar.scopeName isnt scopeName

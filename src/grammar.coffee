@@ -108,15 +108,15 @@ class Grammar
       if compatibilityMode
         openScopeTags = []
         for {scopeName, contentScopeName} in ruleStack
-          openScopeTags.push(@registry.idForScope(scopeName)) if scopeName
-          openScopeTags.push(@registry.idForScope(contentScopeName)) if contentScopeName
+          openScopeTags.push(@registry.startIdForScope(scopeName)) if scopeName
+          openScopeTags.push(@registry.startIdForScope(contentScopeName)) if contentScopeName
     else
       openScopeTags = [] if compatibilityMode
       initialRule = @getInitialRule()
       {scopeName, contentScopeName} = initialRule
       ruleStack = [{rule: initialRule, scopeName, contentScopeName}]
-      tags.push(@idForScope(initialRule.scopeName)) if scopeName
-      tags.push(@idForScope(initialRule.contentScopeName)) if contentScopeName
+      tags.push(@startIdForScope(initialRule.scopeName)) if scopeName
+      tags.push(@startIdForScope(initialRule.contentScopeName)) if contentScopeName
 
     originalRuleStack = ruleStack.slice()
 
@@ -175,7 +175,7 @@ class Grammar
           if popStack
             ruleStack.pop()
             lastSymbol = _.last(tags)
-            if lastSymbol < 0 and lastSymbol is @idForScope(lastRule.scopeName)
+            if lastSymbol < 0 and lastSymbol is @startIdForScope(lastRule.scopeName)
               tags.pop() # also pop the duplicated start scope if it was pushed
             tags.push(line.length - position)
             break
@@ -263,7 +263,9 @@ class Grammar
 
     pathScore
 
-  idForScope: (scope) -> @registry.idForScope(scope)
+  startIdForScope: (scope) -> @registry.startIdForScope(scope)
+  
+  endIdForScope: (scope) -> @registry.endIdForScope(scope)
 
   scopeForId: (id) -> @registry.scopeForId(id)
 
