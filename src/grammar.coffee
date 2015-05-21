@@ -118,8 +118,7 @@ class Grammar
       tags.push(@startIdForScope(initialRule.scopeName)) if scopeName
       tags.push(@startIdForScope(initialRule.contentScopeName)) if contentScopeName
 
-    originalRuleStack = ruleStack.slice()
-
+    initialRuleStackLength = ruleStack.length
     position = 0
     tokenCount = 0
 
@@ -129,7 +128,10 @@ class Grammar
 
       if tokenCount >= @getMaxTokensPerLine() - 1
         tags.push(line.length - position)
-        ruleStack = originalRuleStack
+        while ruleStack.length > initialRuleStackLength
+          {scopeName, contentScopeName} = ruleStack.pop()
+          tags.push(@endIdForScope(contentScopeName)) if contentScopeName
+          tags.push(@endIdForScope(scopeName)) if scopeName
         break
 
       break if position is line.length + 1 # include trailing newline position
@@ -264,7 +266,7 @@ class Grammar
     pathScore
 
   startIdForScope: (scope) -> @registry.startIdForScope(scope)
-  
+
   endIdForScope: (scope) -> @registry.endIdForScope(scope)
 
   scopeForId: (id) -> @registry.scopeForId(id)

@@ -504,11 +504,13 @@ describe "Grammar tokenization", ->
         originalRuleStack = grammar.tokenizeLine('').ruleStack
         spyOn(grammar, 'getMaxTokensPerLine').andCallFake -> 5
         {line, tags, ruleStack} = grammar.tokenizeLine("var x = /[a-z]/;", originalRuleStack)
-        tokens = registry.decodeTokens(line, tags)
+        scopes = []
+        tokens = registry.decodeTokens(line, tags, scopes)
         expect(tokens.length).toBe 6
         expect(tokens[5].value).toBe "[a-z]/;"
         expect(ruleStack).toEqual originalRuleStack
         expect(ruleStack).not.toBe originalRuleStack
+        expect(scopes.length).toBe 0
 
     describe "when a grammar has a capture with patterns", ->
       it "matches the patterns and includes the scope specified as the pattern's match name", ->
