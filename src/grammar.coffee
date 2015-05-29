@@ -158,7 +158,9 @@ class Grammar
         if ruleStack.length is previousRuleStackLength
           console.error("Popping rule because it loops at column #{position} of line '#{line}'", _.clone(ruleStack))
           if ruleStack.length > 1
-            ruleStack.pop()
+            {scopeName, contentScopeName} = ruleStack.pop()
+            tags.push(@endIdForScope(contentScopeName)) if contentScopeName
+            tags.push(@endIdForScope(scopeName)) if scopeName
           else
             if position < line.length or (line.length is 0 and tags.length is 0)
               tags.push(line.length - position)

@@ -485,9 +485,11 @@ describe "Grammar tokenization", ->
         spyOn(console, 'error')
         grammar = loadGrammarSync('infinite-loop.cson')
         {line, tags} = grammar.tokenizeLine("abc")
-        tokens = registry.decodeTokens(line, tags)
+        scopes = []
+        tokens = registry.decodeTokens(line, tags, scopes)
         expect(tokens[0].value).toBe "a"
         expect(tokens[1].value).toBe "bc"
+        expect(scopes).toEqual [registry.startIdForScope(grammar.scopeName)]
         expect(console.error).toHaveBeenCalled()
 
     describe "when a grammar has a pattern that has back references in the match value", ->
@@ -593,7 +595,6 @@ describe "Grammar tokenization", ->
         grammar = loadGrammarSync('forever.cson')
         {line, tags} = grammar.tokenizeLine("forever and ever")
         tokens = registry.decodeTokens(line, tags)
-
         expect(tokens.length).toBe 1
         expect(tokens[0].value).toBe "forever and ever"
         expect(tokens[0].scopes).toEqual ["source.forever", "text"]
