@@ -126,6 +126,8 @@ class Grammar
       previousRuleStackLength = ruleStack.length
       previousPosition = position
 
+      break if position is line.length + 1 # include trailing newline position
+
       if tokenCount >= @getMaxTokensPerLine() - 1
         tags.push(line.length - position)
         while ruleStack.length > initialRuleStackLength
@@ -133,8 +135,6 @@ class Grammar
           tags.push(@endIdForScope(contentScopeName)) if contentScopeName
           tags.push(@endIdForScope(scopeName)) if scopeName
         break
-
-      break if position is line.length + 1 # include trailing newline position
 
       if match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)
         {nextTags, tagsStart, tagsEnd} = match
