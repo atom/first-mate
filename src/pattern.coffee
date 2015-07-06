@@ -129,7 +129,14 @@ class Pattern
   handleMatch: (stack, line, captureIndices, rule, endPatternMatch) ->
     tags = []
 
+    zeroWidthMatch = captureIndices[0].start is captureIndices[0].end
+
     if @popRule
+      # Pushing and popping a rule based on zero width matches at the same index
+      # leads to an infinite loop. We bail on parsing if we detect that case here.
+      if zeroWidthMatch and _.last(stack).zeroWidthMatch and _.last(stack).rule.anchorPosition is captureIndices[0].end
+        return false
+
       {contentScopeName} = _.last(stack)
       tags.push(@grammar.endIdForScope(contentScopeName)) if contentScopeName
     else if @scopeName
@@ -146,7 +153,7 @@ class Pattern
       ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
       ruleToPush.anchorPosition = captureIndices[0].end
       {contentScopeName} = ruleToPush
-      stack.push({rule: ruleToPush, scopeName, contentScopeName})
+      stack.push({rule: ruleToPush, scopeName, contentScopeName, zeroWidthMatch})
       tags.push(@grammar.startIdForScope(contentScopeName)) if contentScopeName
     else
       {scopeName} = stack.pop() if @popRule

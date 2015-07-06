@@ -90,8 +90,8 @@ class Rule
     {index, captureIndices, scanner} = result
     [firstCapture] = captureIndices
     endPatternMatch = @endPattern is scanner.patterns[index]
-    nextTags = scanner.handleMatch(result, ruleStack, line, this, endPatternMatch)
-    {nextTags, tagsStart: firstCapture.start, tagsEnd: firstCapture.end}
+    if nextTags = scanner.handleMatch(result, ruleStack, line, this, endPatternMatch)
+      {nextTags, tagsStart: firstCapture.start, tagsEnd: firstCapture.end}
 
   getRuleToPush: (line, beginPatternCaptureIndices) ->
     if @endPattern.hasBackReferences

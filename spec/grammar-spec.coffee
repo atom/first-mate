@@ -858,6 +858,20 @@ describe "Grammar tokenization", ->
         {line, tags} = grammar.tokenizeLine("\\chapter*{test}")
         registry.decodeTokens(line, tags)
 
+    describe "Thrift", ->
+      it "doesn't loop on this evil example", ->
+        loadGrammarSync("thrift.cson")
+        grammar = registry.grammarForScopeName("source.thrift")
+
+        lines = grammar.tokenizeLines """
+          exception SimpleErr {
+            1: string message
+
+          service SimpleService {
+            void Simple() throws (1: SimpleErr simpleErr)
+          }
+        """
+
   describe "when the position doesn't advance", ->
     it "logs an error and tokenizes the remainder of the line", ->
       spyOn(console, 'error')
