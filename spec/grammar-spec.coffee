@@ -859,7 +859,7 @@ describe "Grammar tokenization", ->
         registry.decodeTokens(line, tags)
 
     describe "Thrift", ->
-      it "doesn't loop on this evil example", ->
+      it "doesn't loop infinitely when the same rule is pushed or popped based on a zero-width match", ->
         loadGrammarSync("thrift.cson")
         grammar = registry.grammarForScopeName("source.thrift")
 
