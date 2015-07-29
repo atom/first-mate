@@ -102,6 +102,12 @@ class Pattern
     else if name is "$base"
       baseGrammar.getInitialRule()
     else
+      hashIndex = name.indexOf("#")
+      if hashIndex isnt -1
+        grammarName = name[0..hashIndex-1]
+        @grammar.addIncludedGrammarScope(grammarName)
+        grammar = @registry.grammarForScopeName(grammarName)
+        return grammar?.getRepository()?[name[hashIndex+1..]]
       @grammar.addIncludedGrammarScope(name)
       @registry.grammarForScopeName(name)?.getInitialRule()
 

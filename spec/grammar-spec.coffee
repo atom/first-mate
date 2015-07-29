@@ -387,6 +387,13 @@ describe "Grammar tokenization", ->
             expect(tokens[12].value).toBe " "
             expect(tokens[13].value).toBe "select"
 
+          it "supports including repository rules from the other grammar", ->
+            loadGrammarSync('include-external-repository-rule.cson')
+            grammar = registry.grammarForScopeName('test.include-external-repository-rule')
+            {line, tags} = grammar.tokenizeLine('enumerate')
+            tokens = registry.decodeTokens(line, tags)
+            expect(tokens[0]).toEqual value: 'enumerate', scopes: ["test.include-external-repository-rule", "support.function.builtin.python"]
+
         describe "when a grammar matching the desired scope is unavailable", ->
           it "updates the grammar if a matching grammar is added later", ->
             registry.removeGrammarForScopeName('text.html.basic')
