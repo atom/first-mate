@@ -24,15 +24,6 @@ describe "Grammar tokenization", ->
     loadGrammarSync('python-regex.cson')
 
   describe "when the registry is empty", ->
-    it "tokenizes using the null grammar", ->
-      emptyRegistry = new GrammarRegistry()
-      grammar = emptyRegistry.selectGrammar('foo.js', '')
-      {line, tags} = grammar.tokenizeLine('a = 1;')
-      tokens = emptyRegistry.decodeTokens(line, tags)
-      expect(tokens.length).toBe 1
-      expect(tokens[0].value).toBe 'a = 1;'
-      expect(tokens[0].scopes).toEqual ['text.plain.null-grammar']
-
     it "allows injections into the null grammar", ->
       registry = new GrammarRegistry()
       loadGrammarSync('hyperlink.json')

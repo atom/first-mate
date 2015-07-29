@@ -159,52 +159,6 @@ class GrammarRegistry
 
     undefined
 
-  # Public: Get the grammar override for the given file path.
-  #
-  # * `filePath` A {String} file path.
-  #
-  # Returns a {Grammar} or undefined.
-  grammarOverrideForPath: (filePath) ->
-    @grammarOverridesByPath[filePath]
-
-  # Public: Set the grammar override for the given file path.
-  #
-  # * `filePath` A non-empty {String} file path.
-  # * `scopeName` A {String} such as `"source.js"`.
-  #
-  # Returns a {Grammar} or undefined.
-  setGrammarOverrideForPath: (filePath, scopeName) ->
-    if filePath
-      @grammarOverridesByPath[filePath] = scopeName
-
-  # Public: Remove the grammar override for the given file path.
-  #
-  # * `filePath` A {String} file path.
-  #
-  # Returns undefined.
-  clearGrammarOverrideForPath: (filePath) ->
-    delete @grammarOverridesByPath[filePath]
-    undefined
-
-  # Public: Remove all grammar overrides.
-  #
-  # Returns undefined.
-  clearGrammarOverrides: ->
-    @grammarOverridesByPath = {}
-    undefined
-
-  # Public: Select a grammar for the given file path and file contents.
-  #
-  # This picks the best match by checking the file path and contents against
-  # each grammar.
-  #
-  # * `filePath` A {String} file path.
-  # * `fileContents` A {String} of text for the file path.
-  #
-  # Returns a {Grammar}, never null.
-  selectGrammar: (filePath, fileContents) ->
-    _.max @grammars, (grammar) -> grammar.getScore(filePath, fileContents)
-
   startIdForScope: (scope) ->
     unless id = @idsByScope[scope]
       id = @scopeIdCounter
