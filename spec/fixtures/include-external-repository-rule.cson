@@ -1,0 +1,4 @@
+scopeName: 'test.include-external-repository-rule'
+patterns: [
+  { include: 'source.python#builtin_functions' }
+]
