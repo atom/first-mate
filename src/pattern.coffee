@@ -95,19 +95,19 @@ class Pattern
     @grammar.createPattern({hasBackReferences: false, match: resolvedMatch, @captures, @popRule})
 
   ruleForInclude: (baseGrammar, name) ->
-    if name[0] is "#"
+    hashIndex = name.indexOf('#')
+    if hashIndex is 0
       @grammar.getRepository()[name[1..]]
-    else if name is "$self"
+    else if hashIndex >= 1
+      grammarName = name[0..hashIndex-1]
+      ruleName = name[hashIndex+1..]
+      @grammar.addIncludedGrammarScope(grammarName)
+      @registry.grammarForScopeName(grammarName)?.getRepository()[ruleName]
+    else if name is '$self'
       @grammar.getInitialRule()
-    else if name is "$base"
+    else if name is '$base'
       baseGrammar.getInitialRule()
     else
-      hashIndex = name.indexOf("#")
-      if hashIndex isnt -1
-        grammarName = name[0..hashIndex-1]
-        @grammar.addIncludedGrammarScope(grammarName)
-        grammar = @registry.grammarForScopeName(grammarName)
-        return grammar?.getRepository()?[name[hashIndex+1..]]
       @grammar.addIncludedGrammarScope(name)
       @registry.grammarForScopeName(name)?.getInitialRule()
 

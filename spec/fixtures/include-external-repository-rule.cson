@@ -1,4 +1,5 @@
 scopeName: 'test.include-external-repository-rule'
 patterns: [
+  { include: 'source.nogrammar#a_rule' }
   { include: 'source.python#builtin_functions' }
 ]
