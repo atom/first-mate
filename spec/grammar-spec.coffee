@@ -394,6 +394,12 @@ describe "Grammar tokenization", ->
             tokens = registry.decodeTokens(line, tags)
             expect(tokens[0]).toEqual value: 'enumerate', scopes: ["test.include-external-repository-rule", "support.function.builtin.python"]
 
+            updateCallback = jasmine.createSpy('updateCallback')
+            grammar.onDidUpdate(updateCallback)
+            expect(grammar.grammarUpdated('source.python')).toBe true
+            expect(grammar.grammarUpdated('not.included')).toBe false
+            expect(updateCallback.callCount).toBe 1
+
         describe "when a grammar matching the desired scope is unavailable", ->
           it "updates the grammar if a matching grammar is added later", ->
             registry.removeGrammarForScopeName('text.html.basic')
