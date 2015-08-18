@@ -11,8 +11,6 @@ Pattern = require './pattern'
 Rule = require './rule'
 ScopeSelector = require './scope-selector'
 
-pathSplitRegex = new RegExp("[/.]")
-
 # Extended: Grammar that tokenizes lines of text.
 #
 # This class should not be instantiated directly but instead obtained from
@@ -224,48 +222,6 @@ class Grammar
     @emit 'grammar-updated' if Grim.includeDeprecatedAPIs
     @emitter.emit 'did-update'
     true
-
-  getScore: (filePath, contents) ->
-    contents = fs.readFileSync(filePath, 'utf8') if not contents? and fs.isFileSync(filePath)
-
-    if @registry.grammarOverrideForPath(filePath) is @scopeName
-      2 + (filePath?.length ? 0)
-    else if @matchesContents(contents)
-      1 + (filePath?.length ? 0)
-    else
-      @getPathScore(filePath)
-
-  matchesContents: (contents) ->
-    return false unless contents? and @firstLineRegex?
-
-    escaped = false
-    numberOfNewlinesInRegex = 0
-    for character in @firstLineRegex.source
-      switch character
-        when '\\'
-          escaped = !escaped
-        when 'n'
-          numberOfNewlinesInRegex++ if escaped
-          escaped = false
-        else
-          escaped = false
-    lines = contents.split('\n')
-    @firstLineRegex.testSync(lines[0..numberOfNewlinesInRegex].join('\n'))
-
-  getPathScore: (filePath) ->
-    return -1 unless filePath
-
-    filePath = filePath.replace(/\\/g, '/') if process.platform is 'win32'
-
-    pathComponents = filePath.toLowerCase().split(pathSplitRegex)
-    pathScore = -1
-    for fileType in @fileTypes
-      fileTypeComponents = fileType.toLowerCase().split(pathSplitRegex)
-      pathSuffix = pathComponents[-fileTypeComponents.length..-1]
-      if _.isEqual(pathSuffix, fileTypeComponents)
-        pathScore = Math.max(pathScore, fileType.length)
-
-    pathScore
 
   startIdForScope: (scope) -> @registry.startIdForScope(scope)
 
