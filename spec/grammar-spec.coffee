@@ -496,6 +496,18 @@ describe "Grammar tokenization", ->
         expect(scopes).toEqual [registry.startIdForScope(grammar.scopeName)]
         expect(console.error).toHaveBeenCalled()
 
+    describe "when the grammar can infinitely loop through non-consuming rule over a line", ->
+      it "aborts tokenization", ->
+        spyOn(console, 'error')
+        grammar = loadGrammarSync('infinite-loop-rules.json')
+        {line, tags} = grammar.tokenizeLine("}<")
+        scopes = []
+        tokens = registry.decodeTokens(line, tags, scopes)
+        expect(tokens[0].value).toBe "}"
+        expect(tokens[1].value).toBe "<"
+        expect(scopes).toEqual [registry.startIdForScope(grammar.scopeName)]
+        expect(console.error).toHaveBeenCalled()
+
     describe "when a grammar has a pattern that has back references in the match value", ->
       it "does not special handle the back references and instead allows oniguruma to resolve them", ->
         loadGrammarSync('scss.json')

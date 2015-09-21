@@ -119,6 +119,8 @@ class Grammar
     initialRuleStackLength = ruleStack.length
     position = 0
     tokenCount = 0
+    # initial rules are considered to have advanced to allow them to pop
+    currentRuleHasAdvanced = true
 
     loop
       previousRuleStackLength = ruleStack.length
@@ -153,7 +155,12 @@ class Grammar
         break
 
       if position is previousPosition
-        if ruleStack.length is previousRuleStackLength
+        if ruleStack.length < previousRuleStackLength # Stack size decreased (rule poped) with zero length match
+          if !currentRuleHasAdvanced
+            console.error("Skipping line because rule loops at column #{position} of line '#{line}'", _.clone(ruleStack))
+            tags.push(line.length - position)
+            break
+        else if ruleStack.length is previousRuleStackLength
           console.error("Popping rule because it loops at column #{position} of line '#{line}'", _.clone(ruleStack))
           if ruleStack.length > 1
             {scopeName, contentScopeName} = ruleStack.pop()
@@ -165,6 +172,9 @@ class Grammar
             break
         else if ruleStack.length > previousRuleStackLength # Stack size increased with zero length match
           [{rule: penultimateRule}, {rule: lastRule}] = ruleStack[-2..]
+
+          # Don't allow the current rule to pop until it has consumed something
+          currentRuleHasAdvanced = false
 
           # Same exact rule was pushed but position wasn't advanced
           if lastRule? and lastRule is penultimateRule
@@ -181,6 +191,8 @@ class Grammar
               tags.pop() # also pop the duplicated start scope if it was pushed
             tags.push(line.length - position)
             break
+      else
+        currentRuleHasAdvanced = true
 
     rule.clearAnchorPosition() for {rule} in ruleStack
 
