@@ -11,6 +11,10 @@ module.exports =
 class GrammarRegistry
   constructor: (options={}) ->
     @maxTokensPerLine = options.maxTokensPerLine ? Infinity
+    @nullGrammar = new NullGrammar(this)
+    @clear()
+
+  clear: ->
     @emitter = new Emitter
     @grammars = []
     @grammarsByScopeName = {}
@@ -19,8 +23,6 @@ class GrammarRegistry
     @scopeIdCounter = -1
     @idsByScope = {}
     @scopesById = {}
-
-    @nullGrammar = new NullGrammar(this)
     @addGrammar(@nullGrammar)
 
   ###
