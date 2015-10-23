@@ -801,19 +801,18 @@ describe "Grammar tokenization", ->
           expect(tokens[6].scopes).toEqual ["source.json", "meta.structure.dictionary.json", "meta.structure.dictionary.value.json", "constant.numeric.json"]
 
       describe "when the line contains emoji characters", ->
-
         it "correctly terminates quotes & parses tokens starting after them", ->
           grammar = registry.grammarForScopeName('source.js')
 
-          withoutEmoji = grammar.tokenizeLine "var emoji = 'http://a'; var after;"
+          withoutEmoji = grammar.tokenizeLine "var emoji = 'xx http://a'; var after;"
           withoutEmojiTokens = registry.decodeTokens(withoutEmoji.line, withoutEmoji.tags)
 
           withEmoji = grammar.tokenizeLine "var emoji = '💻 http://a'; var after;"
           withEmojiTokens = registry.decodeTokens(withEmoji.line, withEmoji.tags)
 
           # ignoring this value (the string containing the emoji), they should be identical
-          withoutEmojiTokens[5].value = 'ABC'
-          withEmojiTokens[5].value = 'ABC'
+          delete withoutEmojiTokens[5].value
+          delete withEmojiTokens[5].value
 
           expect(withEmojiTokens).toEqual(withoutEmojiTokens)
 
