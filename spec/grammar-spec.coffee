@@ -800,6 +800,30 @@ describe "Grammar tokenization", ->
           expect(tokens[6].value).toBe '1'
           expect(tokens[6].scopes).toEqual ["source.json", "meta.structure.dictionary.json", "meta.structure.dictionary.value.json", "constant.numeric.json"]
 
+      describe "when the line contains emoji characters", ->
+        it "correctly terminates quotes & parses tokens starting after them", ->
+          grammar = registry.grammarForScopeName('source.js')
+
+          withoutEmoji = grammar.tokenizeLine "var emoji = 'xx http://a'; var after;"
+          withoutEmojiTokens = registry.decodeTokens(withoutEmoji.line, withoutEmoji.tags)
+
+          withEmoji = grammar.tokenizeLine "var emoji = '💻 http://a'; var after;"
+          withEmojiTokens = registry.decodeTokens(withEmoji.line, withEmoji.tags)
+
+          # ignoring this value (the string containing the emoji), they should be identical
+          delete withoutEmojiTokens[5].value
+          delete withEmojiTokens[5].value
+
+          expect(withEmojiTokens).toEqual(withoutEmojiTokens)
+
+          expect(withoutEmojiTokens.length).toBe 12
+          expect(withoutEmojiTokens[7].value).toBe ';'
+          expect(withoutEmojiTokens[7].scopes).toEqual [ 'source.js', 'punctuation.terminator.statement.js' ]
+
+          expect(withEmojiTokens.length).toBe 12
+          expect(withEmojiTokens[7].value).toBe ';'
+          expect(withEmojiTokens[7].scopes).toEqual [ 'source.js', 'punctuation.terminator.statement.js' ]
+
     describe "python", ->
       it "parses import blocks correctly", ->
         grammar = registry.grammarForScopeName('source.python')

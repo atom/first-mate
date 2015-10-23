@@ -27,7 +27,7 @@
     "event-kit": "^1.0.0",
     "fs-plus": "^2",
     "grim": "^1.2.1",
-    "oniguruma": "^5.1.0",
+    "oniguruma": "^5.1.2",
     "season": "^5.0.2",
     "underscore-plus": "^1"
   },
