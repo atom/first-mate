@@ -153,7 +153,9 @@ class Pattern
       tags.push(@tagsForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
     else
       {start, end} = captureIndices[0]
-      tags.push(end - start) unless end is start
+
+      unless end is start or start is line.length # skip empty tokens or matches of `\n` at end of line
+        tags.push(end - start)
 
     if @pushRule
       ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
