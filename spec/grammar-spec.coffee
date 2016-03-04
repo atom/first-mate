@@ -640,6 +640,15 @@ describe "Grammar tokenization", ->
         expect(tokens[0].scopes).toEqual ["source.makefile", "meta.scope.target.makefile", "support.function.target.PHONY.makefile"]
         expect(tokens[0].value).toEqual ".PHONY"
 
+      it "replaces all occurences of capture index placeholders", ->
+        loadGrammarSync("scope-names-with-placeholders.cson")
+        grammar = registry.grammarForScopeName("scope-names-with-placeholders")
+        {line, tags} = grammar.tokenizeLine("a b")
+        tokens = registry.decodeTokens(line, tags)
+        expect(tokens.length).toBe 1
+        expect(tokens[0].value).toEqual "a b"
+        expect(tokens[0].scopes).toEqual ["scope-names-with-placeholders", "a.b"]
+
   describe "language-specific integration tests", ->
     lines = null
 
