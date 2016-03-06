@@ -24,10 +24,11 @@
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
     "emissary": "^1",
-    "event-kit": "^1.0.0",
+    "event-kit": "^2.0.0",
     "fs-plus": "^2",
     "grim": "^1.2.1",
     "oniguruma": "^5.1.2",
+    "onigurumajs": "^1.0.0",
     "season": "^5.0.2",
     "underscore-plus": "^1"
   },
@@ -42,5 +43,12 @@
     "coffee-script": "~1.7.0",
     "grunt-peg": "~1.1.0",
     "grunt-atomdoc": "^1.0.0"
+  },
+  "browser": {
+    "fs-plus": false,
+    "season": false,
+    "grim": false,
+    "emissary": false,
+    "oniguruma": "onigurumajs"
   }
 }
