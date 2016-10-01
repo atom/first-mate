@@ -1,4 +1,5 @@
-# First Mate [![Build Status](https://travis-ci.org/atom/first-mate.svg?branch=master)](https://travis-ci.org/atom/first-mate)
+# First Mate
+[![Linux Build Status](https://travis-ci.org/atom/first-mate.svg?branch=master)](https://travis-ci.org/atom/first-mate) [![Dependency Status](https://david-dm.org/atom/first-mate/status.svg)](https://david-dm.org/atom/first-mate)
 
 TextMate helpers
 
