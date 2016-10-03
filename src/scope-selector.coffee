@@ -16,6 +16,8 @@ class ScopeSelector
     scopes = [scopes] if typeof scopes is 'string'
     @matcher.matches(scopes)
 
+  getPrefix: (scopes) -> @matcher.getPrefix()
+
   # Convert this TextMate scope selector to a CSS selector.
   #
   # Returns a {String}.

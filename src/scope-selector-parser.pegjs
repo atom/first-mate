@@ -19,8 +19,8 @@ scope
   }
 
 path
-  = first:scope others:(_ scope)* {
-    return new matchers.PathMatcher(first, others);
+  = prefix:([LRB]":")? first:scope others:(_ scope)* {
+    return new matchers.PathMatcher(prefix, first, others);
   }
 
 group
@@ -31,10 +31,6 @@ group
 filter
   = prefix:([LRB]":") _ group:group {
     return group;
-  }
-
-  / prefix:([LRB]":") _ path:path {
-    return path;
   }
 
 expression

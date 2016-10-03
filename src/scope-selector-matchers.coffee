@@ -4,6 +4,8 @@ class SegmentMatcher
 
   matches: (scope) -> scope is @segment
 
+  getPrefix: (scope) ->
+
   toCssSelector: ->
     @segment.split('.').map((dotFragment) ->
       '.' + dotFragment.replace(/\+/g, '\\+')
@@ -13,6 +15,8 @@ class TrueMatcher
   constructor: ->
 
   matches: -> true
+
+  getPrefix: (scopes) ->
 
   toCssSelector: -> '*'
 
@@ -30,11 +34,20 @@ class ScopeMatcher
 
     true
 
+  getPrefix: (scope) ->
+    scopeSegments = scope.split('.')
+    return false if scopeSegments.length < @segments.length
+
+    for segment, index in @segments
+      if segment.matches(scopeSegments[index])
+        return segment.prefix if segment.prefix?
+
   toCssSelector: ->
     @segments.map((matcher) -> matcher.toCssSelector()).join('')
 
 class PathMatcher
-  constructor: (first, others) ->
+  constructor: (prefix, first, others) ->
+    @prefix = prefix?[0]
     @matchers = [first]
     @matchers.push(matcher[1]) for matcher in others
 
@@ -46,6 +59,8 @@ class PathMatcher
       return true unless matcher?
     false
 
+  getPrefix: (scopes) -> @prefix
+
   toCssSelector: ->
     @matchers.map((matcher) -> matcher.toCssSelector()).join(' ')
 
@@ -54,12 +69,16 @@ class OrMatcher
 
   matches: (scopes) -> @left.matches(scopes) or @right.matches(scopes)
 
+  getPrefix: (scopes) -> @left.getPrefix(scopes) or @right.getPrefix(scopes)
+
   toCssSelector: -> "#{@left.toCssSelector()}, #{@right.toCssSelector()}"
 
 class AndMatcher
   constructor: (@left, @right) ->
 
   matches: (scopes) -> @left.matches(scopes) and @right.matches(scopes)
+
+  getPrefix: (scopes) -> @left.getPrefix(scopes) or @right.getPrefix(scopes)
 
   toCssSelector: ->
     if @right instanceof NegateMatcher
@@ -72,6 +91,8 @@ class NegateMatcher
 
   matches: (scopes) -> not @matcher.matches(scopes)
 
+  getPrefix: (scopes) -> @matcher.getPrefix(scopes)
+
   toCssSelector: -> ":not(#{@matcher.toCssSelector()})"
 
 class CompositeMatcher
@@ -82,6 +103,8 @@ class CompositeMatcher
       when '-' then @matcher = new AndMatcher(left, new NegateMatcher(right))
 
   matches: (scopes) -> @matcher.matches(scopes)
+
+  getPrefix: (scopes) -> @matcher.getPrefix(scopes)
 
   toCssSelector: -> @matcher.toCssSelector()
 
