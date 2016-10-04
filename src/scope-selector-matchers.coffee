@@ -54,6 +54,8 @@ class GroupMatcher
 
   getPrefix: (scopes) -> @prefix
 
+  toCssSelector: -> @selector.toCssSelector()
+
 class PathMatcher
   constructor: (prefix, first, others) ->
     @prefix = prefix?[0]
