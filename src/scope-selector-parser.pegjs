@@ -1,4 +1,4 @@
-{ var matchers= require('./scope-selector-matchers'); }
+{ var matchers = require('./scope-selector-matchers'); }
 
 start = _ selector:(selector) _ {
   return selector;
@@ -24,29 +24,18 @@ path
   }
 
 group
-  = "(" _ selector:selector _ ")" {
+  = prefix:([LRB]":")? "(" _ selector:selector _ ")" {
     return selector;
   }
 
-filter
-  = prefix:([LRB]":") _ group:group {
-    return group;
-  }
-
 expression
-  = "-" _ filter:filter _ {
-    return new matchers.NegateMatcher(filter);
-  }
-
-  / "-" _ group:group _ {
+  = "-" _ group:group _ {
     return new matchers.NegateMatcher(group);
   }
 
   / "-" _ path:path _ {
     return new matchers.NegateMatcher(path);
   }
-
-  / filter
 
   / group
 
