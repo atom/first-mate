@@ -35,7 +35,7 @@
     "grunt-coffeelint": "^0.0.16",
     "rimraf": "^2.5.4",
     "coffee-script": "~1.7.0",
-    "grunt-peg": "~1.1.0",
+    "grunt-peg": "^2.0.1",
     "grunt-atomdoc": "^1.0.0"
   }
 }
