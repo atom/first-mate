@@ -45,6 +45,15 @@ class ScopeMatcher
   toCssSelector: ->
     @segments.map((matcher) -> matcher.toCssSelector()).join('')
 
+class GroupMatcher
+  constructor: (prefix, selector) ->
+    @prefix = prefix?[0]
+    @selector = selector
+
+  matches: (scopes) -> @selector.matches(scopes)
+
+  getPrefix: (scopes) -> @prefix
+
 class PathMatcher
   constructor: (prefix, first, others) ->
     @prefix = prefix?[0]
@@ -111,6 +120,7 @@ class CompositeMatcher
 module.exports = {
   AndMatcher
   CompositeMatcher
+  GroupMatcher
   NegateMatcher
   OrMatcher
   PathMatcher

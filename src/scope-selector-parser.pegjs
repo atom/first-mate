@@ -25,7 +25,7 @@ path
 
 group
   = prefix:([LRB]":")? "(" _ selector:selector _ ")" {
-    return selector;
+    return new matchers.GroupMatcher(prefix, selector);
   }
 
 expression
