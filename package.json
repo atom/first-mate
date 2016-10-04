@@ -32,7 +32,7 @@
     "grunt-cli": "~0.1.8",
     "grunt": "~0.4.1",
     "grunt-shell": "~0.2.2",
-    "grunt-coffeelint": "0.0.6",
+    "grunt-coffeelint": "^0.0.16",
     "rimraf": "~2.1.4",
     "coffee-script": "~1.7.0",
     "grunt-peg": "~1.1.0",
