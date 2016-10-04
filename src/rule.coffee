@@ -64,7 +64,6 @@ class Rule
     if result = @scanInjections(ruleStack, lineWithNewline, position, firstLine)
       for injection in baseGrammar.injections.injections
         if injection.scanner is result.scanner
-          console.log injection.selector
           if injection.selector.getPrefix() is 'L'
             results.unshift(result)
           else
