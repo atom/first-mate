@@ -33,7 +33,7 @@
     "grunt": "~0.4.1",
     "grunt-shell": "~0.2.2",
     "grunt-coffeelint": "^0.0.16",
-    "rimraf": "~2.1.4",
+    "rimraf": "^2.5.4",
     "coffee-script": "~1.7.0",
     "grunt-peg": "~1.1.0",
     "grunt-atomdoc": "^1.0.0"
