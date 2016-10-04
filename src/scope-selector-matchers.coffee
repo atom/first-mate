@@ -52,7 +52,7 @@ class GroupMatcher
 
   matches: (scopes) -> @selector.matches(scopes)
 
-  getPrefix: (scopes) -> @prefix
+  getPrefix: (scopes) -> @prefix if @selector.matches(scopes)
 
   toCssSelector: -> @selector.toCssSelector()
 
@@ -70,7 +70,7 @@ class PathMatcher
       return true unless matcher?
     false
 
-  getPrefix: (scopes) -> @prefix
+  getPrefix: (scopes) -> @prefix if @matches(scopes)
 
   toCssSelector: ->
     @matchers.map((matcher) -> matcher.toCssSelector()).join(' ')
