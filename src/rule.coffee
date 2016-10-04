@@ -68,6 +68,9 @@ class Rule
           if injection.selector.getPrefix() is 'L'
             results.unshift(result)
           else
+            # TODO: Prefixes can either be L, B, or R.
+            # R is assumed to mean "right", which is the default (add to end of stack).
+            # There's no documentation on B, however.
             results.push(result)
 
     scopes = null
@@ -78,7 +81,7 @@ class Rule
       if injectionGrammar.injectionSelector.matches(scopes)
         scanner = injectionGrammar.getInitialRule().getScanner(injectionGrammar, position, firstLine)
         if result = scanner.findNextMatch(lineWithNewline, firstLine, position, @anchorPosition)
-          if injectionGrammar.injectionSelector.matcher.prefix is 'L'
+          if injectionGrammar.injectionSelector.getPrefix() is 'L'
             results.unshift(result)
           else
             # TODO: Prefixes can either be L, B, or R.
