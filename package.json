@@ -30,7 +30,7 @@
     "jasmine-focused": "^1",
     "grunt-contrib-coffee": "~0.9.0",
     "grunt-cli": "~0.1.8",
-    "grunt": "~0.4.1",
+    "grunt": "^1.0.1",
     "grunt-shell": "~0.2.2",
     "grunt-coffeelint": "^0.0.16",
     "rimraf": "^2.5.4",
