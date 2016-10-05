@@ -80,7 +80,11 @@ class OrMatcher
 
   matches: (scopes) -> @left.matches(scopes) or @right.matches(scopes)
 
-  getPrefix: (scopes) -> @left.getPrefix(scopes) or @right.getPrefix(scopes)
+  getPrefix: (scopes) ->
+    if @left.matches(scopes)
+      @left.getPrefix(scopes)
+    else if @right.matches(scopes)
+      @right.getPrefix(scopes)
 
   toCssSelector: -> "#{@left.toCssSelector()}, #{@right.toCssSelector()}"
 
@@ -89,7 +93,7 @@ class AndMatcher
 
   matches: (scopes) -> @left.matches(scopes) and @right.matches(scopes)
 
-  getPrefix: (scopes) -> @left.getPrefix(scopes) or @right.getPrefix(scopes)
+  getPrefix: (scopes) -> @left.getPrefix(scopes) if @matches(scopes) # The right side can't have prefixes
 
   toCssSelector: ->
     if @right instanceof NegateMatcher
