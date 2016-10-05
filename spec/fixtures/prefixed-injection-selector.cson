@@ -1,0 +1,9 @@
+'scopeName': 'prefixed.injection-selector'
+'name': 'Prefixed Injection Selector'
+'injectionSelector': 'L:source.js'
+'patterns': [
+  {
+    'match': '(<!--|-->)'
+    'name': 'should-be-matched.prefixed.injection-selector'
+  }
+]
