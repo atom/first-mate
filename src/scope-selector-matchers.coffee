@@ -89,7 +89,7 @@ class AndMatcher
 
   matches: (scopes) -> @left.matches(scopes) and @right.matches(scopes)
 
-  getPrefix: (scopes) -> @left.getPrefix(scopes) # The right side can't have prefixes
+  getPrefix: (scopes) -> @left.getPrefix(scopes) if @left.matches(scopes) and @right.matches(scopes) # The right side can't have prefixes
 
   toCssSelector: ->
     if @right instanceof NegateMatcher
@@ -102,7 +102,7 @@ class NegateMatcher
 
   matches: (scopes) -> not @matcher.matches(scopes)
 
-  getPrefix: (scopes) -> @matcher.getPrefix(scopes)
+  getPrefix: (scopes) ->
 
   toCssSelector: -> ":not(#{@matcher.toCssSelector()})"
 
