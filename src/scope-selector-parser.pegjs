@@ -1,4 +1,4 @@
-{ var matchers= require('./scope-selector-matchers'); }
+{ var matchers = require('./scope-selector-matchers'); }
 
 start = _ selector:(selector) _ {
   return selector;
@@ -19,38 +19,23 @@ scope
   }
 
 path
-  = first:scope others:(_ scope)* {
-    return new matchers.PathMatcher(first, others);
+  = prefix:([LRB]":")? first:scope others:(_ scope)* {
+    return new matchers.PathMatcher(prefix, first, others);
   }
 
 group
-  = "(" _ selector:selector _ ")" {
-    return selector;
-  }
-
-filter
-  = prefix:([LRB]":") _ group:group {
-    return group;
-  }
-
-  / prefix:([LRB]":") _ path:path {
-    return path;
+  = prefix:([LRB]":")? "(" _ selector:selector _ ")" {
+    return new matchers.GroupMatcher(prefix, selector);
   }
 
 expression
-  = "-" _ filter:filter _ {
-    return new matchers.NegateMatcher(filter);
-  }
-
-  / "-" _ group:group _ {
+  = "-" _ group:group _ {
     return new matchers.NegateMatcher(group);
   }
 
   / "-" _ path:path _ {
     return new matchers.NegateMatcher(path);
   }
-
-  / filter
 
   / group
 

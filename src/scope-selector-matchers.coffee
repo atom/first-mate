@@ -4,6 +4,8 @@ class SegmentMatcher
 
   matches: (scope) -> scope is @segment
 
+  getPrefix: (scope) ->
+
   toCssSelector: ->
     @segment.split('.').map((dotFragment) ->
       '.' + dotFragment.replace(/\+/g, '\\+')
@@ -13,6 +15,8 @@ class TrueMatcher
   constructor: ->
 
   matches: -> true
+
+  getPrefix: (scopes) ->
 
   toCssSelector: -> '*'
 
@@ -30,11 +34,31 @@ class ScopeMatcher
 
     true
 
+  getPrefix: (scope) ->
+    scopeSegments = scope.split('.')
+    return false if scopeSegments.length < @segments.length
+
+    for segment, index in @segments
+      if segment.matches(scopeSegments[index])
+        return segment.prefix if segment.prefix?
+
   toCssSelector: ->
     @segments.map((matcher) -> matcher.toCssSelector()).join('')
 
+class GroupMatcher
+  constructor: (prefix, selector) ->
+    @prefix = prefix?[0]
+    @selector = selector
+
+  matches: (scopes) -> @selector.matches(scopes)
+
+  getPrefix: (scopes) -> @prefix if @selector.matches(scopes)
+
+  toCssSelector: -> @selector.toCssSelector()
+
 class PathMatcher
-  constructor: (first, others) ->
+  constructor: (prefix, first, others) ->
+    @prefix = prefix?[0]
     @matchers = [first]
     @matchers.push(matcher[1]) for matcher in others
 
@@ -46,6 +70,8 @@ class PathMatcher
       return true unless matcher?
     false
 
+  getPrefix: (scopes) -> @prefix if @matches(scopes)
+
   toCssSelector: ->
     @matchers.map((matcher) -> matcher.toCssSelector()).join(' ')
 
@@ -54,12 +80,16 @@ class OrMatcher
 
   matches: (scopes) -> @left.matches(scopes) or @right.matches(scopes)
 
+  getPrefix: (scopes) -> @left.getPrefix(scopes) or @right.getPrefix(scopes)
+
   toCssSelector: -> "#{@left.toCssSelector()}, #{@right.toCssSelector()}"
 
 class AndMatcher
   constructor: (@left, @right) ->
 
   matches: (scopes) -> @left.matches(scopes) and @right.matches(scopes)
+
+  getPrefix: (scopes) -> @left.getPrefix(scopes) if @left.matches(scopes) and @right.matches(scopes) # The right side can't have prefixes
 
   toCssSelector: ->
     if @right instanceof NegateMatcher
@@ -72,6 +102,8 @@ class NegateMatcher
 
   matches: (scopes) -> not @matcher.matches(scopes)
 
+  getPrefix: (scopes) ->
+
   toCssSelector: -> ":not(#{@matcher.toCssSelector()})"
 
 class CompositeMatcher
@@ -83,11 +115,14 @@ class CompositeMatcher
 
   matches: (scopes) -> @matcher.matches(scopes)
 
+  getPrefix: (scopes) -> @matcher.getPrefix(scopes)
+
   toCssSelector: -> @matcher.toCssSelector()
 
 module.exports = {
   AndMatcher
   CompositeMatcher
+  GroupMatcher
   NegateMatcher
   OrMatcher
   PathMatcher

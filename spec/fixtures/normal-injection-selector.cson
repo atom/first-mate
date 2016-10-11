@@ -1,0 +1,9 @@
+'scopeName': 'normal.injection-selector'
+'name': 'Normal Injection Selector'
+'injectionSelector': 'source.js'
+'patterns': [
+  {
+    'match': '(<!--|-->)'
+    'name': 'should-not-be-matched.normal.injection-selector'
+  }
+]

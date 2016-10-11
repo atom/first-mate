@@ -62,7 +62,15 @@ class Rule
       results.push(result)
 
     if result = @scanInjections(ruleStack, lineWithNewline, position, firstLine)
-      results.push(result)
+      for injection in baseGrammar.injections.injections
+        if injection.scanner is result.scanner
+          if injection.selector.getPrefix(@grammar.scopesFromStack(ruleStack)) is 'L'
+            results.unshift(result)
+          else
+            # TODO: Prefixes can either be L, B, or R.
+            # R is assumed to mean "right", which is the default (add to end of stack).
+            # There's no documentation on B, however.
+            results.push(result)
 
     scopes = null
     for injectionGrammar in @registry.injectionGrammars
@@ -72,7 +80,13 @@ class Rule
       if injectionGrammar.injectionSelector.matches(scopes)
         scanner = injectionGrammar.getInitialRule().getScanner(injectionGrammar, position, firstLine)
         if result = scanner.findNextMatch(lineWithNewline, firstLine, position, @anchorPosition)
-          results.push(result)
+          if injectionGrammar.injectionSelector.getPrefix(scopes) is 'L'
+            results.unshift(result)
+          else
+            # TODO: Prefixes can either be L, B, or R.
+            # R is assumed to mean "right", which is the default (add to end of stack).
+            # There's no documentation on B, however.
+            results.push(result)
 
     if results.length > 1
       _.min results, (result) =>

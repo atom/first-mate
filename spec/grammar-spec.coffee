@@ -574,12 +574,44 @@ describe "Grammar tokenization", ->
         expect(tokens[17].value).toBe "div"
         expect(tokens[17].scopes).toEqual ["text.html.php", "meta.tag.block.any.html", "entity.name.tag.block.any.html"]
 
-    describe "when the grammar's pattern name has a group number in it", ->
-      it "replaces the group number with the matched captured text", ->
-        grammar = loadGrammarSync('hyperlink.json')
-        {line, tags} = grammar.tokenizeLine("https://github.com")
+      it "gives lower priority to them than other matches", ->
+        loadGrammarSync('php2.json')
+        grammar = registry.grammarForScopeName('text.html.php2')
+        # PHP2 is a modified PHP grammar which has a regular source.js.embedded.html injection
+        {line, tags} = grammar.tokenizeLine("<script><?php function hello() {} ?></script>")
         tokens = registry.decodeTokens(line, tags)
-        expect(tokens[0].scopes).toEqual ["text.hyperlink", "markup.underline.link.https.hyperlink"]
+
+        expect(tokens[3].value).not.toBe "<?php"
+        expect(tokens[3].value).toBe "<"
+        expect(tokens[3].scopes).toEqual ["text.html.php2", "source.js.embedded.html", "keyword.operator.js"]
+
+    describe "when the grammar has prefixed injections", ->
+      it "correctly prioritizes them when tokenizing", ->
+        grammar = registry.grammarForScopeName('text.html.php')
+        # PHP has a L:source.js.embedded.html injection
+        {line, tags} = grammar.tokenizeLine("<script><?php function hello() {} ?></script>")
+        tokens = registry.decodeTokens(line, tags)
+
+        expect(tokens[3].value).toBe "<?php"
+        expect(tokens[3].scopes).toEqual ["text.html.php", "source.js.embedded.html", "meta.embedded.line.php", "punctuation.section.embedded.begin.php"]
+
+        expect(tokens[5].value).toBe "function"
+        expect(tokens[5].scopes).toEqual ["text.html.php", "source.js.embedded.html", "meta.embedded.line.php", "source.php", "meta.function.php", "storage.type.function.php"]
+
+        expect(tokens[7].value).toBe "hello"
+        expect(tokens[7].scopes).toEqual ["text.html.php", "source.js.embedded.html", "meta.embedded.line.php", "source.php", "meta.function.php", "entity.name.function.php"]
+
+        expect(tokens[14].value).toBe "?"
+        expect(tokens[14].scopes).toEqual ["text.html.php", "source.js.embedded.html", "meta.embedded.line.php", "punctuation.section.embedded.end.php", "source.php"]
+
+        expect(tokens[15].value).toBe ">"
+        expect(tokens[15].scopes).toEqual ["text.html.php", "source.js.embedded.html", "meta.embedded.line.php", "punctuation.section.embedded.end.php"]
+
+        expect(tokens[16].value).toBe "</"
+        expect(tokens[16].scopes).toEqual ["text.html.php", "source.js.embedded.html", "punctuation.definition.tag.html"]
+
+        expect(tokens[17].value).toBe "script"
+        expect(tokens[17].scopes).toEqual ["text.html.php", "source.js.embedded.html", "entity.name.tag.script.html"]
 
     describe "when the grammar has an injection selector", ->
       it "includes the grammar's patterns when the selector matches the current scope in other grammars", ->
@@ -593,6 +625,34 @@ describe "Grammar tokenization", ->
 
         expect(tokens[6].value).toBe "http://github.com"
         expect(tokens[6].scopes).toEqual ["source.js", "comment.line.double-slash.js", "markup.underline.link.http.hyperlink"]
+
+      it "gives lower priority to them than other matches", ->
+        loadGrammarSync('normal-injection-selector.cson')
+        grammar = registry.grammarForScopeName("source.js")
+        {line, tags} = grammar.tokenizeLine("<!--")
+        tokens = registry.decodeTokens(line, tags)
+
+        expect(tokens[0].value).toBe "<!--"
+        expect(tokens[0].scopes).not.toEqual ["source.js", "should-not-be-matched.normal.injection-selector"]
+        expect(tokens[0].scopes).toEqual ["source.js", "comment.block.html.js", "punctuation.definition.comment.html.js"]
+
+    describe "when the grammar has a prefixed injection selector", ->
+      it "correctly prioritizes them when tokenizing", ->
+        loadGrammarSync('prefixed-injection-selector.cson')
+        grammar = registry.grammarForScopeName("source.js")
+        {line, tags} = grammar.tokenizeLine("<!--")
+        tokens = registry.decodeTokens(line, tags)
+
+        expect(tokens[0].value).toBe "<!--"
+        expect(tokens[0].scopes).not.toEqual ["source.js", "comment.block.html.js", "punctuation.definition.comment.html.js"]
+        expect(tokens[0].scopes).toEqual ["source.js", "should-be-matched.prefixed.injection-selector"]
+
+    describe "when the grammar's pattern name has a group number in it", ->
+      it "replaces the group number with the matched captured text", ->
+        grammar = loadGrammarSync('hyperlink.json')
+        {line, tags} = grammar.tokenizeLine("https://github.com")
+        tokens = registry.decodeTokens(line, tags)
+        expect(tokens[0].scopes).toEqual ["text.hyperlink", "markup.underline.link.https.hyperlink"]
 
     describe "when the position doesn't advance and rule includes $self and matches itself", ->
       it "tokenizes the entire line using the rule", ->
