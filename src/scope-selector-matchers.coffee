@@ -8,6 +8,11 @@ class SegmentMatcher
 
   toCssSelector: ->
     @segment.split('.').map((dotFragment) ->
+      '.' + dotFragment.replace(/\+/g, '\\+')
+    ).join('')
+
+  toCssSyntaxSelector: ->
+    @segment.split('.').map((dotFragment) ->
       '.syntax--' + dotFragment.replace(/\+/g, '\\+')
     ).join('')
 
@@ -19,6 +24,8 @@ class TrueMatcher
   getPrefix: (scopes) ->
 
   toCssSelector: -> '*'
+
+  toCssSyntaxSelector: -> '*'
 
 class ScopeMatcher
   constructor: (first, others) ->
@@ -45,6 +52,9 @@ class ScopeMatcher
   toCssSelector: ->
     @segments.map((matcher) -> matcher.toCssSelector()).join('')
 
+  toCssSyntaxSelector: ->
+    @segments.map((matcher) -> matcher.toCssSyntaxSelector()).join('')
+
 class GroupMatcher
   constructor: (prefix, selector) ->
     @prefix = prefix?[0]
@@ -55,6 +65,8 @@ class GroupMatcher
   getPrefix: (scopes) -> @prefix if @selector.matches(scopes)
 
   toCssSelector: -> @selector.toCssSelector()
+
+  toCssSyntaxSelector: -> @selector.toCssSyntaxSelector()
 
 class PathMatcher
   constructor: (prefix, first, others) ->
@@ -75,6 +87,9 @@ class PathMatcher
   toCssSelector: ->
     @matchers.map((matcher) -> matcher.toCssSelector()).join(' ')
 
+  toCssSyntaxSelector: ->
+    @matchers.map((matcher) -> matcher.toCssSyntaxSelector()).join(' ')
+
 class OrMatcher
   constructor: (@left, @right) ->
 
@@ -83,6 +98,8 @@ class OrMatcher
   getPrefix: (scopes) -> @left.getPrefix(scopes) or @right.getPrefix(scopes)
 
   toCssSelector: -> "#{@left.toCssSelector()}, #{@right.toCssSelector()}"
+
+  toCssSyntaxSelector: -> "#{@left.toCssSyntaxSelector()}, #{@right.toCssSyntaxSelector()}"
 
 class AndMatcher
   constructor: (@left, @right) ->
@@ -97,6 +114,12 @@ class AndMatcher
     else
       "#{@left.toCssSelector()} #{@right.toCssSelector()}"
 
+  toCssSyntaxSelector: ->
+    if @right instanceof NegateMatcher
+      "#{@left.toCssSyntaxSelector()}#{@right.toCssSyntaxSelector()}"
+    else
+      "#{@left.toCssSyntaxSelector()} #{@right.toCssSyntaxSelector()}"
+
 class NegateMatcher
   constructor: (@matcher) ->
 
@@ -105,6 +128,8 @@ class NegateMatcher
   getPrefix: (scopes) ->
 
   toCssSelector: -> ":not(#{@matcher.toCssSelector()})"
+
+  toCssSyntaxSelector: -> ":not(#{@matcher.toCssSyntaxSelector()})"
 
 class CompositeMatcher
   constructor: (left, operator, right) ->
@@ -118,6 +143,8 @@ class CompositeMatcher
   getPrefix: (scopes) -> @matcher.getPrefix(scopes)
 
   toCssSelector: -> @matcher.toCssSelector()
+
+  toCssSyntaxSelector: -> @matcher.toCssSyntaxSelector()
 
 module.exports = {
   AndMatcher
