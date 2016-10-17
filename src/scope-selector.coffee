@@ -29,3 +29,8 @@ class ScopeSelector
   #
   # Returns a {String}.
   toCssSelector: -> @matcher.toCssSelector()
+
+  # Convert this TextMate scope selector to a CSS selector, prefixing scopes with `syntax--`.
+  #
+  # Returns a {String}.
+  toCssSyntaxSelector: -> @matcher.toCssSyntaxSelector()

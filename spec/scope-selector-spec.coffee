@@ -110,3 +110,16 @@ describe "ScopeSelector", ->
       expect(new ScopeSelector('a - (b.c d)').toCssSelector()).toBe '.a:not(.b.c .d)'
       expect(new ScopeSelector('a, b').toCssSelector()).toBe '.a, .b'
       expect(new ScopeSelector('c++').toCssSelector()).toBe '.c\\+\\+'
+
+  describe ".toCssSyntaxSelector()", ->
+    it "converts the TextMate scope selector to a CSS selector prefixing it `syntax--`", ->
+      expect(new ScopeSelector('a b c').toCssSyntaxSelector()).toBe '.syntax--a .syntax--b .syntax--c'
+      expect(new ScopeSelector('a.b.c').toCssSyntaxSelector()).toBe '.syntax--a.syntax--b.syntax--c'
+      expect(new ScopeSelector('*').toCssSyntaxSelector()).toBe '*'
+      expect(new ScopeSelector('a - b').toCssSyntaxSelector()).toBe '.syntax--a:not(.syntax--b)'
+      expect(new ScopeSelector('a & b').toCssSyntaxSelector()).toBe '.syntax--a .syntax--b'
+      expect(new ScopeSelector('a & -b').toCssSyntaxSelector()).toBe '.syntax--a:not(.syntax--b)'
+      expect(new ScopeSelector('a | b').toCssSyntaxSelector()).toBe '.syntax--a, .syntax--b'
+      expect(new ScopeSelector('a - (b.c d)').toCssSyntaxSelector()).toBe '.syntax--a:not(.syntax--b.syntax--c .syntax--d)'
+      expect(new ScopeSelector('a, b').toCssSyntaxSelector()).toBe '.syntax--a, .syntax--b'
+      expect(new ScopeSelector('c++').toCssSyntaxSelector()).toBe '.syntax--c\\+\\+'
