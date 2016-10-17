@@ -8,7 +8,7 @@ class SegmentMatcher
 
   toCssSelector: ->
     @segment.split('.').map((dotFragment) ->
-      '.syntax--' + dotFragment.replace(/\+/g, '\\+')
+      '.' + dotFragment.replace(/\+/g, '\\+')
     ).join('')
 
 class TrueMatcher
