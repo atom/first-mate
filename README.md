@@ -1,5 +1,8 @@
 # First Mate
-[![Linux Build Status](https://travis-ci.org/atom/first-mate.svg?branch=master)](https://travis-ci.org/atom/first-mate) [![Dependency Status](https://david-dm.org/atom/first-mate/status.svg)](https://david-dm.org/atom/first-mate)
+[![Linux Build Status](https://travis-ci.org/atom/first-mate.svg?branch=master)](https://travis-ci.org/atom/first-mate)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/p5im21uq22cwgb6d/branch/master?svg=true
+)](https://ci.appveyor.com/project/Atom/first-mate)
+[![Dependency Status](https://david-dm.org/atom/first-mate/status.svg)](https://david-dm.org/atom/first-mate)
 
 TextMate helpers
 
