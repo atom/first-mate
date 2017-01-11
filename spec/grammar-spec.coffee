@@ -518,6 +518,20 @@ describe "Grammar tokenization", ->
         expect(ruleStack).not.toBe originalRuleStack
         expect(scopes.length).toBe 0
 
+    describe "when the line is longer than the maxLineLength", ->
+      it "creates a final token with the text between the maxLineLength and the end of the line and resets the ruleStack to the starting stack", ->
+        grammar = registry.grammarForScopeName('source.js')
+        originalRuleStack = grammar.tokenizeLine('').ruleStack
+        spyOn(grammar, 'getMaxLineLength').andCallFake -> 9
+        {line, tags, ruleStack} = grammar.tokenizeLine("var x = /[a-z]/;", originalRuleStack)
+        scopes = []
+        tokens = registry.decodeTokens(line, tags, scopes)
+        expect(tokens.length).toBe 6
+        expect(tokens[5].value).toBe "[a-z]/;"
+        expect(ruleStack).toEqual originalRuleStack
+        expect(ruleStack).not.toBe originalRuleStack
+        expect(scopes.length).toBe 0
+
     describe "when a grammar has a capture with patterns", ->
       it "matches the patterns and includes the scope specified as the pattern's match name", ->
         grammar = registry.grammarForScopeName('text.html.php')

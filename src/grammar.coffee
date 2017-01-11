@@ -20,7 +20,7 @@ class Grammar
   registration: null
 
   constructor: (@registry, options={}) ->
-    {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine} = options
+    {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine, @maxLineLength} = options
     {injections, injectionSelector, patterns, repository, firstLineMatch} = options
 
     @emitter = new Emitter
@@ -100,6 +100,7 @@ class Grammar
   #   tokenizing the next line in the file.
   tokenizeLine: (line, ruleStack, firstLine=false, compatibilityMode=true) ->
     tags = []
+    fullLine = line
 
     if ruleStack?
       ruleStack = ruleStack.slice()
@@ -119,6 +120,17 @@ class Grammar
     initialRuleStackLength = ruleStack.length
     position = 0
     tokenCount = 0
+    truncatedMode = false
+
+    if line.length > @getMaxLineLength()
+      line = line.slice(0, @getMaxLineLength())
+      truncatedMode = true
+
+    closeLineScopes = =>
+      while ruleStack.length > initialRuleStackLength
+        {scopeName, contentScopeName} = ruleStack.pop()
+        tags.push(@endIdForScope(contentScopeName)) if contentScopeName
+        tags.push(@endIdForScope(scopeName)) if scopeName
 
     loop
       previousRuleStackLength = ruleStack.length
@@ -128,10 +140,7 @@ class Grammar
 
       if tokenCount >= @getMaxTokensPerLine() - 1
         tags.push(line.length - position)
-        while ruleStack.length > initialRuleStackLength
-          {scopeName, contentScopeName} = ruleStack.pop()
-          tags.push(@endIdForScope(contentScopeName)) if contentScopeName
-          tags.push(@endIdForScope(scopeName)) if scopeName
+        closeLineScopes()
         break
 
       if match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)
@@ -184,10 +193,14 @@ class Grammar
 
     rule.clearAnchorPosition() for {rule} in ruleStack
 
+    if truncatedMode
+      tags.push(fullLine.length - line.length)
+      closeLineScopes()
+
     if compatibilityMode
-      new TokenizeLineResult(line, openScopeTags, tags, ruleStack, @registry)
+      new TokenizeLineResult(fullLine, openScopeTags, tags, ruleStack, @registry)
     else
-      {line, tags, ruleStack}
+      {fullLine, tags, ruleStack}
 
   activate: ->
     @registration = @registry.addGrammar(this)
@@ -235,6 +248,9 @@ class Grammar
 
   getMaxTokensPerLine: ->
     @maxTokensPerLine
+
+  getMaxLineLength: ->
+    @maxLineLength
 
   scopesFromStack: (stack, rule, endPatternMatch) ->
     scopes = []

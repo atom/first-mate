@@ -33,3 +33,15 @@ describe "GrammarRegistry", ->
       {line, tags} = grammar.tokenizeLine("{ }")
       tokens = registry.decodeTokens(line, tags)
       expect(tokens.length).toBe 2
+
+  describe "maxLineLength option", ->
+    it "should set the value on each created grammar and doesn't tokenize more than that many characters of the line", ->
+      registry = new GrammarRegistry(maxLineLength: 1)
+      loadGrammarSync('json.json')
+
+      grammar = registry.grammarForScopeName('source.json')
+      expect(grammar.maxLineLength).toBe 1
+
+      {line, tags} = grammar.tokenizeLine("{ \"test\":\"object\" }")
+      tokens = registry.decodeTokens(line, tags)
+      expect(tokens.length).toBe 2
