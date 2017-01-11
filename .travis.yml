@@ -6,9 +6,7 @@ notifications:
     on_failure: change
 
 node_js:
-  - 6
-  - 5
-  - 0.10
+  - node
 
 git:
   depth: 10
