@@ -20,7 +20,7 @@ class Grammar
   registration: null
 
   constructor: (@registry, options={}) ->
-    {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine} = options
+    {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine, @keywords} = options
     {injections, injectionSelector, patterns, repository, firstLineMatch} = options
 
     @emitter = new Emitter
