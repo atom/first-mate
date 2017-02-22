@@ -23,13 +23,33 @@ describe "GrammarRegistry", ->
         expect(callback.argsForCall[0][0].message.length).toBeGreaterThan 0
 
   describe "maxTokensPerLine option", ->
-    it "set the value on each created grammar and limits the number of tokens per line to that value", ->
+    it "limits the number of tokens created by the parser per line", ->
       registry = new GrammarRegistry(maxTokensPerLine: 2)
       loadGrammarSync('json.json')
 
       grammar = registry.grammarForScopeName('source.json')
-      expect(grammar.maxTokensPerLine).toBe 2
-
       {line, tags} = grammar.tokenizeLine("{ }")
       tokens = registry.decodeTokens(line, tags)
       expect(tokens.length).toBe 2
+
+  describe "maxLineLength option", ->
+    it "limits the number of characters scanned by the parser per line", ->
+      registry = new GrammarRegistry(maxLineLength: 10)
+      loadGrammarSync('json.json')
+      grammar = registry.grammarForScopeName('source.json')
+
+      {ruleStack: initialRuleStack} = grammar.tokenizeLine('[')
+      {line, tags, ruleStack} = grammar.tokenizeLine('{"foo": "this is a long value"}', initialRuleStack)
+      tokens = registry.decodeTokens(line, tags)
+
+      expect(ruleStack.map((entry) -> entry.scopeName)).toEqual(initialRuleStack.map((entry) -> entry.scopeName))
+      expect(tokens.map((token) -> token.value)).toEqual([
+        '{',
+        '"',
+        'foo',
+        '"',
+        ':',
+        ' ',
+        '"',
+        'this is a long value"}'
+      ])
