@@ -53,3 +53,11 @@ describe "GrammarRegistry", ->
         '"',
         'this is a long value"}'
       ])
+
+    it "does not apply if the grammar's limitLineLength option is set to false", ->
+      registry = new GrammarRegistry(maxLineLength: 10)
+      loadGrammarSync('no-line-length-limit.cson')
+      grammar = registry.grammarForScopeName('source.long-lines')
+
+      {tokens} = grammar.tokenizeLine("hello goodbye hello goodbye hello")
+      expect(tokens.length).toBe(5)

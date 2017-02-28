@@ -189,6 +189,8 @@ class GrammarRegistry
   createGrammar: (grammarPath, object) ->
     object.maxTokensPerLine ?= @maxTokensPerLine
     object.maxLineLength ?= @maxLineLength
+    if object.limitLineLength is false
+      object.maxLineLength = Infinity
     grammar = new Grammar(this, object)
     grammar.path = grammarPath
     grammar

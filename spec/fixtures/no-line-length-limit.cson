@@ -1,0 +1,9 @@
+'name': 'no-line-length-limit'
+'scopeName': 'source.long-lines'
+'limitLineLength': false
+'patterns': [
+  {
+    'match': 'hello'
+    'name': 'prefix.hello'
+  }
+]
