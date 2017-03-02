@@ -20,7 +20,7 @@ class Grammar
   registration: null
 
   constructor: (@registry, options={}) ->
-    {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine} = options
+    {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine, @maxLineLength} = options
     {injections, injectionSelector, patterns, repository, firstLineMatch} = options
 
     @emitter = new Emitter
@@ -98,8 +98,15 @@ class Grammar
   # * `ruleStack` An {Array} of rules representing the tokenized state at the
   #   end of the line. These should be passed back into this method when
   #   tokenizing the next line in the file.
-  tokenizeLine: (line, ruleStack, firstLine=false, compatibilityMode=true) ->
+  tokenizeLine: (inputLine, ruleStack, firstLine=false, compatibilityMode=true) ->
     tags = []
+
+    truncatedLine = false
+    if inputLine.length > @maxLineLength
+      line = inputLine.slice(0, @maxLineLength)
+      truncatedLine = true
+    else
+      line = inputLine
 
     if ruleStack?
       ruleStack = ruleStack.slice()
@@ -127,11 +134,7 @@ class Grammar
       break if position is line.length + 1 # include trailing newline position
 
       if tokenCount >= @getMaxTokensPerLine() - 1
-        tags.push(line.length - position)
-        while ruleStack.length > initialRuleStackLength
-          {scopeName, contentScopeName} = ruleStack.pop()
-          tags.push(@endIdForScope(contentScopeName)) if contentScopeName
-          tags.push(@endIdForScope(scopeName)) if scopeName
+        truncatedLine = true
         break
 
       if match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)
@@ -182,12 +185,23 @@ class Grammar
             tags.push(line.length - position)
             break
 
+    if truncatedLine
+      tagCount = tags.length
+      if tags[tagCount - 1] > 0
+        tags[tagCount - 1] += inputLine.length - position
+      else
+        tags.push(inputLine.length - position)
+      while ruleStack.length > initialRuleStackLength
+        {scopeName, contentScopeName} = ruleStack.pop()
+        tags.push(@endIdForScope(contentScopeName)) if contentScopeName
+        tags.push(@endIdForScope(scopeName)) if scopeName
+
     rule.clearAnchorPosition() for {rule} in ruleStack
 
     if compatibilityMode
-      new TokenizeLineResult(line, openScopeTags, tags, ruleStack, @registry)
+      new TokenizeLineResult(inputLine, openScopeTags, tags, ruleStack, @registry)
     else
-      {line, tags, ruleStack}
+      {line: inputLine, tags, ruleStack}
 
   activate: ->
     @registration = @registry.addGrammar(this)
