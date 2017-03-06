@@ -1,6 +1,6 @@
 {
   "name": "first-mate",
-  "version": "6.3.0",
+  "version": "7.0.0",
   "description": "TextMate helpers",
   "main": "./lib/first-mate.js",
   "scripts": {
