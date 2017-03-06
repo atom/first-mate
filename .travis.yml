@@ -5,10 +5,7 @@ notifications:
     on_success: never
     on_failure: change
 
-node_js:
-  - 6
-  - 5
-  - 0.10
+node_js: 6
 
 git:
   depth: 10
@@ -16,10 +13,10 @@ git:
 branches:
   only:
     - master
-    
+
 env:
   - CXX=g++-4.8
-  
+
 addons:
   apt:
     sources:
