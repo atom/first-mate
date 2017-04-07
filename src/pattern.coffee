@@ -8,7 +8,7 @@ module.exports =
 class Pattern
   constructor: (@grammar, @registry, options={}) ->
     {name, contentName, match, begin, end, patterns} = options
-    {captures, beginCaptures, endCaptures, applyEndPatternLast} = options
+    {captures, beginCaptures, endCaptures, applyEndPatternLast, @alwaysMatchEndPattern} = options
     {@include, @popRule, @hasBackReferences} = options
 
     @pushRule = null
@@ -25,8 +25,8 @@ class Pattern
     else if begin
       @regexSource = begin
       @captures = beginCaptures ? captures
-      endPattern = @grammar.createPattern({match: end, captures: endCaptures ? captures, popRule: true})
-      @pushRule = @grammar.createRule({@scopeName, @contentScopeName, patterns, endPattern, applyEndPatternLast})
+      endPattern = @grammar.createPattern({match: end, captures: endCaptures ? captures, popRule: true, @alwaysMatchEndPattern})
+      @pushRule = @grammar.createRule({@scopeName, @contentScopeName, patterns, endPattern, applyEndPatternLast, @alwaysMatchEndPattern})
 
     if @captures?
       for group, capture of @captures
@@ -92,7 +92,7 @@ class Pattern
       else
         "\\#{index}"
 
-    @grammar.createPattern({hasBackReferences: false, match: resolvedMatch, @captures, @popRule})
+    @grammar.createPattern({hasBackReferences: false, match: resolvedMatch, @captures, @popRule, @alwaysMatchEndPattern})
 
   ruleForInclude: (baseGrammar, name) ->
     hashIndex = name.indexOf('#')
@@ -132,38 +132,60 @@ class Pattern
       else
         match
 
-  handleMatch: (stack, line, captureIndices, rule, endPatternMatch) ->
+  handleMatch: (stack, line, captureIndices, override) ->
     tags = []
 
     zeroWidthMatch = captureIndices[0].start is captureIndices[0].end
 
-    if @popRule
+    if @popRule and override
       # Pushing and popping a rule based on zero width matches at the same index
       # leads to an infinite loop. We bail on parsing if we detect that case here.
       if zeroWidthMatch and _.last(stack).zeroWidthMatch and _.last(stack).rule.anchorPosition is captureIndices[0].end
         return false
 
-      {contentScopeName} = _.last(stack)
-      tags.push(@grammar.endIdForScope(contentScopeName)) if contentScopeName
-    else if @scopeName
-      scopeName = @resolveScopeName(@scopeName, line, captureIndices)
-      tags.push(@grammar.startIdForScope(scopeName))
+      if @captures
+        tags.push(@tagsForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
+      else
+        {start, end} = captureIndices[0]
+        tags.push(end - start) unless end is start
 
-    if @captures
-      tags.push(@tagsForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
-    else
-      {start, end} = captureIndices[0]
-      tags.push(end - start) unless end is start
+      overrideTags = []
+      while stack.length
+        {contentScopeName, scopeName, rule} = stack.pop() if @popRule
+        overrideTags.push(@grammar.endIdForScope(contentScopeName)) if contentScopeName
+        overrideTags.push(@grammar.endIdForScope(scopeName)) if scopeName
 
-    if @pushRule
-      ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
-      ruleToPush.anchorPosition = captureIndices[0].end
-      {contentScopeName} = ruleToPush
-      stack.push({rule: ruleToPush, scopeName, contentScopeName, zeroWidthMatch})
-      tags.push(@grammar.startIdForScope(contentScopeName)) if contentScopeName
+        break if rule.alwaysMatchEndPattern
+
+      tags.unshift(overrideTags...)
     else
-      {scopeName} = stack.pop() if @popRule
-      tags.push(@grammar.endIdForScope(scopeName)) if scopeName
+      if @popRule
+        # Pushing and popping a rule based on zero width matches at the same index
+        # leads to an infinite loop. We bail on parsing if we detect that case here.
+        if zeroWidthMatch and _.last(stack).zeroWidthMatch and _.last(stack).rule.anchorPosition is captureIndices[0].end
+          return false
+
+        {contentScopeName} = _.last(stack)
+        tags.push(@grammar.endIdForScope(contentScopeName)) if contentScopeName
+      else if @scopeName
+        scopeName = @resolveScopeName(@scopeName, line, captureIndices)
+        tags.push(@grammar.startIdForScope(scopeName))
+
+      if @captures
+        tags.push(@tagsForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
+      else
+        {start, end} = captureIndices[0]
+        tags.push(end - start) unless end is start
+
+      if @pushRule
+        ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
+        ruleToPush.anchorPosition = captureIndices[0].end
+        {contentScopeName} = ruleToPush
+        stack.push({rule: ruleToPush, scopeName, contentScopeName, zeroWidthMatch})
+        tags.push(@grammar.startIdForScope(contentScopeName)) if contentScopeName
+      else
+        {scopeName} = stack.pop() if @popRule
+        tags.push(@grammar.endIdForScope(scopeName)) if scopeName
 
     tags
 

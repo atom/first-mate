@@ -4,7 +4,7 @@ Scanner = require './scanner'
 
 module.exports =
 class Rule
-  constructor: (@grammar, @registry, {@scopeName, @contentScopeName, patterns, @endPattern, @applyEndPatternLast}={}) ->
+  constructor: (@grammar, @registry, {@scopeName, @contentScopeName, patterns, @endPattern, @applyEndPatternLast, @alwaysMatchEndPattern}={}) ->
     @patterns = []
     for pattern in patterns ? []
       @patterns.push(@grammar.createPattern(pattern)) unless pattern.disabled
@@ -38,6 +38,13 @@ class Rule
     @scannersByBaseGrammarName[baseGrammar.name] = scanner
     scanner
 
+  getEndPatternScanner: (ruleStack) ->
+    patterns = @getIncludedPatterns(ruleStack.shift().rule.grammar)
+    for stack in ruleStack by -1
+      patterns.unshift(stack.rule.endPattern) if stack.rule.endPattern?.alwaysMatchEndPattern
+
+    new Scanner(patterns)
+
   scanInjections: (ruleStack, line, position, firstLine) ->
     baseGrammar = ruleStack[0].rule.grammar
     if injections = baseGrammar.injections
@@ -57,7 +64,11 @@ class Rule
     baseGrammar = ruleStack[0].rule.grammar
     results = []
 
-    scanner = @getScanner(baseGrammar)
+    if @endPattern
+      scanner = @getEndPatternScanner(ruleStack.slice())
+    else
+      scanner = @getScanner(baseGrammar)
+
     if result = scanner.findNextMatch(lineWithNewline, firstLine, position, @anchorPosition)
       results.push(result)
 
@@ -103,13 +114,13 @@ class Rule
 
     {index, captureIndices, scanner} = result
     [firstCapture] = captureIndices
-    endPatternMatch = @endPattern is scanner.patterns[index]
-    if nextTags = scanner.handleMatch(result, ruleStack, line, this, endPatternMatch)
+    override = @endPattern isnt scanner.patterns[index] and scanner.patterns[index].alwaysMatchEndPattern
+    if nextTags = scanner.handleMatch(result, ruleStack, line, override)
       {nextTags, tagsStart: firstCapture.start, tagsEnd: firstCapture.end}
 
   getRuleToPush: (line, beginPatternCaptureIndices) ->
     if @endPattern.hasBackReferences
-      rule = @grammar.createRule({@scopeName, @contentScopeName})
+      rule = @grammar.createRule({@scopeName, @contentScopeName, @alwaysMatchEndPattern})
       rule.endPattern = @endPattern.resolveBackReferences(line, beginPatternCaptureIndices)
       rule.patterns = [rule.endPattern, @patterns...]
       rule
