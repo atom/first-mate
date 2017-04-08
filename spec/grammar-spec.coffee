@@ -295,6 +295,35 @@ describe "Grammar tokenization", ->
           expect(lines[4][2]).toEqual value: "}", scopes: ['source.apply-end-pattern-last', 'normal-env', 'scope']
           expect(lines[4][3]).toEqual value: "excentricSyntax }", scopes: ['source.apply-end-pattern-last', 'normal-env']
 
+      describe "when the alwaysMatchEndPattern flag is set in a pattern", ->
+        beforeEach ->
+          grammar = loadGrammarSync('always-match-end-pattern.cson')
+
+        it "attempts to match that end pattern first even when its included patterns have not finished matching", ->
+          lines = grammar.tokenizeLines """
+            outer-inner
+            /*
+            stuff
+            ```
+          """
+
+          expect(lines[1][0]).toEqual value: '/*', scopes: ['source.always-match-end-pattern', 'outer', 'inner']
+          expect(lines[3][0]).toEqual value: '```', scopes: ['source.always-match-end-pattern', 'outer']
+
+        it "attempts to match the outermost pattern", ->
+          lines = grammar.tokenizeLines """
+            outer-middle-inner
+            /*
+            stuff
+            <!--
+            stuff
+            ```
+          """
+
+          expect(lines[1][0]).toEqual value: '/*', scopes: ['source.always-match-end-pattern', 'outer', 'middle']
+          expect(lines[3][0]).toEqual value: '<!--', scopes: ['source.always-match-end-pattern', 'outer', 'middle', 'inner']
+          expect(lines[5][0]).toEqual value: '```', scopes: ['source.always-match-end-pattern', 'outer']
+
       describe "when the end pattern contains a back reference", ->
         it "constructs the end rule based on its back-references to captures in the begin rule", ->
           grammar = registry.grammarForScopeName('source.ruby')

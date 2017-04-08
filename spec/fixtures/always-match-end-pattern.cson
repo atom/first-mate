@@ -1,0 +1,38 @@
+name: "alwaysMatchEndPattern"
+scopeName: "source.always-match-end-pattern"
+patterns: [
+  {
+    begin: 'outer-inner'
+    end: '```'
+    name: 'outer'
+    alwaysMatchEndPattern: true
+    patterns: [
+      {
+        begin: '/\\*'
+        end: '\\*/'
+        name: 'inner'
+      }
+    ]
+  }
+  {
+    begin: 'outer-middle-inner'
+    end: '```'
+    name: 'outer'
+    alwaysMatchEndPattern: true
+    patterns: [
+      {
+        begin: '/\\*'
+        end: '```'
+        name: 'middle'
+        alwaysMatchEndPattern: true
+        patterns: [
+          {
+            begin: '<!--'
+            end: '-->'
+            name: 'inner'
+          }
+        ]
+      }
+    ]
+  }
+]
