@@ -153,9 +153,10 @@ class Pattern
       while stack.length
         {contentScopeName, scopeName, rule} = stack.pop() if @popRule
         overrideTags.push(@grammar.endIdForScope(contentScopeName)) if contentScopeName
-        overrideTags.push(@grammar.endIdForScope(scopeName)) if scopeName
 
-        break if rule.alwaysMatchEndPattern
+        break if rule.alwaysMatchEndPattern and rule.endPattern is this
+
+        overrideTags.push(@grammar.endIdForScope(scopeName)) if scopeName
 
       tags.unshift(overrideTags...)
     else
