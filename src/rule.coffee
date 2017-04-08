@@ -39,6 +39,7 @@ class Rule
     scanner
 
   getEndPatternScanner: (ruleStack) ->
+    # TODO: Return a cached scanner here if applicable
     patterns = @getIncludedPatterns(ruleStack.shift().rule.grammar)
     for stack in ruleStack by -1
       patterns.unshift(stack.rule.endPattern) if stack.rule.endPattern?.alwaysMatchEndPattern
