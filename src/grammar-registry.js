@@ -1,33 +1,30 @@
-/** @babel */
+import _ from 'underscore-plus'
+import CSON from 'season'
+import {Emitter, Disposable} from 'event-kit'
+import Grim from 'grim'
 
-let GrammarRegistry;
-import _ from 'underscore-plus';
-import CSON from 'season';
-import { Emitter, Disposable } from 'event-kit';
-import Grim from 'grim';
-
-import Grammar from './grammar';
-import NullGrammar from './null-grammar';
+import Grammar from './grammar'
+import NullGrammar from './null-grammar'
 
 // Extended: Registry containing one or more grammars.
-export default GrammarRegistry = class GrammarRegistry {
-  constructor(options={}) {
-    this.maxTokensPerLine = options.maxTokensPerLine ? options.maxTokensPerLine : Infinity;
-    this.maxLineLength = options.maxLineLength ? options.maxLineLength : Infinity;
-    this.nullGrammar = new NullGrammar(this);
-    this.clear();
+export default class GrammarRegistry {
+  constructor (options = {}) {
+    this.maxTokensPerLine = options.maxTokensPerLine ? options.maxTokensPerLine : Infinity
+    this.maxLineLength = options.maxLineLength ? options.maxLineLength : Infinity
+    this.nullGrammar = new NullGrammar(this)
+    this.clear()
   }
 
-  clear() {
-    this.emitter = new Emitter;
-    this.grammars = [];
-    this.grammarsByScopeName = {};
-    this.injectionGrammars = [];
-    this.grammarOverridesByPath = {};
-    this.scopeIdCounter = -1;
-    this.idsByScope = {};
-    this.scopesById = {};
-    this.addGrammar(this.nullGrammar);
+  clear () {
+    this.emitter = new Emitter()
+    this.grammars = []
+    this.grammarsByScopeName = {}
+    this.injectionGrammars = []
+    this.grammarOverridesByPath = {}
+    this.scopeIdCounter = -1
+    this.idsByScope = {}
+    this.scopesById = {}
+    this.addGrammar(this.nullGrammar)
   }
 
   /*
@@ -40,8 +37,8 @@ export default GrammarRegistry = class GrammarRegistry {
   //   * `grammar` {Grammar} that was added.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidAddGrammar(callback) {
-    return this.emitter.on('did-add-grammar', callback);
+  onDidAddGrammar (callback) {
+    return this.emitter.on('did-add-grammar', callback)
   }
 
   // Public: Invoke the given callback when a grammar is updated due to a grammar
@@ -51,8 +48,8 @@ export default GrammarRegistry = class GrammarRegistry {
   //   * `grammar` {Grammar} that was updated.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidUpdateGrammar(callback) {
-    return this.emitter.on('did-update-grammar', callback);
+  onDidUpdateGrammar (callback) {
+    return this.emitter.on('did-update-grammar', callback)
   }
 
   /*
@@ -62,8 +59,8 @@ export default GrammarRegistry = class GrammarRegistry {
   // Public: Get all the grammars in this registry.
   //
   // Returns a non-empty {Array} of {Grammar} instances.
-  getGrammars() {
-    return _.clone(this.grammars);
+  getGrammars () {
+    return _.clone(this.grammars)
   }
 
   // Public: Get a grammar with the given scope name.
@@ -71,8 +68,8 @@ export default GrammarRegistry = class GrammarRegistry {
   // * `scopeName` A {String} such as `"source.js"`.
   //
   // Returns a {Grammar} or undefined.
-  grammarForScopeName(scopeName) {
-    return this.grammarsByScopeName[scopeName];
+  grammarForScopeName (scopeName) {
+    return this.grammarsByScopeName[scopeName]
   }
 
   // Public: Add a grammar to this registry.
@@ -84,21 +81,21 @@ export default GrammarRegistry = class GrammarRegistry {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to remove the
   // grammar.
-  addGrammar(grammar) {
-    this.grammars.push(grammar);
-    this.grammarsByScopeName[grammar.scopeName] = grammar;
-    if (grammar.injectionSelector) { this.injectionGrammars.push(grammar); }
-    this.grammarUpdated(grammar.scopeName);
-    if (Grammar.includeDeprecatedAPIs) { this.emit('grammar-added', grammar); }
-    this.emitter.emit('did-add-grammar', grammar);
-    return new Disposable(() => this.removeGrammar(grammar););
+  addGrammar (grammar) {
+    this.grammars.push(grammar)
+    this.grammarsByScopeName[grammar.scopeName] = grammar
+    if (grammar.injectionSelector) { this.injectionGrammars.push(grammar) }
+    this.grammarUpdated(grammar.scopeName)
+    if (Grammar.includeDeprecatedAPIs) { this.emit('grammar-added', grammar) }
+    this.emitter.emit('did-add-grammar', grammar)
+    return new Disposable(() => { return this.removeGrammar(grammar) })
   }
 
-  removeGrammar(grammar) {
-    _.remove(this.grammars, grammar);
-    delete this.grammarsByScopeName[grammar.scopeName];
-    _.remove(this.injectionGrammars, grammar);
-    this.grammarUpdated(grammar.scopeName);
+  removeGrammar (grammar) {
+    _.remove(this.grammars, grammar)
+    delete this.grammarsByScopeName[grammar.scopeName]
+    _.remove(this.injectionGrammars, grammar)
+    this.grammarUpdated(grammar.scopeName)
   }
 
   // Public: Remove the grammar with the given scope name.
@@ -106,10 +103,10 @@ export default GrammarRegistry = class GrammarRegistry {
   // * `scopeName` A {String} such as `"source.js"`.
   //
   // Returns the removed {Grammar} or undefined.
-  removeGrammarForScopeName(scopeName) {
-    const grammar = this.grammarForScopeName(scopeName);
-    if (grammar) { this.removeGrammar(grammar); }
-    return grammar;
+  removeGrammarForScopeName (scopeName) {
+    const grammar = this.grammarForScopeName(scopeName)
+    if (grammar) { this.removeGrammar(grammar) }
+    return grammar
   }
 
   // Public: Read a grammar synchronously but don't add it to the registry.
@@ -117,13 +114,13 @@ export default GrammarRegistry = class GrammarRegistry {
   // * `grammarPath` A {String} absolute file path to a grammar file.
   //
   // Returns a {Grammar}.
-  readGrammarSync(grammarPath) {
-    const file = CSON.readFileSync(grammarPath);
-    const grammar = file ? file : {};
+  readGrammarSync (grammarPath) {
+    const file = CSON.readFileSync(grammarPath)
+    const grammar = file || {}
     if (typeof grammar.scopeName === 'string' && grammar.scopeName.length > 0) {
-      return this.createGrammar(grammarPath, grammar);
+      return this.createGrammar(grammarPath, grammar)
     } else {
-      throw new Error(`Grammar missing required scopeName property: ${grammarPath}`);
+      throw new Error(`Grammar missing required scopeName property: ${grammarPath}`)
     }
   }
 
@@ -135,20 +132,20 @@ export default GrammarRegistry = class GrammarRegistry {
   //   * `grammar` A {Grammar} or null if an error occured.
   //
   // Returns undefined.
-  readGrammar(grammarPath, callback) {
-    CSON.readFile(grammarPath, (error, grammar={}) => {
+  readGrammar (grammarPath, callback) {
+    CSON.readFile(grammarPath, (error, grammar = {}) => {
       if (typeof callback === 'function') {
         if (error) {
-          callback(error);
+          callback(error)
         } else {
           if (typeof grammar.scopeName === 'string' && grammar.scopeName.length > 0) {
-            callback(null, this.createGrammar(grammarPath, grammar));
+            callback(null, this.createGrammar(grammarPath, grammar))
           } else {
-            callback(new Error(`Grammar missing required scopeName property: ${grammarPath}`));
+            callback(new Error(`Grammar missing required scopeName property: ${grammarPath}`))
           }
         }
       }
-    });
+    })
   }
 
   // Public: Read a grammar synchronously and add it to this registry.
@@ -156,10 +153,10 @@ export default GrammarRegistry = class GrammarRegistry {
   // * `grammarPath` A {String} absolute file path to a grammar file.
   //
   // Returns a {Grammar}.
-  loadGrammarSync(grammarPath) {
-    const grammar = this.readGrammarSync(grammarPath);
-    this.addGrammar(grammar);
-    return grammar;
+  loadGrammarSync (grammarPath) {
+    const grammar = this.readGrammarSync(grammarPath)
+    this.addGrammar(grammar)
+    return grammar
   }
 
   // Public: Read a grammar asynchronously and add it to the registry.
@@ -170,115 +167,115 @@ export default GrammarRegistry = class GrammarRegistry {
   //   * `grammar` A {Grammar} or null if an error occured.
   //
   // Returns undefined.
-  loadGrammar(grammarPath, callback) {
+  loadGrammar (grammarPath, callback) {
     this.readGrammar(grammarPath, (error, grammar) => {
       if (typeof callback === 'function') {
         if (error) {
-          callback(error);
+          callback(error)
         } else {
-          this.addGrammar(grammar);
-          callback(null, grammar);
+          this.addGrammar(grammar)
+          callback(null, grammar)
         }
       }
-    });
+    })
   }
 
-  startIdForScope(scope) {
-    let id = this.idsByScope[scope];
+  startIdForScope (scope) {
+    let id = this.idsByScope[scope]
     if (!id) {
-      id = this.scopeIdCounter;
-      this.scopeIdCounter -= 2;
-      this.idsByScope[scope] = id;
-      this.scopesById[id] = scope;
+      id = this.scopeIdCounter
+      this.scopeIdCounter -= 2
+      this.idsByScope[scope] = id
+      this.scopesById[id] = scope
     }
-    return id;
+    return id
   }
 
-  endIdForScope(scope) {
-    return this.startIdForScope(scope) - 1;
+  endIdForScope (scope) {
+    return this.startIdForScope(scope) - 1
   }
 
-  scopeForId(id) {
+  scopeForId (id) {
     if (id % 2 === -1) {
-      return this.scopesById[id]; // start id
+      return this.scopesById[id] // start id
     } else {
-      return this.scopesById[id + 1]; // end id
+      return this.scopesById[id + 1] // end id
     }
   }
 
-  grammarUpdated(scopeName) {
+  grammarUpdated (scopeName) {
     for (let grammar of this.grammars) {
       if (grammar.scopeName !== scopeName) {
         if (grammar.grammarUpdated(scopeName)) {
-          if (Grammar.includeDeprecatedAPIs) { this.emit('grammar-updated', grammar); }
-          this.emitter.emit('did-update-grammar', grammar);
+          if (Grammar.includeDeprecatedAPIs) { this.emit('grammar-updated', grammar) }
+          this.emitter.emit('did-update-grammar', grammar)
         }
       }
     }
   }
 
-  createGrammar(grammarPath, object) {
-    if (!object.maxTokensPerLine) { object.maxTokensPerLine = this.maxTokensPerLine; }
-    if (!object.maxLineLength) { object.maxLineLength = this.maxLineLength; }
-    if (object.limitLineLength === false) { object.maxLineLength = Infinity; }
-    const grammar = new Grammar(this, object);
-    grammar.path = grammarPath;
-    return grammar;
+  createGrammar (grammarPath, object) {
+    if (!object.maxTokensPerLine) { object.maxTokensPerLine = this.maxTokensPerLine }
+    if (!object.maxLineLength) { object.maxLineLength = this.maxLineLength }
+    if (object.limitLineLength === false) { object.maxLineLength = Infinity }
+    const grammar = new Grammar(this, object)
+    grammar.path = grammarPath
+    return grammar
   }
 
-  decodeTokens(lineText, tags, scopeTags = [], fn) {
-    let offset = 0;
-    const scopeNames = scopeTags.map(tag => this.scopeForId(tag));
+  decodeTokens (lineText, tags, scopeTags = [], fn) {
+    let offset = 0
+    const scopeNames = scopeTags.map(tag => this.scopeForId(tag))
 
-    const tokens = [];
+    const tokens = []
     for (let index = 0; index < tags.length; index++) {
       // positive numbers indicate string content with length equaling the number
-      const tag = tags[index];
+      const tag = tags[index]
       if (tag >= 0) {
         let token = {
           value: lineText.substring(offset, offset + tag),
           scopes: scopeNames.slice()
-        };
-        if (fn) { token = fn(token, index); }
-        tokens.push(token);
-        offset += tag;
+        }
+        if (fn) { token = fn(token, index) }
+        tokens.push(token)
+        offset += tag
 
       // odd negative numbers are begin scope tags
       } else if (tag % 2 === -1) {
-        scopeTags.push(tag);
-        scopeNames.push(this.scopeForId(tag));
+        scopeTags.push(tag)
+        scopeNames.push(this.scopeForId(tag))
 
       // even negative numbers are end scope tags
       } else {
-        scopeTags.pop();
-        const expectedScopeName = this.scopeForId(tag + 1);
-        const poppedScopeName = scopeNames.pop();
+        scopeTags.pop()
+        const expectedScopeName = this.scopeForId(tag + 1)
+        const poppedScopeName = scopeNames.pop()
         if (poppedScopeName !== expectedScopeName) {
-          throw new Error(`Expected popped scope to be ${expectedScopeName}, but it was ${poppedScopeName}`);
+          throw new Error(`Expected popped scope to be ${expectedScopeName}, but it was ${poppedScopeName}`)
         }
       }
     }
 
-    return tokens;
+    return tokens
   }
-};
+}
 
 if (Grim.includeDeprecatedAPIs) {
-  const EmitterMixin = require('emissary').Emitter;
-  EmitterMixin.includeInto(GrammarRegistry);
+  const EmitterMixin = require('emissary').Emitter
+  EmitterMixin.includeInto(GrammarRegistry)
 
-  GrammarRegistry.prototype.on = function(eventName) {
+  GrammarRegistry.prototype.on = function (eventName) {
     switch (eventName) {
       case 'grammar-added':
-        Grim.deprecate("Call GrammarRegistry::onDidAddGrammar instead");
-        break;
+        Grim.deprecate('Call GrammarRegistry::onDidAddGrammar instead')
+        break
       case 'grammar-updated':
-        Grim.deprecate("Call GrammarRegistry::onDidUpdateGrammar instead");
-        break;
+        Grim.deprecate('Call GrammarRegistry::onDidUpdateGrammar instead')
+        break
       default:
-        Grim.deprecate("Call explicit event subscription methods instead");
+        Grim.deprecate('Call explicit event subscription methods instead')
     }
 
-    return EmitterMixin.prototype.on.apply(this, arguments);
-  };
+    return EmitterMixin.prototype.on.apply(this, arguments)
+  }
 }

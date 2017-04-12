@@ -4,9 +4,13 @@
   "description": "TextMate helpers",
   "main": "./lib/first-mate.js",
   "scripts": {
-    "test": "grunt test",
-    "prepublish": "grunt prepublish",
-    "benchmark": "node_modules/.bin/coffee benchmark/benchmark.coffee"
+    "atomdoc": "node script/generate-api-docs.js",
+    "build": "babel src --out-dir lib && pegjs -o lib/scope-selector-parser.js src/scope-selector-parser.pegjs",
+    "clean": "node script/clean.js",
+    "lint": "standard",
+    "test": "npm run lint && npm run build && mocha --compilers js:babel-core/register spec/",
+    "prepublish": "npm run clean && npm run build && npm run lint && npm run atomdoc",
+    "benchmark": "node benchmark/benchmark.js"
   },
   "repository": {
     "type": "git",
@@ -27,15 +31,21 @@
     "underscore-plus": "^1"
   },
   "devDependencies": {
-    "jasmine-focused": "^1",
-    "grunt-contrib-coffee": "~0.9.0",
-    "grunt-cli": "~0.1.8",
-    "grunt": "~0.4.1",
-    "grunt-shell": "~0.2.2",
-    "grunt-coffeelint": "0.0.6",
-    "rimraf": "~2.1.4",
-    "coffee-script": "~1.7.0",
-    "grunt-peg": "~1.1.0",
-    "grunt-atomdoc": "^1.0.0"
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
+    "chai": "^3.5.0",
+    "glob": "^7.1.1",
+    "joanna": "0.0.8",
+    "mocha": "^3.2.0",
+    "pegjs": "^0.10.0",
+    "rimraf": "^2.6.1",
+    "sinon": "^2.1.0",
+    "standard": "^10.0.1",
+    "tello": "^1.0.6"
+  },
+  "standard": {
+    "ignore": [
+      "**/fixtures/"
+    ]
   }
 }

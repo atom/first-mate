@@ -1,13 +1,8 @@
-/** @babel */
-
-let Grammar;
-import path from 'path';
-
-import _ from 'underscore-plus';
-import fs from 'fs-plus';
-import { OnigRegExp } from 'oniguruma';
-import { Emitter } from 'event-kit';
-import Grim from 'grim';
+import _ from 'underscore-plus'
+import {OnigRegExp} from 'oniguruma'
+import {Emitter} from 'event-kit'
+import Grim from 'grim'
+import {Emitter as EmitterMixin} from 'emissary'
 
 import Injections from './injections'
 import Pattern from './pattern'
@@ -18,38 +13,37 @@ import ScopeSelector from './scope-selector'
 //
 // This class should not be instantiated directly but instead obtained from
 // a {GrammarRegistry} by calling {GrammarRegistry::loadGrammar}.
-export default Grammar = class Grammar {
-  Grammar.prototype.registry = null;
-
-  constructor(registry, options={}) {
+export default class Grammar {
+  constructor (registry, options = {}) {
+    this.registration = null
     this.registry = registry;
-    {name: this.name, fileTypes: this.fileTypes, scopeName: this.scopeName, foldingStopMarker: this.foldingStopMarker, maxTokensPerLine: this.maxTokensPerLine, maxLineLength: this.maxLineLength} = options;
-    const {injections, injectionSelector, patterns, repository, firstLineMatch} = options;
+    ({name: this.name, fileTypes: this.fileTypes, scopeName: this.scopeName, foldingStopMarker: this.foldingStopMarker, maxTokensPerLine: this.maxTokensPerLine, maxLineLength: this.maxLineLength} = options)
+    const {injections, injectionSelector, patterns, repository, firstLineMatch} = options
 
-    this.emitter = new Emitter;
-    this.repository = null;
-    this.initialRule = null;
+    this.emitter = new Emitter()
+    this.repository = null
+    this.initialRule = null
 
-    this.rawPatterns = patterns;
-    this.rawRepository = repository;
+    this.rawPatterns = patterns
+    this.rawRepository = repository
 
     if (injectionSelector) {
-      this.injectionSelector = new ScopeSelector(injectionSelector);
+      this.injectionSelector = new ScopeSelector(injectionSelector)
     } else {
-      this.injectionSelector = null;
+      this.injectionSelector = null
     }
 
     if (firstLineMatch) {
-      this.firstLineRegex = new OnigRegExp(firstLineMatch);
+      this.firstLineRegex = new OnigRegExp(firstLineMatch)
     } else {
-      this.firstLineRegex = null;
+      this.firstLineRegex = null
     }
 
-    if (!this.fileTypes) { this.fileTypes = []; }
-    this.includedGrammarScopes = [];
+    if (!this.fileTypes) { this.fileTypes = [] }
+    this.includedGrammarScopes = []
 
     // Create last since Injections uses APIs from this class
-    this.injections = new Injections(this, injections);
+    this.injections = new Injections(this, injections)
   }
 
   /*
@@ -62,8 +56,8 @@ export default Grammar = class Grammar {
   // * `callback` {Function} to call when this grammar is updated.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidUpdate(callback) {
-    return this.emitter.on('did-update', callback);
+  onDidUpdate (callback) {
+    return this.emitter.on('did-update', callback)
   }
 
   /*
@@ -75,14 +69,15 @@ export default Grammar = class Grammar {
   // * `text` A {String} containing one or more lines.
   //
   // Returns an {Array} of token arrays for each line tokenized.
-  tokenizeLines(text) {
-    const lines = text.split('\n');
+  tokenizeLines (text) {
+    const lines = text.split('\n')
+    let tags, ruleStack
 
-    const scopes = [];
+    const scopes = []
     return lines.map((line, lineNumber) => {
-      const {tags} = this.tokenizeLine(line, ruleStack, lineNumber === 0);
-      return this.registry.decodeTokens(line, tags, scopes);
-    });
+      ({tags, ruleStack} = this.tokenizeLine(line, ruleStack, lineNumber === 0))
+      return this.registry.decodeTokens(line, tags, scopes)
+    })
   }
 
   // Public: Tokenize the line of text.
@@ -106,239 +101,235 @@ export default Grammar = class Grammar {
   // * `ruleStack` An {Array} of rules representing the tokenized state at the
   //   end of the line. These should be passed back into this method when
   //   tokenizing the next line in the file.
-  tokenizeLine(inputLine, ruleStack, firstLine=false, compatibilityMode=true) {
-    let line, openScopeTags;
-    const tags = [];
+  tokenizeLine (inputLine, ruleStack, firstLine = false, compatibilityMode = true) {
+    let line, openScopeTags
+    const tags = []
 
-    let truncatedLine = false;
+    let truncatedLine = false
     if (inputLine.length > this.maxLineLength) {
-      line = inputLine.slice(0, this.maxLineLength);
-      truncatedLine = true;
+      line = inputLine.slice(0, this.maxLineLength)
+      truncatedLine = true
     } else {
-      line = inputLine;
+      line = inputLine
     }
 
     if (ruleStack) {
-      ruleStack = ruleStack.slice();
+      ruleStack = ruleStack.slice()
       if (compatibilityMode) {
-        openScopeTags = [];
+        openScopeTags = []
         for (let {scopeName, contentScopeName} of ruleStack) {
-          if (scopeName) { openScopeTags.push(this.registry.startIdForScope(scopeName)); }
-          if (contentScopeName) { openScopeTags.push(this.registry.startIdForScope(contentScopeName)); }
+          if (scopeName) { openScopeTags.push(this.registry.startIdForScope(scopeName)) }
+          if (contentScopeName) { openScopeTags.push(this.registry.startIdForScope(contentScopeName)) }
         }
       }
     } else {
-      if (compatibilityMode) { openScopeTags = []; }
-      const initialRule = this.getInitialRule();
-      let {scopeName, contentScopeName} = initialRule;
-      ruleStack = [{rule: initialRule, scopeName, contentScopeName}];
-      if (scopeName) { tags.push(this.startIdForScope(initialRule.scopeName)); }
-      if (contentScopeName) { tags.push(this.startIdForScope(initialRule.contentScopeName)); }
+      if (compatibilityMode) { openScopeTags = [] }
+      const initialRule = this.getInitialRule()
+      let {scopeName, contentScopeName} = initialRule
+      ruleStack = [{rule: initialRule, scopeName, contentScopeName}]
+      if (scopeName) { tags.push(this.startIdForScope(initialRule.scopeName)) }
+      if (contentScopeName) { tags.push(this.startIdForScope(initialRule.contentScopeName)) }
     }
 
-    const initialRuleStackLength = ruleStack.length;
-    let position = 0;
-    let tokenCount = 0;
+    const initialRuleStackLength = ruleStack.length
+    let position = 0
+    let tokenCount = 0
 
     while (true) {
-      let match;
-      const previousRuleStackLength = ruleStack.length;
-      const previousPosition = position;
+      const previousRuleStackLength = ruleStack.length
+      const previousPosition = position
 
-      if (position === line.length + 1) { break; } // include trailing newline position
+      if (position === line.length + 1) { break } // include trailing newline position
 
       if (tokenCount >= this.getMaxTokensPerLine() - 1) {
-        truncatedLine = true;
-        break;
+        truncatedLine = true
+        break
       }
 
-      if (match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)) {
-        const {nextTags, tagsStart, tagsEnd} = match;
+      const match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)
+      if (match) {
+        const {nextTags, tagsStart, tagsEnd} = match
 
         // Unmatched text before next tags
         if (position < tagsStart) {
-          tags.push(tagsStart - position);
-          tokenCount++;
+          tags.push(tagsStart - position)
+          tokenCount++
         }
 
-        tags.push(...nextTags);
-        for (let tag of nextTags) { if (tag >= 0) { tokenCount++; } }
-        position = tagsEnd;
-
+        tags.push(...nextTags)
+        for (let tag of nextTags) { if (tag >= 0) { tokenCount++ } }
+        position = tagsEnd
       } else {
         // Push filler token for unmatched text at end of line
         if (position < line.length || line.length === 0) {
-          tags.push(line.length - position);
+          tags.push(line.length - position)
         }
-        break;
+        break
       }
 
       if (position === previousPosition) {
         if (ruleStack.length === previousRuleStackLength) {
-          console.error(`Popping rule because it loops at column ${position} of line '${line}'`, _.clone(ruleStack));
+          console.error(`Popping rule because it loops at column ${position} of line '${line}'`, _.clone(ruleStack))
           if (ruleStack.length > 1) {
-            let {scopeName, contentScopeName} = ruleStack.pop();
-            if (contentScopeName) { tags.push(this.endIdForScope(contentScopeName)); }
-            if (scopeName) { tags.push(this.endIdForScope(scopeName)); }
+            let {scopeName, contentScopeName} = ruleStack.pop()
+            if (contentScopeName) { tags.push(this.endIdForScope(contentScopeName)) }
+            if (scopeName) { tags.push(this.endIdForScope(scopeName)) }
           } else {
-            if (position < line.length || line.length === 0 && tags.length === 0) {
-              tags.push(line.length - position);
+            if (position < line.length || (line.length === 0 && tags.length === 0)) {
+              tags.push(line.length - position)
             }
-            break;
+            break
           }
         } else if (ruleStack.length > previousRuleStackLength) { // Stack size increased with zero length match
-          let popStack;
-          const [{rule: penultimateRule}, {rule: lastRule}] = ruleStack.slice(-2);
+          let popStack
+          const [{rule: penultimateRule}, {rule: lastRule}] = ruleStack.slice(-2)
 
           // Same exact rule was pushed but position wasn't advanced
           if (lastRule && lastRule === penultimateRule) {
-            popStack = true;
+            popStack = true
           }
 
           // Rule with same scope name as previous rule was pushed but position wasn't advanced
           if (lastRule && lastRule.scopeName && penultimateRule.scopeName === lastRule.scopeName) {
-            popStack = true;
+            popStack = true
           }
 
           if (popStack) {
-            ruleStack.pop();
-            const lastSymbol = _.last(tags);
+            ruleStack.pop()
+            const lastSymbol = _.last(tags)
             if (lastSymbol < 0 && lastSymbol === this.startIdForScope(lastRule.scopeName)) {
-              tags.pop(); // also pop the duplicated start scope if it was pushed
+              tags.pop() // also pop the duplicated start scope if it was pushed
             }
-            tags.push(line.length - position);
-            break;
+            tags.push(line.length - position)
+            break
           }
         }
       }
     }
 
     if (truncatedLine) {
-      const tagCount = tags.length;
+      const tagCount = tags.length
       if (tags[tagCount - 1] > 0) {
-        tags[tagCount - 1] += inputLine.length - position;
+        tags[tagCount - 1] += inputLine.length - position
       } else {
-        tags.push(inputLine.length - position);
+        tags.push(inputLine.length - position)
       }
       while (ruleStack.length > initialRuleStackLength) {
-        let {scopeName, contentScopeName} = ruleStack.pop();
-        if (contentScopeName) { tags.push(this.endIdForScope(contentScopeName)); }
-        if (scopeName) { tags.push(this.endIdForScope(scopeName)); }
+        let {scopeName, contentScopeName} = ruleStack.pop()
+        if (contentScopeName) { tags.push(this.endIdForScope(contentScopeName)) }
+        if (scopeName) { tags.push(this.endIdForScope(scopeName)) }
       }
     }
 
-    for (let {rule} of ruleStack) { rule.clearAnchorPosition(); }
+    for (let {rule} of ruleStack) { rule.clearAnchorPosition() }
 
     if (compatibilityMode) {
-      return new TokenizeLineResult(inputLine, openScopeTags, tags, ruleStack, this.registry);
+      return new TokenizeLineResult(inputLine, openScopeTags, tags, ruleStack, this.registry)
     } else {
-      return {line: inputLine, tags, ruleStack};
+      return {line: inputLine, tags, ruleStack}
     }
   }
 
-  activate() {
-    return this.registration = this.registry.addGrammar(this);
+  activate () {
+    this.registration = this.registry.addGrammar(this)
   }
 
-  deactivate() {
-    this.emitter = new Emitter;
+  deactivate () {
+    this.emitter = new Emitter()
     if (this.registration) {
-      this.registration.dispose();
+      this.registration.dispose()
     }
-    return this.registration = null;
+    this.registration = null
   }
 
-  clearRules() {
-    this.initialRule = null;
-    return this.repository = null;
+  clearRules () {
+    this.initialRule = null
+    this.repository = null
   }
 
-  getInitialRule() {
-    return this.initialRule ? this.initialRule : (this.initialRule = this.createRule({scopeName: this.scopeName, patterns: this.rawPatterns}));
+  getInitialRule () {
+    return this.initialRule ? this.initialRule : (this.initialRule = this.createRule({scopeName: this.scopeName, patterns: this.rawPatterns}))
   }
 
-  getRepository() {
+  getRepository () {
     return this.repository ? this.repository : (this.repository = (() => {
-      const repository = {};
+      const repository = {}
       for (let name in this.rawRepository) {
-        let data = this.rawRepository[name];
-        if (data.begin || data.match) { data = {patterns: [data], tempName: name}; }
-        repository[name] = this.createRule(data);
+        let data = this.rawRepository[name]
+        if (data.begin || data.match) { data = {patterns: [data], tempName: name} }
+        repository[name] = this.createRule(data)
       }
-      return repository;
-    })());
+      return repository
+    })())
   }
 
-  addIncludedGrammarScope(scope) {
-    if (!_.include(this.includedGrammarScopes, scope)) { return this.includedGrammarScopes.push(scope); }
+  addIncludedGrammarScope (scope) {
+    if (!_.include(this.includedGrammarScopes, scope)) { return this.includedGrammarScopes.push(scope) }
   }
 
-  grammarUpdated(scopeName) {
-    if (!_.include(this.includedGrammarScopes, scopeName)) { return false; }
-    this.clearRules();
-    this.registry.grammarUpdated(this.scopeName);
-    if (Grim.includeDeprecatedAPIs) { this.emit('grammar-updated'); }
-    this.emitter.emit('did-update');
-    return true;
+  grammarUpdated (scopeName) {
+    if (!_.include(this.includedGrammarScopes, scopeName)) { return false }
+    this.clearRules()
+    this.registry.grammarUpdated(this.scopeName)
+    if (Grim.includeDeprecatedAPIs) { this.emit('grammar-updated') }
+    this.emitter.emit('did-update')
+    return true
   }
 
-  startIdForScope(scope) { return this.registry.startIdForScope(scope); }
+  startIdForScope (scope) { return this.registry.startIdForScope(scope) }
 
-  endIdForScope(scope) { return this.registry.endIdForScope(scope); }
+  endIdForScope (scope) { return this.registry.endIdForScope(scope) }
 
-  scopeForId(id) { return this.registry.scopeForId(id); }
+  scopeForId (id) { return this.registry.scopeForId(id) }
 
-  createRule(options) { return new Rule(this, this.registry, options); }
+  createRule (options) { return new Rule(this, this.registry, options) }
 
-  createPattern(options) { return new Pattern(this, this.registry, options); }
+  createPattern (options) { return new Pattern(this, this.registry, options) }
 
-  getMaxTokensPerLine() { return this.maxTokensPerLine; }
+  getMaxTokensPerLine () { return this.maxTokensPerLine }
 
-  scopesFromStack(stack, rule, endPatternMatch) {
-    const scopes = [];
+  scopesFromStack (stack, rule, endPatternMatch) {
+    const scopes = []
     for (let {scopeName, contentScopeName} of stack) {
-      if (scopeName) { scopes.push(scopeName); }
-      if (contentScopeName) { scopes.push(contentScopeName); }
+      if (scopeName) { scopes.push(scopeName) }
+      if (contentScopeName) { scopes.push(contentScopeName) }
     }
 
     // Pop the last content name scope if the end pattern at the top of the stack
     // was matched since only text between the begin/end patterns should have the
     // content name scope
     if (endPatternMatch && rule && rule.contentScopeName && rule === stack[stack.length - 1]) {
-      scopes.pop();
+      scopes.pop()
     }
 
-    return scopes;
+    return scopes
   }
-};
+}
 
 if (Grim.includeDeprecatedAPIs) {
-  import Emitter as EmitterMixin from 'emissary';
-  EmitterMixin.includeInto(Grammar);
+  EmitterMixin.includeInto(Grammar)
 
-  Grammar.prototype.on = function(eventName) {
+  Grammar.prototype.on = function (eventName) {
     if (eventName === 'did-update') {
-      Grim.deprecate("Call Grammar::onDidUpdate instead");
+      Grim.deprecate('Call Grammar::onDidUpdate instead')
     } else {
-      Grim.deprecate("Call explicit event subscription methods instead");
+      Grim.deprecate('Call explicit event subscription methods instead')
     }
 
-    return EmitterMixin.prototype.on.apply(this, arguments);
-  };
+    return EmitterMixin.prototype.on.apply(this, arguments)
+  }
 }
 
 class TokenizeLineResult {
-  Object.defineProperty(this.prototype, 'tokens', {
-    get() {
-      return this.registry.decodeTokens(this.line, this.tags, this.openScopeTags);
-    }
-  });
+  constructor (line, openScopeTags, tags, ruleStack, registry) {
+    this.line = line
+    this.openScopeTags = openScopeTags
+    this.tags = tags
+    this.ruleStack = ruleStack
+    this.registry = registry
+  }
 
-  constructor(line, openScopeTags, tags, ruleStack, registry) {
-    this.line = line;
-    this.openScopeTags = openScopeTags;
-    this.tags = tags;
-    this.ruleStack = ruleStack;
-    this.registry = registry;
+  get tokens () {
+    return this.registry.decodeTokens(this.line, this.tags, this.openScopeTags)
   }
 }
