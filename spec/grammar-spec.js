@@ -553,7 +553,7 @@ first
 
     describe('when the grammar can infinitely loop over a line', () =>
       it('aborts tokenization', () => {
-        sandbox.spy(console, 'error')
+        sandbox.stub(console, 'error')
         grammar = loadGrammarSync('infinite-loop.cson')
         const {line, tags} = grammar.tokenizeLine('abc')
         const scopes = []
@@ -1116,7 +1116,7 @@ service SimpleService {
 
   describe("when the position doesn't advance", () => {
     it('logs an error and tokenizes the remainder of the line', () => {
-      sandbox.spy(console, 'error')
+      sandbox.stub(console, 'error')
       loadGrammarSync('loops.json')
       grammar = registry.grammarForScopeName('source.loops')
       const {line, tags, ruleStack} = grammar.tokenizeLine('test')
