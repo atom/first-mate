@@ -25,8 +25,7 @@
     "event-kit": "^2.2.0",
     "fs-plus": "^3.0.0",
     "oniguruma": "^6.1.0",
-    "season": "^6.0.0",
-    "underscore-plus": "^1"
+    "season": "^6.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

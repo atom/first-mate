@@ -4,7 +4,6 @@ import {assert} from 'chai'
 import sinon from 'sinon'
 
 import path from 'path'
-import _ from 'underscore-plus'
 import fs from 'fs-plus'
 import GrammarRegistry from '../lib/grammar-registry'
 import Grammar from '../lib/grammar'
@@ -873,10 +872,10 @@ a = {
       })
 
       it("doesn't loop infinitely (regression)", () => {
-        assert.equal(_.pluck(lines[0], 'value').join(''), 'a = {')
-        assert.equal(_.pluck(lines[1], 'value').join(''), '  "b" => "c",')
-        assert.equal(_.pluck(lines[2], 'value').join(''), '}')
-        assert.equal(_.pluck(lines[3], 'value').join(''), '')
+        assert.equal(lines[0].map(object => object['value']).join(''), 'a = {')
+        assert.equal(lines[1].map(object => object['value']).join(''), '  "b" => "c",')
+        assert.equal(lines[2].map(object => object['value']).join(''), '}')
+        assert.isUndefined(lines[3])
       })
     })
 
@@ -902,7 +901,7 @@ NSString *a = @"a\\nb";
 
       it('correctly parses the semicolon at the end of the line', () => {
         const tokens = lines[1]
-        const lastToken = _.last(tokens)
+        const lastToken = tokens[tokens.length - 1]
         assert.equal(lastToken.value, ';')
         assert.deepEqual(lastToken.scopes, ['source.objc++', 'meta.function.c', 'meta.block.c'])
       })
@@ -938,7 +937,7 @@ public void test() {
       it('correctly parses nested method calls', () => {
         const {line, tags} = grammar.tokenizeLine('a(b(new Object[0]));')
         const tokens = registry.decodeTokens(line, tags)
-        const lastToken = _.last(tokens)
+        const lastToken = tokens[tokens.length - 1]
         assert.deepEqual(lastToken.scopes, ['source.java', 'punctuation.terminator.java'])
         assert.equal(lastToken.value, ';')
       })

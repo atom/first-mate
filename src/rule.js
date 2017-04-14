@@ -1,5 +1,3 @@
-import _ from 'underscore-plus'
-
 import Scanner from './scanner'
 
 export default class Rule {
@@ -29,7 +27,7 @@ export default class Rule {
   }
 
   getIncludedPatterns (baseGrammar, included = []) {
-    if (_.include(included, this)) { return [] }
+    if (included.includes(this)) { return [] }
 
     included = included.concat([this])
     const allPatterns = []
@@ -119,10 +117,11 @@ export default class Rule {
     }
 
     if (results.length > 1) {
-      return _.min(results, result => {
-        this.normalizeCaptureIndices(lineWithNewline, result.captureIndices)
-        return result.captureIndices[0].start
-      })
+      return results.sort((a, b) => {
+        this.normalizeCaptureIndices(lineWithNewline, a.captureIndices)
+        this.normalizeCaptureIndices(lineWithNewline, b.captureIndices)
+        return a.captureIndices[0].start - b.captureIndices[0].start
+      })[0]
     } else if (results.length === 1) {
       [result] = results
       this.normalizeCaptureIndices(lineWithNewline, result.captureIndices)

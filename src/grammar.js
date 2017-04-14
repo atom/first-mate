@@ -1,4 +1,3 @@
-import _ from 'underscore-plus'
 import {OnigRegExp} from 'oniguruma'
 import {Emitter} from 'event-kit'
 
@@ -144,7 +143,7 @@ export default class Grammar {
         break
       }
 
-      const match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)
+      const match = ruleStack[ruleStack.length - 1].rule.getNextTags(ruleStack, line, position, firstLine)
       if (match) {
         const {nextTags, tagsStart, tagsEnd} = match
 
@@ -167,7 +166,7 @@ export default class Grammar {
 
       if (position === previousPosition) {
         if (ruleStack.length === previousRuleStackLength) {
-          console.error(`Popping rule because it loops at column ${position} of line '${line}'`, _.clone(ruleStack))
+          console.error(`Popping rule because it loops at column ${position} of line '${line}'`, ruleStack.slice())
           if (ruleStack.length > 1) {
             let {scopeName, contentScopeName} = ruleStack.pop()
             if (contentScopeName) { tags.push(this.endIdForScope(contentScopeName)) }
@@ -194,7 +193,7 @@ export default class Grammar {
 
           if (popStack) {
             ruleStack.pop()
-            const lastSymbol = _.last(tags)
+            const lastSymbol = tags[tags.length - 1]
             if (lastSymbol < 0 && lastSymbol === this.startIdForScope(lastRule.scopeName)) {
               tags.pop() // also pop the duplicated start scope if it was pushed
             }
@@ -262,11 +261,11 @@ export default class Grammar {
   }
 
   addIncludedGrammarScope (scope) {
-    if (!_.include(this.includedGrammarScopes, scope)) { return this.includedGrammarScopes.push(scope) }
+    if (!this.includedGrammarScopes.includes(scope)) { return this.includedGrammarScopes.push(scope) }
   }
 
   grammarUpdated (scopeName) {
-    if (!_.include(this.includedGrammarScopes, scopeName)) { return false }
+    if (!this.includedGrammarScopes.includes(scopeName)) { return false }
     this.clearRules()
     this.registry.grammarUpdated(this.scopeName)
     this.emitter.emit('did-update')

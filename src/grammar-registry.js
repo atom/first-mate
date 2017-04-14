@@ -1,4 +1,3 @@
-import _ from 'underscore-plus'
 import CSON from 'season'
 import {Emitter, Disposable} from 'event-kit'
 
@@ -59,7 +58,7 @@ export default class GrammarRegistry {
   //
   // Returns a non-empty {Array} of {Grammar} instances.
   getGrammars () {
-    return _.clone(this.grammars)
+    return this.grammars.slice()
   }
 
   // Public: Get a grammar with the given scope name.
@@ -91,9 +90,11 @@ export default class GrammarRegistry {
   }
 
   removeGrammar (grammar) {
-    _.remove(this.grammars, grammar)
+    let index = this.grammars.indexOf(grammar)
+    if (index >= 0) { this.grammars.splice(index, 1) }
     delete this.grammarsByScopeName[grammar.scopeName]
-    _.remove(this.injectionGrammars, grammar)
+    index = this.injectionGrammars.indexOf(grammar)
+    if (index >= 0) { this.injectionGrammars.splice(index, 1) }
     this.grammarUpdated(grammar.scopeName)
   }
 

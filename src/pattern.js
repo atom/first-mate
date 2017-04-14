@@ -1,5 +1,3 @@
-import _ from 'underscore-plus'
-
 const AllCustomCaptureIndicesRegex = /\$(\d+)|\${(\d+):\/(downcase|upcase)}/g
 const AllDigitsRegex = /\\\d+/g
 const DigitRegex = /\\\d+/
@@ -110,7 +108,7 @@ export default class Pattern {
     const resolvedMatch = this.match.replace(AllDigitsRegex, function (match) {
       const index = parseInt(match.slice(1))
       if (beginCaptures[index] != null) {
-        return _.escapeRegExp(beginCaptures[index])
+        return beginCaptures[index].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape regex
       } else {
         return `\\${index}`
       }
@@ -177,11 +175,11 @@ export default class Pattern {
     if (this.popRule) {
       // Pushing and popping a rule based on zero width matches at the same index
       // leads to an infinite loop. We bail on parsing if we detect that case here.
-      if (zeroWidthMatch && _.last(stack).zeroWidthMatch && _.last(stack).rule.anchorPosition === captureIndices[0].end) {
+      if (zeroWidthMatch && stack[stack.length - 1].zeroWidthMatch && stack[stack.length - 1].rule.anchorPosition === captureIndices[0].end) {
         return false
       }
 
-      const {contentScopeName} = _.last(stack)
+      const {contentScopeName} = stack[stack.length - 1]
       if (contentScopeName) { tags.push(this.grammar.endIdForScope(contentScopeName)) }
     } else if (this.scopeName) {
       scopeName = this.resolveScopeName(this.scopeName, line, captureIndices)
@@ -189,7 +187,7 @@ export default class Pattern {
     }
 
     if (this.captures) {
-      tags.push(...this.tagsForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack))
+      tags.push(...this.tagsForCaptureIndices(line, captureIndices.slice(), captureIndices, stack))
     } else {
       const {start, end} = captureIndices[0]
       if (end !== start) { tags.push(end - start) }
