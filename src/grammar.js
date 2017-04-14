@@ -1,8 +1,6 @@
 import _ from 'underscore-plus'
 import {OnigRegExp} from 'oniguruma'
 import {Emitter} from 'event-kit'
-import Grim from 'grim'
-import {Emitter as EmitterMixin} from 'emissary'
 
 import Injections from './injections'
 import Pattern from './pattern'
@@ -271,7 +269,6 @@ export default class Grammar {
     if (!_.include(this.includedGrammarScopes, scopeName)) { return false }
     this.clearRules()
     this.registry.grammarUpdated(this.scopeName)
-    if (Grim.includeDeprecatedAPIs) { this.emit('grammar-updated') }
     this.emitter.emit('did-update')
     return true
   }
@@ -303,20 +300,6 @@ export default class Grammar {
     }
 
     return scopes
-  }
-}
-
-if (Grim.includeDeprecatedAPIs) {
-  EmitterMixin.includeInto(Grammar)
-
-  Grammar.prototype.on = function (eventName) {
-    if (eventName === 'did-update') {
-      Grim.deprecate('Call Grammar::onDidUpdate instead')
-    } else {
-      Grim.deprecate('Call explicit event subscription methods instead')
-    }
-
-    return EmitterMixin.prototype.on.apply(this, arguments)
   }
 }
 

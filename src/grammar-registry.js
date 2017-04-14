@@ -1,7 +1,6 @@
 import _ from 'underscore-plus'
 import CSON from 'season'
 import {Emitter, Disposable} from 'event-kit'
-import Grim from 'grim'
 
 import Grammar from './grammar'
 import NullGrammar from './null-grammar'
@@ -257,25 +256,5 @@ export default class GrammarRegistry {
     }
 
     return tokens
-  }
-}
-
-if (Grim.includeDeprecatedAPIs) {
-  const EmitterMixin = require('emissary').Emitter
-  EmitterMixin.includeInto(GrammarRegistry)
-
-  GrammarRegistry.prototype.on = function (eventName) {
-    switch (eventName) {
-      case 'grammar-added':
-        Grim.deprecate('Call GrammarRegistry::onDidAddGrammar instead')
-        break
-      case 'grammar-updated':
-        Grim.deprecate('Call GrammarRegistry::onDidUpdateGrammar instead')
-        break
-      default:
-        Grim.deprecate('Call explicit event subscription methods instead')
-    }
-
-    return EmitterMixin.prototype.on.apply(this, arguments)
   }
 }
