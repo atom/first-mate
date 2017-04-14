@@ -3,12 +3,12 @@ import ScopeSelectorParser from './scope-selector-parser'
 export default class ScopeSelector {
   // Create a new scope selector.
   //
-  // source - A {String} to parse as a scope selector.
+  // * `source` A {String} to parse as a scope selector.
   constructor (source) { this.matcher = ScopeSelectorParser.parse(source) }
 
   // Check if this scope selector matches the scopes.
   //
-  // scopes - An {Array} of {String}s or a single {String}.
+  // * `scopes` An {Array} of {String}s or a single {String}.
   //
   // Returns a {Boolean}.
   matches (scopes) {
@@ -18,7 +18,7 @@ export default class ScopeSelector {
 
   // Gets the prefix of this scope selector.
   //
-  // scopes - An {Array} of {String}s or a single {String}.
+  // * `scopes` An {Array} of {String}s or a single {String}.
   //
   // Returns a {String} if there is a prefix or undefined otherwise.
   getPrefix (scopes) {
