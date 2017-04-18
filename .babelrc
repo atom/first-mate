@@ -2,6 +2,7 @@
   "sourceMaps": "inline",
   "plugins": [
     "babel-plugin-add-module-exports",
+    "babel-plugin-transform-es2015-classes",
     "transform-es2015-modules-commonjs"
   ]
 }
