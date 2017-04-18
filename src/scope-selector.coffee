@@ -1,4 +1,4 @@
-ScopeSelectorParser = require './scope-selector-parser'
+ScopeSelectorParser = require '../lib/scope-selector-parser'
 
 module.exports =
 class ScopeSelector
