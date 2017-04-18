@@ -1,6 +1,6 @@
 path = require 'path'
 fs = require 'fs-plus'
-GrammarRegistry = require '../lib/grammar-registry'
+GrammarRegistry = require '../src/grammar-registry'
 
 registry = new GrammarRegistry()
 jsGrammar = registry.loadGrammarSync(path.resolve(__dirname, '..', 'spec', 'fixtures', 'javascript.json'))
@@ -10,10 +10,11 @@ cssGrammar.maxTokensPerLine = Infinity
 
 tokenize = (grammar, content, lineCount) ->
   start = Date.now()
-  {tags} = grammar.tokenizeLines(content)
+  tokenizedLines = grammar.tokenizeLines(content, false)
   duration = Date.now() - start
   tokenCount = 0
-  tokenCount++ for tag in tags when tag >= 0
+  for tokenizedLine in tokenizedLines
+    tokenCount += tokenizedLine.length
   tokensPerMillisecond = Math.round(tokenCount / duration)
   console.log "Generated #{tokenCount} tokens for #{lineCount} lines in #{duration}ms (#{tokensPerMillisecond} tokens/ms)"
 

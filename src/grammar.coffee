@@ -68,13 +68,13 @@ class Grammar
   # * `text` A {String} containing one or more lines.
   #
   # Returns an {Array} of token arrays for each line tokenized.
-  tokenizeLines: (text) ->
+  tokenizeLines: (text, compatibilityMode=true) ->
     lines = text.split('\n')
     ruleStack = null
 
     scopes = []
     for line, lineNumber in lines
-      {tags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
+      {tags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0, compatibilityMode)
       @registry.decodeTokens(line, tags, scopes)
 
   # Public: Tokenize the line of text.
