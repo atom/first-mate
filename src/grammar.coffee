@@ -2,7 +2,7 @@ path = require 'path'
 
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
-{OnigRegExp} = require 'oniguruma'
+{OnigRegExp, OnigString} = require 'oniguruma'
 {Emitter} = require 'event-kit'
 Grim = require 'grim'
 
@@ -108,6 +108,8 @@ class Grammar
     else
       line = inputLine
 
+    string = new OnigString(line + '\n')
+
     if ruleStack?
       ruleStack = ruleStack.slice()
       if compatibilityMode
@@ -137,7 +139,7 @@ class Grammar
         truncatedLine = true
         break
 
-      if match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)
+      if match = _.last(ruleStack).rule.getNextTags(ruleStack, string, position, firstLine)
         {nextTags, tagsStart, tagsEnd} = match
 
         # Unmatched text before next tags

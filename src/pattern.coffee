@@ -83,7 +83,7 @@ class Pattern
     beginCaptures = []
 
     for {start, end} in beginCaptureIndices
-      beginCaptures.push(line[start...end])
+      beginCaptures.push(line.substring(start, end))
 
     resolvedMatch = @match.replace AllDigitsRegex, (match) ->
       index = parseInt(match[1..])
