@@ -1,8 +1,8 @@
 path = require 'path'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
-GrammarRegistry = require '../lib/grammar-registry'
-Grammar = require '../lib/grammar'
+GrammarRegistry = require '../src/grammar-registry'
+Grammar = require '../src/grammar'
 
 describe "Grammar tokenization", ->
   [grammar, registry] = []

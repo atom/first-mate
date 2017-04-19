@@ -2,7 +2,7 @@ path = require 'path'
 
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
-{OnigRegExp} = require 'oniguruma'
+{OnigRegExp, OnigString} = require 'oniguruma'
 {Emitter} = require 'event-kit'
 Grim = require 'grim'
 
@@ -68,13 +68,13 @@ class Grammar
   # * `text` A {String} containing one or more lines.
   #
   # Returns an {Array} of token arrays for each line tokenized.
-  tokenizeLines: (text) ->
+  tokenizeLines: (text, compatibilityMode=true) ->
     lines = text.split('\n')
     ruleStack = null
 
     scopes = []
     for line, lineNumber in lines
-      {tags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0)
+      {tags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0, compatibilityMode)
       @registry.decodeTokens(line, tags, scopes)
 
   # Public: Tokenize the line of text.
@@ -108,6 +108,8 @@ class Grammar
     else
       line = inputLine
 
+    string = new OnigString(line + '\n')
+
     if ruleStack?
       ruleStack = ruleStack.slice()
       if compatibilityMode
@@ -137,7 +139,7 @@ class Grammar
         truncatedLine = true
         break
 
-      if match = _.last(ruleStack).rule.getNextTags(ruleStack, line, position, firstLine)
+      if match = _.last(ruleStack).rule.getNextTags(ruleStack, string, position, firstLine)
         {nextTags, tagsStart, tagsEnd} = match
 
         # Unmatched text before next tags

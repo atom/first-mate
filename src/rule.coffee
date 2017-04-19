@@ -52,8 +52,7 @@ class Rule
       capture.start = Math.min(capture.start, lineLength)
     return
 
-  findNextMatch: (ruleStack, line, position, firstLine) ->
-    lineWithNewline = "#{line}\n"
+  findNextMatch: (ruleStack, lineWithNewline, position, firstLine) ->
     baseGrammar = ruleStack[0].rule.grammar
     results = []
 
