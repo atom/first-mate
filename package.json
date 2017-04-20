@@ -8,7 +8,7 @@
     "build": "babel src --out-dir lib && pegjs -o lib/scope-selector-parser.js src/scope-selector-parser.pegjs",
     "clean": "node script/clean.js",
     "lint": "standard",
-    "test": "npm run lint && npm run build && mocha --compilers js:babel-core/register spec/",
+    "test": "npm run build && npm run lint && npm run benchmark && mocha --compilers js:babel-core/register spec/",
     "prepublish": "npm run clean && npm run build && npm run lint && npm run atomdoc",
     "benchmark": "node benchmark/benchmark.js"
   },
