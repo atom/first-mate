@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const joanna = require('joanna')
 const tello = require('tello')
 const glob = require('glob')
