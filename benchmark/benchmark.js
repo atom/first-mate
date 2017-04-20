@@ -19,7 +19,7 @@ function tokenize (grammar, content, lineCount) {
     tokenCount += tokenizedLine.length
   }
   const tokensPerMillisecond = Math.round(tokenCount / duration)
-  console.log(`Generated #{tokenCount} tokens for ${lineCount} lines in ${duration}ms (${tokensPerMillisecond} tokens/ms)`)
+  console.log(`Generated ${tokenCount} tokens for ${lineCount} lines in ${duration}ms (${tokensPerMillisecond} tokens/ms)`)
 };
 
 function tokenizeFile (filePath, grammar, message) {
