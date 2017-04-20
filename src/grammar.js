@@ -1,4 +1,4 @@
-import {OnigRegExp} from 'oniguruma'
+import {OnigRegExp, OnigString} from 'oniguruma'
 import {Emitter} from 'event-kit'
 
 import Injections from './injections'
@@ -66,13 +66,13 @@ export default class Grammar {
   // * `text` A {String} containing one or more lines.
   //
   // Returns an {Array} of token arrays for each line tokenized.
-  tokenizeLines (text) {
+  tokenizeLines (text, compatibilityMode = true) {
     const lines = text.split('\n')
     let tags, ruleStack
 
     const scopes = []
     return lines.map((line, lineNumber) => {
-      ({tags, ruleStack} = this.tokenizeLine(line, ruleStack, lineNumber === 0))
+      ({tags, ruleStack} = this.tokenizeLine(line, ruleStack, lineNumber === 0, compatibilityMode))
       return this.registry.decodeTokens(line, tags, scopes)
     })
   }
@@ -110,6 +110,8 @@ export default class Grammar {
       line = inputLine
     }
 
+    const string = new OnigString(`${line}\n`)
+
     if (ruleStack) {
       ruleStack = ruleStack.slice()
       if (compatibilityMode) {
@@ -143,7 +145,7 @@ export default class Grammar {
         break
       }
 
-      const match = ruleStack[ruleStack.length - 1].rule.getNextTags(ruleStack, line, position, firstLine)
+      const match = ruleStack[ruleStack.length - 1].rule.getNextTags(ruleStack, string, position, firstLine)
       if (match) {
         const {nextTags, tagsStart, tagsEnd} = match
 

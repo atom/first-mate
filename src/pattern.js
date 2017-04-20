@@ -102,7 +102,7 @@ export default class Pattern {
     const beginCaptures = []
 
     for (let {start, end} of beginCaptureIndices) {
-      beginCaptures.push(line.slice(start, end))
+      beginCaptures.push(line.substring(start, end))
     }
 
     const resolvedMatch = this.match.replace(AllDigitsRegex, function (match) {

@@ -68,8 +68,7 @@ export default class Rule {
     }
   }
 
-  findNextMatch (ruleStack, line, position, firstLine) {
-    const lineWithNewline = `${line}\n`
+  findNextMatch (ruleStack, lineWithNewline, position, firstLine) {
     const baseGrammar = ruleStack[0].rule.grammar
     const results = []
 

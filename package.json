@@ -1,6 +1,6 @@
 {
   "name": "first-mate",
-  "version": "7.0.2",
+  "version": "7.0.4",
   "description": "TextMate helpers",
   "main": "./lib/first-mate.js",
   "scripts": {
@@ -23,7 +23,7 @@
   "homepage": "http://atom.github.io/first-mate",
   "dependencies": {
     "event-kit": "^2.3.0",
-    "oniguruma": "^6.1.1",
+    "oniguruma": "^6.2.1",
     "season": "^6.0.0"
   },
   "devDependencies": {

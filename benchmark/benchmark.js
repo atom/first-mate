@@ -10,15 +10,14 @@ cssGrammar.maxTokensPerLine = Infinity
 
 function tokenize (grammar, content, lineCount) {
   const start = Date.now()
-  grammar.tokenizeLines(content)
-  console.log(Date.now() - start)
-  // const start = Date.now();
-  // const {tags} = grammar.tokenizeLines(content);
-  // const duration = Date.now() - start;
-  // let tokenCount = 0;
-  // for (let tag of tags) { if (tag >= 0) { tokenCount++; } }
-  // const tokensPerMillisecond = Math.round(tokenCount / duration);
-  // console.log(`Generated ${tokenCount} tokens for ${lineCount} lines in ${duration}ms (${tokensPerMillisecond} tokens/ms)`);
+  const tokenizedLines = grammar.tokenizeLines(content, false)
+  const duration = Date.now() - start
+  let tokenCount = 0
+  for (let tokenizedLine of tokenizedLines) {
+    tokenCount += tokenizedLine.length
+  }
+  const tokensPerMillisecond = Math.round(tokenCount / duration)
+  console.log(`Generated #{tokenCount} tokens for ${lineCount} lines in ${duration}ms (${tokensPerMillisecond} tokens/ms)`)
 };
 
 function tokenizeFile (filePath, grammar, message) {
