@@ -159,8 +159,10 @@ class Pattern
       ruleToPush = @pushRule.getRuleToPush(line, captureIndices)
       ruleToPush.anchorPosition = captureIndices[0].end
       {contentScopeName} = ruleToPush
+      if contentScopeName
+        contentScopeName = @resolveScopeName(contentScopeName, line, captureIndices)
+        tags.push(@grammar.startIdForScope(contentScopeName))
       stack.push({rule: ruleToPush, scopeName, contentScopeName, zeroWidthMatch})
-      tags.push(@grammar.startIdForScope(contentScopeName)) if contentScopeName
     else
       {scopeName} = stack.pop() if @popRule
       tags.push(@grammar.endIdForScope(scopeName)) if scopeName

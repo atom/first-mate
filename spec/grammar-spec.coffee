@@ -709,6 +709,16 @@ describe "Grammar tokenization", ->
         expect(tokens[0].value).toEqual "a b"
         expect(tokens[0].scopes).toEqual ["scope-names-with-placeholders", "a.b"]
 
+        {line, tags} = grammar.tokenizeLine("c d - e")
+        tokens = registry.decodeTokens(line, tags)
+        expect(tokens.length).toBe 3
+        expect(tokens[0].value).toEqual "c d"
+        expect(tokens[0].scopes).toEqual ["scope-names-with-placeholders"]
+        expect(tokens[1].value).toEqual " - "
+        expect(tokens[1].scopes).toEqual ["scope-names-with-placeholders", "c.d"]
+        expect(tokens[2].value).toEqual "e"
+        expect(tokens[2].scopes).toEqual ["scope-names-with-placeholders"]
+
   describe "language-specific integration tests", ->
     lines = null
 
