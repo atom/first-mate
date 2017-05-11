@@ -33,13 +33,19 @@ class ScopeMatcher
     @segments.push(segment[1]) for segment in others
 
   matches: (scope) ->
-    scopeSegments = scope.split('.')
-    return false if scopeSegments.length < @segments.length
+    lastDotIndex = 0
+    for matcherSegment, matcherSegmentIndex in @segments
+      break if lastDotIndex > scope.length
 
-    for segment, index in @segments
-      return false unless segment.matches(scopeSegments[index])
+      nextDotIndex = scope.indexOf('.', lastDotIndex)
+      nextDotIndex = scope.length if nextDotIndex is -1
 
-    true
+      scopeSegment = scope.substring(lastDotIndex, nextDotIndex)
+      return false unless matcherSegment.matches(scopeSegment)
+
+      lastDotIndex = nextDotIndex + 1
+
+    matcherSegmentIndex is @segments.length
 
   getPrefix: (scope) ->
     scopeSegments = scope.split('.')
