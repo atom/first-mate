@@ -150,7 +150,7 @@ class Pattern
       tags.push(@grammar.startIdForScope(scopeName))
 
     if @captures
-      tags.push(@tagsForCaptureIndices(line, _.clone(captureIndices), captureIndices, stack)...)
+      tags.push(@tagsForCaptureIndices(line, captureIndices.slice(), captureIndices, stack)...)
     else
       {start, end} = captureIndices[0]
       tags.push(end - start) unless end is start
