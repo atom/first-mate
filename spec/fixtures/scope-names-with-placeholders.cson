@@ -5,4 +5,9 @@ patterns: [
     match: '(a) (b)'
     name: '$1.$2'
   }
+  {
+    begin: '(c) (d)'
+    end: 'e'
+    contentName: '$1.$2'
+  }
 ]
