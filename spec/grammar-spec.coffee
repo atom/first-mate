@@ -204,11 +204,9 @@ describe "Grammar tokenization", ->
         expect(lines[1][0].value).toEqual "test"
         expect(lines[1][0].scopes).toEqual ["source.test", "pre", "nested"]
 
-        expect(lines[2].length).toBe 2
+        expect(lines[2].length).toBe 1
         expect(lines[2][0].value).toEqual "#endif"
         expect(lines[2][0].scopes).toEqual ["source.test", "pre"]
-        expect(lines[2][1].value).toEqual ""
-        expect(lines[2][1].scopes).toEqual ["source.test", "all"]
 
         {line, tags} = grammar.tokenizeLine "test"
         tokens = registry.decodeTokens(line, tags)
@@ -420,6 +418,18 @@ describe "Grammar tokenization", ->
             expect(tokens[9]).toEqual value: '<%=', scopes: ["text.html.ruby","source.ruby.rails.embedded.html","punctuation.section.embedded.ruby"]
             expect(tokens[10]).toEqual value: ' ', scopes: ["text.html.ruby","source.ruby.rails.embedded.html"]
 
+      describe "when the end pattern matches a newline", ->
+        it "does not return a positive tag corresponding to the matched newline character", ->
+          grammar = registry.grammarForScopeName('source.coffee')
+          line = "# a"
+          {tags} = grammar.tokenizeLine(line)
+
+          sumOfPositiveTags = 0
+          for tag in tags
+            sumOfPositiveTags += tag if tag > 0
+
+          expect(sumOfPositiveTags).toBe line.length
+
     it "can parse a grammar with newline characters in its regular expressions (regression)", ->
       grammar = loadGrammarSync('imaginary.cson')
       {line, tags, ruleStack} = grammar.tokenizeLine("// a singleLineComment")
@@ -427,10 +437,9 @@ describe "Grammar tokenization", ->
       expect(ruleStack.length).toBe 1
       expect(ruleStack[0].scopeName).toBe "source.imaginaryLanguage"
 
-      expect(tokens.length).toBe 3
+      expect(tokens.length).toBe 2
       expect(tokens[0].value).toBe "//"
       expect(tokens[1].value).toBe " a singleLineComment"
-      expect(tokens[2].value).toBe ""
 
     it "can parse multiline text using a grammar containing patterns with newlines", ->
       grammar = loadGrammarSync('multiline.cson')
