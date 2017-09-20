@@ -933,7 +933,7 @@ describe "Grammar tokenization", ->
     describe "HTML", ->
       describe "when it contains CSS", ->
         it "correctly parses the CSS rules", ->
-          loadGrammarSync("css.json")
+          loadGrammarSync("css.cson")
           grammar = registry.grammarForScopeName("text.html.basic")
 
           lines = grammar.tokenizeLines """
@@ -956,6 +956,33 @@ describe "Grammar tokenization", ->
             "meta.property-list.css"
             "meta.property-value.css"
             "support.constant.color.w3c-standard-color-name.css"
+          ]
+
+      describe "when it contains inline CSS", ->
+        it "correctly stops parsing CSS", ->
+          loadGrammarSync('css.cson')
+          loadGrammarSync('html-css-inline.cson')
+          grammar = registry.grammarForScopeName('text.html.basic.css')
+
+          {tokens} = grammar.tokenizeLine "<span style='s:'></style>"
+          expect(tokens[8]).toEqual value: "'", scopes: [
+            'text.html.basic.css'
+            'meta.tag.inline.any.html'
+            'meta.attribute-with-value.style.html'
+            'string.quoted.single.html'
+            'punctuation.definition.string.end.html'
+          ]
+
+          expect(tokens[9]).toEqual value: ">", scopes: [
+            'text.html.basic.css'
+            'meta.tag.inline.any.html'
+            'punctuation.definition.tag.end.html'
+          ]
+
+          expect(tokens[10]).toEqual value: "</", scopes: [
+            'text.html.basic.css'
+            'meta.tag.inline.any.html'
+            'punctuation.definition.tag.begin.html'
           ]
 
     describe "Latex", ->
