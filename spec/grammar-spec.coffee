@@ -979,7 +979,7 @@ describe "Grammar tokenization", ->
             'punctuation.definition.tag.end.html'
           ]
 
-          expect(tokens[10]).toEqual value: "<", scopes: [
+          expect(tokens[10]).toEqual value: "</", scopes: [
             'text.html.basic.css'
             'meta.tag.inline.any.html'
             'punctuation.definition.tag.begin.html'
