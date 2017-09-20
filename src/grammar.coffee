@@ -70,11 +70,12 @@ class Grammar
   # Returns an {Array} of token arrays for each line tokenized.
   tokenizeLines: (text, compatibilityMode=true) ->
     lines = text.split('\n')
+    lastLine = lines.length - 1
     ruleStack = null
 
     scopes = []
     for line, lineNumber in lines
-      {tags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0, compatibilityMode)
+      {tags, ruleStack} = @tokenizeLine(line, ruleStack, lineNumber is 0, compatibilityMode, lineNumber isnt lastLine)
       @registry.decodeTokens(line, tags, scopes)
 
   # Public: Tokenize the line of text.
@@ -98,7 +99,7 @@ class Grammar
   # * `ruleStack` An {Array} of rules representing the tokenized state at the
   #   end of the line. These should be passed back into this method when
   #   tokenizing the next line in the file.
-  tokenizeLine: (inputLine, ruleStack, firstLine=false, compatibilityMode=true) ->
+  tokenizeLine: (inputLine, ruleStack, firstLine=false, compatibilityMode=true, withNewLine=true) ->
     tags = []
 
     truncatedLine = false
@@ -108,7 +109,8 @@ class Grammar
     else
       line = inputLine
 
-    string = new OnigString(line + '\n')
+    string = new OnigString(line)
+    stringWithNewLine = if withNewLine then new OnigString(line + '\n') else string
 
     if ruleStack?
       ruleStack = ruleStack.slice()
@@ -133,13 +135,13 @@ class Grammar
       previousRuleStackLength = ruleStack.length
       previousPosition = position
 
-      break if position is line.length + 1 # include trailing newline position
+      break if position is stringWithNewLine.length
 
       if tokenCount >= @getMaxTokensPerLine() - 1
         truncatedLine = true
         break
 
-      if match = _.last(ruleStack).rule.getNextTags(ruleStack, string, position, firstLine)
+      if match = _.last(ruleStack).rule.getNextTags(ruleStack, string, stringWithNewLine, position, firstLine)
         {nextTags, tagsStart, tagsEnd} = match
 
         # Unmatched text before next tags

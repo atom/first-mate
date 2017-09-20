@@ -171,7 +171,7 @@ class Pattern
 
   tagsForCaptureRule: (rule, line, captureStart, captureEnd, stack) ->
     captureText = line.substring(captureStart, captureEnd)
-    {tags} = rule.grammar.tokenizeLine(captureText, [stack..., {rule}])
+    {tags} = rule.grammar.tokenizeLine(captureText, [stack..., {rule}], false, true, false)
 
     # only accept non empty tokens that don't exceed the capture end
     openScopes = []

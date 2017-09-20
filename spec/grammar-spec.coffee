@@ -204,11 +204,9 @@ describe "Grammar tokenization", ->
         expect(lines[1][0].value).toEqual "test"
         expect(lines[1][0].scopes).toEqual ["source.test", "pre", "nested"]
 
-        expect(lines[2].length).toBe 2
+        expect(lines[2].length).toBe 1
         expect(lines[2][0].value).toEqual "#endif"
         expect(lines[2][0].scopes).toEqual ["source.test", "pre"]
-        expect(lines[2][1].value).toEqual ""
-        expect(lines[2][1].scopes).toEqual ["source.test", "all"]
 
         {line, tags} = grammar.tokenizeLine "test"
         tokens = registry.decodeTokens(line, tags)
@@ -466,6 +464,22 @@ describe "Grammar tokenization", ->
       grammar = registry.grammarForScopeName('source.js')
       {line, tags, ruleStack} = grammar.tokenizeLine("// line comment")
       {line, tags, ruleStack} = grammar.tokenizeLine(" // second line comment with a single leading space", ruleStack)
+
+    it "can parse a grammar that captures the same text multiple times (regression)", ->
+      grammar = loadGrammarSync('captures-patterns.cson')
+      lines = grammar.tokenizeLines('abc')
+      expect(lines.length).toBe 1
+      expect(lines[0].length).toBe 3
+      expect(lines[0][0]).toEqual value: 'a', scopes: ['abcabx', 'abc']
+      expect(lines[0][1]).toEqual value: 'b', scopes: ['abcabx', 'abc', 'b']
+      expect(lines[0][2]).toEqual value: 'c', scopes: ['abcabx', 'abc']
+
+      lines = grammar.tokenizeLines('abx')
+      expect(lines.length).toBe 1
+      expect(lines[0].length).toBe 3
+      expect(lines[0][0]).toEqual value: 'a', scopes: ['abcabx', 'abx']
+      expect(lines[0][1]).toEqual value: 'b', scopes: ['abcabx', 'abx', 'up-to-x-outer', 'up-to-x-inner']
+      expect(lines[0][2]).toEqual value: 'x', scopes: ['abcabx', 'abx']
 
     describe "when inside a C block", ->
       beforeEach ->
