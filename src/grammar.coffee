@@ -99,7 +99,7 @@ class Grammar
   # * `ruleStack` An {Array} of rules representing the tokenized state at the
   #   end of the line. These should be passed back into this method when
   #   tokenizing the next line in the file.
-  tokenizeLine: (inputLine, ruleStack, firstLine=false, compatibilityMode=true, withNewLine=true) ->
+  tokenizeLine: (inputLine, ruleStack, firstLine=false, compatibilityMode=true, appendNewLine=true) ->
     tags = []
 
     truncatedLine = false
@@ -110,7 +110,7 @@ class Grammar
       line = inputLine
 
     string = new OnigString(line)
-    stringWithNewLine = if withNewLine then new OnigString(line + '\n') else string
+    stringWithNewLine = if appendNewLine then new OnigString(line + '\n') else string
 
     if ruleStack?
       ruleStack = ruleStack.slice()
