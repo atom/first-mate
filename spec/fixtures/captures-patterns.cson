@@ -1,0 +1,35 @@
+'scopeName': 'abcabx'
+'patterns': [
+    {
+      'match': 'a(.+)c'
+      'captures':
+        '1':
+          'patterns':[
+            {
+              'match': '[^c]+'
+              'name': 'b'
+            }
+          ]
+      'name': 'abc'
+    },
+    {
+      'match': 'a(.+)x'
+      'captures':
+        '1':
+          'patterns':[
+            {
+              'match': '[^x]+'
+              'name': 'up-to-x-outer'
+              'captures':
+                '0':
+                  'patterns':[
+                    {
+                      'match': '.+'
+                      'name': 'up-to-x-inner'
+                    }
+                  ]
+            }
+          ]
+      'name': 'abx'
+    }
+]

@@ -96,8 +96,8 @@ class Rule
       @normalizeCaptureIndices(lineWithNewline, result.captureIndices)
       result
 
-  getNextTags: (ruleStack, line, position, firstLine) ->
-    result = @findNextMatch(ruleStack, line, position, firstLine)
+  getNextTags: (ruleStack, line, lineWithNewline, position, firstLine) ->
+    result = @findNextMatch(ruleStack, lineWithNewline, position, firstLine)
     return null unless result?
 
     {index, captureIndices, scanner} = result
