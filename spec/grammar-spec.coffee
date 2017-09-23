@@ -57,6 +57,13 @@ describe "Grammar tokenization", ->
       expect(tokens[3].value).toBe '!'
       expect(tokens[3].scopes).toEqual ['source.hello', 'suffix.hello', 'emphasis.hello']
 
+  describe '::tokenizeLines(text)', ->
+    describe 'when the text is empty', ->
+      it 'returns a single line with a single token which has the global scope', ->
+        grammar = registry.grammarForScopeName('source.coffee')
+        lines = grammar.tokenizeLines('')
+        expect(lines).toEqual [[{value: '',  scopes: ['source.coffee']}]]
+
   describe "::tokenizeLine(line, ruleStack)", ->
     describe "when the entire line matches a single pattern with no capture groups", ->
       it "returns a single token with the correct scope", ->

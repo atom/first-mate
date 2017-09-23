@@ -135,7 +135,7 @@ class Grammar
       previousRuleStackLength = ruleStack.length
       previousPosition = position
 
-      break if position is stringWithNewLine.length
+      break if position > line.length
 
       if tokenCount >= @getMaxTokensPerLine() - 1
         truncatedLine = true
