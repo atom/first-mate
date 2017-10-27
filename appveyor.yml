@@ -14,4 +14,8 @@ test_script:
   - npm --version
   - npm test
 
+branches:
+  only:
+    - master
+
 build: off
