@@ -49,6 +49,15 @@ class GrammarRegistry
   onDidUpdateGrammar: (callback) ->
     @emitter.on 'did-update-grammar', callback
 
+  # Public: Invoke the given callback when a grammar is removed from the registry.
+  #
+  # * `callback` {Function} to call when a grammar is removed.
+  #   * `grammar` {Grammar} that was removed.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidRemoveGrammar: (callback) ->
+    @emitter.on 'did-remove-grammar', callback
+
   ###
   Section: Managing Grammars
   ###
@@ -90,6 +99,7 @@ class GrammarRegistry
     delete @grammarsByScopeName[grammar.scopeName]
     _.remove(@injectionGrammars, grammar)
     @grammarUpdated(grammar.scopeName)
+    @emitter.emit 'did-remove-grammar', grammar
     undefined
 
   # Public: Remove the grammar with the given scope name.
