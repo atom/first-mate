@@ -43,8 +43,11 @@ class Grammar
     @fileTypes ?= []
     @includedGrammarScopes = []
 
-    # Create last since Injections uses APIs from this class
-    @injections = new Injections(this, injections)
+    @initialInjections = injections
+    grammar = this
+    @registry.onDidUpdateGrammar -> grammar.recalculateInjections()
+    @registry.onDidAddGrammar -> grammar.recalculateInjections()
+    @registry.onDidRemoveGrammar -> grammar.recalculateInjections()
 
   ###
   Section: Event Subscription
@@ -267,6 +270,9 @@ class Grammar
       scopes.pop()
 
     scopes
+
+  recalculateInjections: ->
+    @injections = new Injections(this, @initialInjections) if @initialInjections
 
 if Grim.includeDeprecatedAPIs
   EmitterMixin = require('emissary').Emitter
