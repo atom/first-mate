@@ -44,10 +44,9 @@ class Grammar
     @includedGrammarScopes = []
 
     @initialInjections = injections
-    grammar = this
-    @registry.onDidUpdateGrammar -> grammar.recalculateInjections()
-    @registry.onDidAddGrammar -> grammar.recalculateInjections()
-    @registry.onDidRemoveGrammar -> grammar.recalculateInjections()
+    @registry.onDidUpdateGrammar => @recalculateInjections()
+    @registry.onDidAddGrammar => @recalculateInjections()
+    @registry.onDidRemoveGrammar => @recalculateInjections()
 
   ###
   Section: Event Subscription
