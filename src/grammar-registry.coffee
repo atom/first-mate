@@ -37,7 +37,7 @@ class GrammarRegistry
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddGrammar: (callback) ->
-    @emitter?.on 'did-add-grammar', callback
+    @emitter.on 'did-add-grammar', callback
 
   # Public: Invoke the given callback when a grammar is updated due to a grammar
   # it depends on being added or removed from the registry.
@@ -47,7 +47,7 @@ class GrammarRegistry
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidUpdateGrammar: (callback) ->
-    @emitter?.on 'did-update-grammar', callback
+    @emitter.on 'did-update-grammar', callback
 
   # Public: Invoke the given callback when a grammar is removed from the registry.
   #
@@ -56,7 +56,7 @@ class GrammarRegistry
   #
   # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidRemoveGrammar: (callback) ->
-    @emitter?.on 'did-remove-grammar', callback
+    @emitter.on 'did-remove-grammar', callback
 
   ###
   Section: Managing Grammars
