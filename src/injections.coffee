@@ -13,7 +13,7 @@ class Injections
       patterns = []
       for regex in values.patterns
         pattern = @grammar.createPattern(regex)
-        patterns.push(pattern.getIncludedPatterns(grammar, patterns)...)
+        patterns.push(pattern.getIncludedPatterns(@grammar, patterns)...)
       @injections.push
         selector: new ScopeSelector(selector)
         patterns: patterns
