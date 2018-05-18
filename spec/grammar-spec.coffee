@@ -595,6 +595,26 @@ describe "Grammar tokenization", ->
         expect(tokens[17].value).toBe "div"
         expect(tokens[17].scopes).toEqual ["text.html.php", "meta.tag.block.any.html", "entity.name.tag.block.any.html"]
 
+      it "updates injections when grammars that the injection patterns use are updated", ->
+        loadGrammarSync('sql-injection.cson')
+        grammar = registry.grammarForScopeName('source.sql-injection')
+        grammarUpdatedHandler = jasmine.createSpy("grammarUpdatedHandler")
+        grammar.onDidUpdate grammarUpdatedHandler
+
+        # At this point, the SQL grammar has not yet been loaded
+        {line, tags} = grammar.tokenizeLine('"SELECT something"')
+        tokens = registry.decodeTokens(line, tags)
+
+        expect(tokens[1]).toEqual value: 'SELECT something', scopes: ['source.sql-injection', 'string', 'meta.embedded.sql']
+
+        # But now it has
+        loadGrammarSync('sql.json')
+        expect(grammarUpdatedHandler).toHaveBeenCalled()
+        {line, tags} = grammar.tokenizeLine('"SELECT something"')
+        tokens = registry.decodeTokens(line, tags)
+
+        expect(tokens[1]).toEqual value: 'SELECT', scopes: ['source.sql-injection', 'string', 'meta.embedded.sql', 'keyword.other.DML.sql']
+
       it "gives lower priority to them than other matches", ->
         loadGrammarSync('php2.json')
         grammar = registry.grammarForScopeName('text.html.php2')

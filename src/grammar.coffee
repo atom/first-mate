@@ -27,9 +27,6 @@ class Grammar
     @repository = null
     @initialRule = null
 
-    @rawPatterns = patterns
-    @rawRepository = repository
-
     if injectionSelector?
       @injectionSelector = new ScopeSelector(injectionSelector)
     else
@@ -43,8 +40,11 @@ class Grammar
     @fileTypes ?= []
     @includedGrammarScopes = []
 
-    # Create last since Injections uses APIs from this class
-    @injections = new Injections(this, injections)
+    @rawPatterns = patterns
+    @rawRepository = repository
+    @rawInjections = injections
+
+    @updateRules()
 
   ###
   Section: Event Subscription
@@ -121,11 +121,10 @@ class Grammar
           openScopeTags.push(@registry.startIdForScope(contentScopeName)) if contentScopeName
     else
       openScopeTags = [] if compatibilityMode
-      initialRule = @getInitialRule()
-      {scopeName, contentScopeName} = initialRule
-      ruleStack = [{rule: initialRule, scopeName, contentScopeName}]
-      tags.push(@startIdForScope(initialRule.scopeName)) if scopeName
-      tags.push(@startIdForScope(initialRule.contentScopeName)) if contentScopeName
+      {scopeName, contentScopeName} = @initialRule
+      ruleStack = [{rule: @initialRule, scopeName, contentScopeName}]
+      tags.push(@startIdForScope(@initialRule.scopeName)) if scopeName
+      tags.push(@startIdForScope(@initialRule.contentScopeName)) if contentScopeName
 
     initialRuleStackLength = ruleStack.length
     position = 0
@@ -215,27 +214,28 @@ class Grammar
     @registration?.dispose()
     @registration = null
 
-  clearRules: ->
-    @initialRule = null
-    @repository = null
+  updateRules: ->
+    @initialRule = @createRule({@scopeName, patterns: @rawPatterns})
+    @repository = @createRepository()
+    @injections = new Injections(this, @rawInjections)
 
-  getInitialRule: ->
-    @initialRule ?= @createRule({@scopeName, patterns: @rawPatterns})
+  getInitialRule: -> @initialRule
 
-  getRepository: ->
-    @repository ?= do =>
-      repository = {}
-      for name, data of @rawRepository
-        data = {patterns: [data], tempName: name} if data.begin? or data.match?
-        repository[name] = @createRule(data)
-      repository
+  getRepository: -> @repository
+
+  createRepository: ->
+    repository = {}
+    for name, data of @rawRepository
+      data = {patterns: [data], tempName: name} if data.begin? or data.match?
+      repository[name] = @createRule(data)
+    repository
 
   addIncludedGrammarScope: (scope) ->
     @includedGrammarScopes.push(scope) unless _.include(@includedGrammarScopes, scope)
 
   grammarUpdated: (scopeName) ->
     return false unless _.include(@includedGrammarScopes, scopeName)
-    @clearRules()
+    @updateRules()
     @registry.grammarUpdated(@scopeName)
     @emit 'grammar-updated' if Grim.includeDeprecatedAPIs
     @emitter.emit 'did-update'
