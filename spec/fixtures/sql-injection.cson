@@ -1,0 +1,16 @@
+'scopeName': 'source.sql-injection'
+'injections':
+  'source.sql-injection meta.embedded.sql':
+    'patterns': [
+      {
+        'include': 'source.sql'
+      }
+    ]
+'patterns': [
+  {
+    'begin': '"'
+    'end': '"'
+    'name': 'string'
+    'contentName': 'meta.embedded.sql'
+  }
+]
