@@ -21,7 +21,7 @@ class Grammar
 
   constructor: (@registry, options={}) ->
     {@name, @fileTypes, @scopeName, @foldingStopMarker, @maxTokensPerLine, @maxLineLength} = options
-    {injections, injectionSelector, patterns, repository, firstLineMatch} = options
+    {injections, injectionSelector, patterns, repository, firstLineMatch, contentRegex} = options
 
     @emitter = new Emitter
     @repository = null
@@ -36,6 +36,11 @@ class Grammar
       @firstLineRegex = new OnigRegExp(firstLineMatch)
     else
       @firstLineRegex = null
+      
+    if contentRegex
+      @contentRegex = new OnigRegExp(contentRegex)
+    else
+      @contentRegex = null
 
     @fileTypes ?= []
     @includedGrammarScopes = []
