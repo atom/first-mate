@@ -2,3 +2,4 @@ module.exports =
   ScopeSelector: require './scope-selector'
   GrammarRegistry: require './grammar-registry'
   Grammar: require './grammar'
+  OnigRegExp: require('oniguruma').OnigRegExp
