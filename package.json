@@ -22,20 +22,20 @@
     "event-kit": "^2.2.0",
     "fs-plus": "^3.0.0",
     "grim": "^2.0.1",
-    "oniguruma": "7.2.1",
+    "oniguruma": "^7.2.3",
     "season": "^6.0.2",
     "underscore-plus": "^1"
   },
   "devDependencies": {
-    "jasmine-focused": "^1",
-    "grunt-contrib-coffee": "~0.9.0",
-    "grunt-cli": "~0.1.8",
-    "grunt": "~0.4.1",
-    "grunt-shell": "~0.2.2",
-    "grunt-coffeelint": "0.0.6",
-    "rimraf": "~2.1.4",
     "coffee-script": "~1.7.0",
+    "grunt": "~0.4.1",
+    "grunt-atomdoc": "^1.0.0",
+    "grunt-cli": "~0.1.8",
+    "grunt-coffeelint": "0.0.6",
+    "grunt-contrib-coffee": "~0.9.0",
     "grunt-peg": "~1.1.0",
-    "grunt-atomdoc": "^1.0.0"
+    "grunt-shell": "~0.2.2",
+    "jasmine-focused": "^1",
+    "rimraf": "~2.1.4"
   }
 }
