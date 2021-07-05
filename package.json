@@ -5,7 +5,7 @@
   "main": "./lib/first-mate.js",
   "scripts": {
     "test": "grunt test",
-    "prepublish": "grunt prepublish",
+    "prepare": "grunt prepublish",
     "benchmark": "node_modules/.bin/coffee benchmark/benchmark.coffee"
   },
   "repository": {
