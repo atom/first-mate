@@ -123,7 +123,7 @@ class ChildMatcher
     @matchers.map((matcher) -> if matcher is ">" then matcher else matcher.toCssSelector()).join(' ')
 
   toCssSyntaxSelector: ->
-    @matchers.map((matcher) -> if matcher is ">" then matcher else matcher.toCssSelector()).join(' ')
+    @matchers.map((matcher) -> if matcher is ">" then matcher else matcher.toCssSyntaxSelector()).join(' ')
 
 class OrMatcher
   constructor: (@left, @right) ->
