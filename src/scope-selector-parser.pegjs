@@ -23,6 +23,10 @@ path
     return new matchers.PathMatcher(prefix, first, others);
   }
 
+  / prefix:([LRB]":")? parent:(scope _)+ ">" descendants:(_ scope)+ {
+    return new matchers.ChildMatcher(prefix, parent, issue);
+  }
+
 group
   = prefix:([LRB]":")? "(" _ selector:selector _ ")" {
     return new matchers.GroupMatcher(prefix, selector);

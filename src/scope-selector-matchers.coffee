@@ -96,6 +96,35 @@ class PathMatcher
   toCssSyntaxSelector: ->
     @matchers.map((matcher) -> matcher.toCssSyntaxSelector()).join(' ')
 
+class ChildMatcher
+  constructor: (prefix, parent, issue) ->
+    @prefix = prefix?[0]
+    @matchers = []
+    @matchers.push(matcher[0]) for matcher in parent
+    @matchers.push(">")
+    @matchers.push(matcher[1]) for matcher in issue
+
+  matches: (scopes) ->
+    index = 0
+    matcher = @matchers[index]
+    for scope in scopes
+      if matcher is ">"
+        matcher = @matchers[++index]
+        return false unless matcher.matches(scope)
+        matcher = @matchers[++index]
+      else
+        matcher = @matchers[++index] if matcher.matches(scope)
+      return true unless matcher?
+    false
+
+  getPrefix: (scopes) -> @prefix if @matches(scopes)
+
+  toCssSelector: ->
+    @matchers.map((matcher) -> if matcher is ">" then matcher else matcher.toCssSelector()).join(' ')
+
+  toCssSyntaxSelector: ->
+    @matchers.map((matcher) -> if matcher is ">" then matcher else matcher.toCssSelector()).join(' ')
+
 class OrMatcher
   constructor: (@left, @right) ->
 
