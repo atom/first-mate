@@ -97,12 +97,12 @@ class PathMatcher
     @matchers.map((matcher) -> matcher.toCssSyntaxSelector()).join(' ')
 
 class ChildMatcher
-  constructor: (prefix, parent, issue) ->
+  constructor: (prefix, ancestors, descendants) ->
     @prefix = prefix?[0]
     @matchers = []
-    @matchers.push(matcher[0]) for matcher in parent
+    @matchers.push(matcher[0]) for matcher in ancestors
     @matchers.push(">")
-    @matchers.push(matcher[1]) for matcher in issue
+    @matchers.push(matcher[1]) for matcher in descendants
 
   matches: (scopes) ->
     index = 0
