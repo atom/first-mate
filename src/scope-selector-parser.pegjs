@@ -19,12 +19,8 @@ scope
   }
 
 path
-  = prefix:([LRB]":")? first:scope others:(_ scope)* {
+  = prefix:([LRB]":")? first:scope others:(_ ">"? _ scope)* {
     return new matchers.PathMatcher(prefix, first, others);
-  }
-
-  / prefix:([LRB]":")? parent:(scope _)+ ">" descendants:(_ scope)+ {
-    return new matchers.ChildMatcher(prefix, parent, issue);
   }
 
 group

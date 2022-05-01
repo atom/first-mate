@@ -78,52 +78,33 @@ class PathMatcher
   constructor: (prefix, first, others) ->
     @prefix = prefix?[0]
     @matchers = [first]
-    @matchers.push(matcher[1]) for matcher in others
+    @children = [false]
+    for matcher in others
+      @children.push(matcher[1]?)
+      @matchers.push(matcher[3])
 
   matches: (scopes) ->
     index = 0
     matcher = @matchers[index]
     for scope in scopes
-      matcher = @matchers[++index] if matcher.matches(scope)
-      return true unless matcher?
-    false
-
-  getPrefix: (scopes) -> @prefix if @matches(scopes)
-
-  toCssSelector: ->
-    @matchers.map((matcher) -> matcher.toCssSelector()).join(' ')
-
-  toCssSyntaxSelector: ->
-    @matchers.map((matcher) -> matcher.toCssSyntaxSelector()).join(' ')
-
-class ChildMatcher
-  constructor: (prefix, ancestors, descendants) ->
-    @prefix = prefix?[0]
-    @matchers = []
-    @matchers.push(matcher[0]) for matcher in ancestors
-    @matchers.push(">")
-    @matchers.push(matcher[1]) for matcher in descendants
-
-  matches: (scopes) ->
-    index = 0
-    matcher = @matchers[index]
-    for scope in scopes
-      if matcher is ">"
-        matcher = @matchers[++index]
-        return false unless matcher.matches(scope)
+      if matcher.matches(scope)
         matcher = @matchers[++index]
       else
-        matcher = @matchers[++index] if matcher.matches(scope)
+        return false if @children[index]
       return true unless matcher?
     false
 
   getPrefix: (scopes) -> @prefix if @matches(scopes)
 
   toCssSelector: ->
-    @matchers.map((matcher) -> if matcher is ">" then matcher else matcher.toCssSelector()).join(' ')
+    @matchers.map((matcher, index) ->
+      (is @children[index] then "> " else "") + matcher.toCssSelector()
+    ).join(' ')
 
   toCssSyntaxSelector: ->
-    @matchers.map((matcher) -> if matcher is ">" then matcher else matcher.toCssSyntaxSelector()).join(' ')
+    @matchers.map((matcher) ->
+      (is @children[index] then "> " else "") + matcher.toCssSyntaxSelector()
+    ).join(' ')
 
 class OrMatcher
   constructor: (@left, @right) ->
