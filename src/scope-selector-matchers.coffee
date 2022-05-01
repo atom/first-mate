@@ -102,7 +102,7 @@ class PathMatcher
     ).join(' ')
 
   toCssSyntaxSelector: ->
-    @matchers.map((matcher) ->
+    @matchers.map((matcher, index) ->
       (is @children[index] then "> " else "") + matcher.toCssSyntaxSelector()
     ).join(' ')
 
