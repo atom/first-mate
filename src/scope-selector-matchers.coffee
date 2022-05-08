@@ -78,23 +78,33 @@ class PathMatcher
   constructor: (prefix, first, others) ->
     @prefix = prefix?[0]
     @matchers = [first]
-    @matchers.push(matcher[1]) for matcher in others
+    @children = [false]
+    for matcher in others
+      @children.push(matcher[1]?)
+      @matchers.push(matcher[3])
 
   matches: (scopes) ->
     index = 0
     matcher = @matchers[index]
     for scope in scopes
-      matcher = @matchers[++index] if matcher.matches(scope)
+      if matcher.matches(scope)
+        matcher = @matchers[++index]
+      else
+        return false if @children[index]
       return true unless matcher?
     false
 
   getPrefix: (scopes) -> @prefix if @matches(scopes)
 
   toCssSelector: ->
-    @matchers.map((matcher) -> matcher.toCssSelector()).join(' ')
+    @matchers.map((matcher, index) =>
+      (if @children[index] then "> " else "") + matcher.toCssSelector()
+    ).join(' ')
 
   toCssSyntaxSelector: ->
-    @matchers.map((matcher) -> matcher.toCssSyntaxSelector()).join(' ')
+    @matchers.map((matcher, index) =>
+      (if @children[index] then "> " else "") + matcher.toCssSyntaxSelector()
+    ).join(' ')
 
 class OrMatcher
   constructor: (@left, @right) ->
