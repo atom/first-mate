@@ -97,13 +97,13 @@ class PathMatcher
   getPrefix: (scopes) -> @prefix if @matches(scopes)
 
   toCssSelector: ->
-    @matchers.map((matcher, index) ->
-      (is @children[index] then "> " else "") + matcher.toCssSelector()
+    @matchers.map((matcher, index) =>
+      (if @children[index] then "> " else "") + matcher.toCssSelector()
     ).join(' ')
 
   toCssSyntaxSelector: ->
-    @matchers.map((matcher, index) ->
-      (is @children[index] then "> " else "") + matcher.toCssSyntaxSelector()
+    @matchers.map((matcher, index) =>
+      (if @children[index] then "> " else "") + matcher.toCssSyntaxSelector()
     ).join(' ')
 
 class OrMatcher
